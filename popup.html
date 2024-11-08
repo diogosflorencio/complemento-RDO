@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDO</title>
+    <link rel="shortcut icon" href="imagens/icon48.png" type="image/x-icon">
+</head>
+<body>
+    <head>
+        <title>RDO Helper</title>
+        <style>
+            body {
+                width: 400px;
+                padding: 20px;
+                font-family: Arial, sans-serif;
+                background: #1a1a1a;
+                color: #fff;
+            }
+    
+            .beta-banner {
+                background: #ff9800;
+                color: black;
+                padding: 8px;
+                text-align: center;
+                border-radius: 4px;
+                margin-bottom: 20px;
+            }
+    
+            .section {
+                background: #2d2d2d;
+                padding: 15px;
+                margin: 15px 0;
+                border-radius: 8px;
+                border: 1px solid #3d3d3d;
+            }
+    
+            h2 {
+                color: #1d5b50;
+                margin-top: 0;
+            }
+    
+            .feature-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid #3d3d3d;
+            }
+    
+            .feature-row:last-child {
+                border-bottom: none;
+            }
+    
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+    
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+    
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 24px;
+            }
+    
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+    
+            input:checked + .slider {
+                background-color: #1d5b50;
+            }
+    
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+    
+            .color-picker {
+                display: flex;
+                gap: 10px;
+                margin-top: 10px;
+            }
+    
+            .color-option {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                border: 2px solid transparent;
+            }
+    
+            .color-option.active {
+                border-color: #fff;
+            }
+    
+            .custom-color {
+                padding: 5px;
+                background: #3d3d3d;
+                border: none;
+                border-radius: 4px;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="beta-banner">
+            🚧 Em desenvolvimento - Algumas funções podem estar instáveis 🚧
+        </div>
+    
+        <div class="section">
+            <h2>Funcionalidade Implementadas</h2>
+            
+            <div class="feature-row">
+                <span>Card de Horas/Funções (RDO HH)</span>
+                <label class="switch">
+                    <input type="checkbox" id="hoursCard" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+    
+            <div class="feature-row">
+                <span>Expansão de Campo de texto (RSP)</span>
+                <label class="switch">
+                    <input type="checkbox" id="textareaExpand" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    
+        <div class="section">
+            <h2>Personalização</h2>
+            <div class="feature-row">
+                <span>Tema Escuro (desenvolvendo)</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkTheme" >
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <p>Cor Principal: (ainda não conectei as funções do popup aos scripts)</p>
+            <div class="color-picker">
+                <div class="color-option active" style="background: #1d5b50"></div>
+                <div class="color-option" style="background: #2c3e50"></div>
+                <div class="color-option" style="background: #8e44ad"></div>
+                <div class="color-option" style="background: #c0392b"></div>
+                <input type="color" class="custom-color" value="#1d5b50">
+            </div>
+        </div>
+    
+        <div class="section">
+            <h2>Funções Futuras</h2>
+            
+            <div class="feature-row">
+                <span>Auto formatação de Texto (tende ao impossível)</span>
+                <label class="switch">
+                    <input type="checkbox" id="autoFormat" unchecked disabled>
+                    <span class="slider"></span>
+                </label>
+            </div>
+    
+            <div class="feature-row">
+                <span>Validador de Campos (se algum campo essencial estiver vazio, alertar)</span>
+                <label class="switch">
+                    <input type="checkbox" id="fieldValidator" unchecked disabled>
+                    <span class="slider"></span>
+                </label>
+            </div>
+    
+            <div class="feature-row">
+                <span>Teclas de Atalho (Shift + H = HOME)</span>
+                <label class="switch">
+                    <input type="checkbox" id="keyboardShortcuts" unchecked disabled>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    
+        <script src="popup.js"></script>    
+</body>
+</html>

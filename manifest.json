@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Complemento RDO [BETA]",
+  "short_name": "RDO",
+  "version": "0.1",
+  "version_name": "0.1 beta",
+  "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
+  "action": {
+   "default_popup": "popup.html"
+ },
+  "icons": {
+    "48": "imagens/icon48.png"
+  },
+  "permissions": [
+    "activeTab","storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://web.diariodeobra.app/*"],
+      "js": ["card_rdo_hh.js", "personalizacao_app.js", "rsp_script.js", "atalhos.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
