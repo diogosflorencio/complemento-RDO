@@ -33,7 +33,7 @@ async function formatarTextoComIA(texto) {
         const apiKey = data.geminiApiKey;
         
         if (!apiKey) {
-            throw new Error('API key not found. Please configure it in the extension settings.');
+            throw new Error('Key não encontrada.');
         }
 
         const prompt = `
@@ -253,4 +253,3 @@ const observerRelatorio = new MutationObserver(() => {
 });
 
 observerRelatorio.observe(document.body, { childList: true, subtree: true });
-// correção da cor inicial padrão do cabeçaalho, adicionado funcionalidade de auto formatação e restauração com key de api individual para cada usuario, ajustado tamanho das evidencias dos relatorios, ajustado wrap do card de horas, ajustado bug que não estava considerando as variações no tempo de intervalo de cada colaborador o codigo estava considerando 1h de intervalos quando o value do campo do mesmo estava vazio o que n faz o menor sentido., ajustado erro no observer devido ao reload da extensão.
