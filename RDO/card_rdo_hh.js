@@ -75,12 +75,6 @@ function exibirDadosFuncionarios() {
                     const LIMITE_ENTRADA_K1_OUTRA_OBRA = 17; // Limite máximo para entrada do K1 outra frente
                     const LIMITE_SAIDA_K1_OUTRA_OBRA = 20; // Limite para saída do K1 outra frente
                     const INICIO_K3 = 22; // Início do noturno
-                    const FIM_K3 = 5; // Fim do noturno
-                    const INICIO_K3_MIN = 17.5; // 17:30
-                    const INICIO_K3_MAX = 19;   // 19:00
-                    const FIM_K3_MIN = 21;      // 21:00 
-                    const FIM_K3_MAX = 7;       // 07:00
-
 
                     let horas = {
                         hn: 0,
@@ -109,62 +103,50 @@ function exibirDadosFuncionarios() {
 
                     // Verificar se é elegível para K1 de outra frente
                     const elegivelK1OutraFrente =
-                        entradaHora >= INICIO_K1_OUTRA_OBRA &&
-                        entradaHora <= LIMITE_ENTRADA_K1_OUTRA_OBRA &&
+                        entradaHora >= 16 &&
+                        entradaHora <= 17 &&
                         saidaHora >= 17 &&
                         saidaHora <= 20;
-
+                        
+                    console.log("é", elegivelK1OutraFrente)// isso deve me retornar true quando for um colaborador de outra frente indo fazer horas extras 
 
                     while (totalTrabalhado > 0) {
-                        // K1 de outra frente (16:00-20:00, com condições de entrada e saída)
-                        if (elegivelK1OutraFrente) {
-                            const limiteK1OutraFrente = Math.min(totalTrabalhado, LIMITE_SAIDA_K1_OUTRA_OBRA - inicio);
-                            horas.k1 += limiteK1OutraFrente;
-                            totalTrabalhado -= limiteK1OutraFrente;
-                            inicio += limiteK1OutraFrente;
-                            console.log(elegivelK1OutraFrente)
-                            continue;
-                        }
-
-                        // K3 (noturno)
-                        // Calcula K3 para trabalho após 22h
+                        // K3 (noturno) - Primeira verificação pois é independente das outras regras
                         if (saidaHora >= INICIO_K3 || saidaHora <= 7) {
                             let horasAposK3;
                             if (saidaHora >= INICIO_K3) {
                                 horasAposK3 = (saidaHora - INICIO_K3) + (saidaMinuto / 60);
                             } else {
-                                // For hours after midnight, add 24 to properly calculate
                                 horasAposK3 = ((saidaHora + 24) - INICIO_K3) + (saidaMinuto / 60);
                             }
                             horas.k3 = Math.min(horasAposK3, 7);
                         }
-
-
-
-                        // Jornada normal
-                        if (horas.hn < JORNADA_NORMAL) {
+                    
+                        // Jornada normal (apenas se não for K1 outra frente)
+                        if (horas.hn < JORNADA_NORMAL && !elegivelK1OutraFrente) {
                             const restanteNormal = Math.min(totalTrabalhado, JORNADA_NORMAL - horas.hn);
                             horas.hn += restanteNormal;
                             totalTrabalhado -= restanteNormal;
                             inicio += restanteNormal;
                             continue;
                         }
-
-                        // K1 (2 horas extras após jornada normal)
-                        if (horas.k1 < LIMITE_K1) {
+                    
+                        // K1 (regular ou outra frente)
+                        if (horas.k1 < LIMITE_K1 && totalTrabalhado > 0) {
                             const restanteK1 = Math.min(totalTrabalhado, LIMITE_K1 - horas.k1);
                             horas.k1 += restanteK1;
                             totalTrabalhado -= restanteK1;
                             inicio += restanteK1;
                             continue;
                         }
-
-                        // K2 (restante das horas extras)
+                    
+                        // K2 (todas as horas extras restantes)
                         horas.k2 += totalTrabalhado;
                         break;
                     }
-
+                    
                     return horas;
+                    
                 }
 
 
@@ -179,7 +161,9 @@ function exibirDadosFuncionarios() {
 
 
 
-                    const intervalo = document.querySelector('input[name="horasIntervalo"]')?.value || '01:00';
+                    const intervalo = linha.querySelector('input[name="horasIntervalo"]')?.value || '00:00';
+
+
 
                     const diaDaSemana = pegaDiaSemana();
                     const ehFimDeSemana = diaDaSemana.includes('Sábado') || diaDaSemana.includes('Domingo');

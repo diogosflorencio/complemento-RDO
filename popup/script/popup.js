@@ -9,14 +9,39 @@ document.addEventListener('DOMContentLoaded', function () {
         'darkTheme',
         'cardRDOHH',
         'PDFExtractor',
-        'themeColor'
+        'themeColor',
+        'geminiApiKey'
     ], function (data) {
         setupDarkTheme(data.darkTheme ?? false);
         setupHoursCard(data.cardRDOHH ?? true);
         setupPDFExtractor(data.PDFExtractor ?? false);
         setupThemeColor(data.themeColor ?? defaultColor);
+        setupGeminiKey(data.geminiApiKey ?? '');
     });
 });
+
+
+// functio to setup the key value 
+
+function setupGeminiKey(initialKey) {
+    const geminiKeyInput = document.getElementById('geminiKey');
+    const toggleButton = document.getElementById('toggleKey');
+    const visibilityIcon = toggleButton.querySelector('i');
+    
+    geminiKeyInput.value = initialKey;
+    
+    toggleButton.addEventListener('click', () => {
+        const isVisible = geminiKeyInput.type === 'text';
+        geminiKeyInput.type = isVisible ? 'password' : 'text';
+        visibilityIcon.textContent = isVisible ? 'visibility' : 'visibility_off';
+    });
+    
+    geminiKeyInput.addEventListener('change', function() {
+        const apiKey = geminiKeyInput.value;
+        chrome.storage.sync.set({ geminiApiKey: apiKey });
+    });
+}
+
 
 // the dark theme function
 function setupDarkTheme(initialState) {

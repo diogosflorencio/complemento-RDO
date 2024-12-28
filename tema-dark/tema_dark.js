@@ -8888,14 +8888,25 @@ function applyDarkMode(isEnabled) {
 
 // Configuração do MutationObserver para monitorar mudanças no DOM
 const observerRSP = new MutationObserver(() => {
-  chrome.storage.sync.get('darkTheme', function (data) {
-    const isDarkTheme = data.darkTheme ?? false;
-    temaDark(isDarkTheme);
+  try {
+    chrome.storage.sync.get('darkTheme', function (data) {
+      const isDarkTheme = data.darkTheme ?? false;
+      temaDark(isDarkTheme);
+    });
+  } catch (error) {
+    // If extension context is invalid, disconnect the observer
+    observerRSP.disconnect();
+  }
+});
+
+// Reconnect observer when extension is ready
+document.addEventListener('DOMContentLoaded', () => {
+  observerRSP.observe(document.body, { 
+    childList: true, 
+    subtree: true 
   });
 });
 
-
-observerRSP.observe(document.body, { childList: true, subtree: true });
 temaDark(false);
   const corPadrao = '#1d5b50';
 

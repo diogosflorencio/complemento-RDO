@@ -35,7 +35,8 @@
         "RSP/scripts/rsp_script.js",
         "atalhos/atalhos.js",
         "atalhos/card_atalhos.js",
-        "extrair-pdfs/extrairPDFs.js"
+        "extrair-pdfs/extrairPDFs.js",
+        "relatorios/relatorios.js"
       ],
       "run_at": "document_idle"
     }
