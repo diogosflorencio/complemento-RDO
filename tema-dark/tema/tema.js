@@ -6,11 +6,15 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 // Load saved theme on page load
+// Set default theme color if none is stored
 chrome.storage.sync.get('themeColor', (data) => {
-    if (data.themeColor) {
-        updateThemeColor(data.themeColor);
+    const defaultColor = '#1d5b50';
+    if (!data.themeColor) {
+        chrome.storage.sync.set({ themeColor: defaultColor });
     }
+    updateThemeColor(data.themeColor || defaultColor);
 });
+
 
 function updateThemeColor(color) {
     document.documentElement.style.setProperty('--theme-color', color);

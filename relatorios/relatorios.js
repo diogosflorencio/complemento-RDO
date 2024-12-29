@@ -37,15 +37,16 @@ async function formatarTextoComIA(texto) {
         }
 
         const prompt = `
-            Formate o seguinte texto seguindo este padrão de formatação, mas considerando as informação passadas no campo "texto para formatar":
+            Formate o seguinte texto seguindo este padrão de formatação, mas considerando as informações passadas no campo "texto para formatar":
             
             Local/Equipamento ou Período do dia
             
-            Atividades executadas no dia (uma por linha, com ponto e vírgula no final):
-            - Tratamento St2; (por exemplo)
-            - Limpeza com solvente; (por exemplo)
-            - Aplicação de primer; (por exemplo)
-            - Organização e limpeza. (este, mesmo que no texto original não tenha, ponha sempre este item na liste de serviços executados. lembrando que o ultimo item finaliza com ponto final.)
+            (A listagem de atividades devem ser uma por linha, com ponto e vírgula no final):
+            Tratamento ST2 - ST3; (por exemplo)
+            Jato ou jateamento abrasivo SA1 - SA2½; (por exemplo)
+            Limpeza com solvente; (por exemplo)
+            Aplicação de primer; (por exemplo)
+            Organização e limpeza. (este, mesmo que no texto original não tenha, ponha sempre este item na liste de serviços executados. lembrando que o ultimo item finaliza com ponto final.)
             
             COLABORADORES: Nome1, Nome2. (por exemplo)
             
@@ -58,7 +59,10 @@ async function formatarTextoComIA(texto) {
             4. Mantenha a formatação em lista simples
             5. Não adicione cabeçalhos ou seções extras
             6. Não adicione comentários ou sugestões
-            7. Caso no texto original não tenha algo, como colaboradores, não precisa deixar o campo, simplesmente o remova`;
+            7. Caso no texto original não tenha algo, como colaboradores, não precisa deixar o campo, simplesmente o remova. E no caso de haver colaboradores, liste eles assim: "Nome1." ou "Nome1 e Nome2." ou ainda: "Nome1, Nome2 e Nome3." etc. "colaboradores" deve variar em grau de acordo com a quantidade de colaboradores.
+            8. Caso na listagem de serviços executados nos texto tenha a informação de que houve lavagem, troque por "Lavagem de estrutura" e, no fim do texto todo ponha "Conforme acordado entre o cliente e a executante, a água utilizada para a lavagem é de reuso, com pH médio de 8,75 e salinidade de 0,38."
+            9. É importante você saber que se trata de uma empresa de pintura e o comentario destina-se ao relatório da obra do dia RDO. Com isso, é importante seguir as regras que coloquei e saber que o que é executado durante o dia deve se listado individualmente e de forma coerente.
+            10. Se houver erros grandes de portugues e gramatica, não hesite em corrigir`;
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -123,7 +127,7 @@ async function atualizarComentario(elementoOriginal, textoFormatado) {
 const textosOriginais = new Map();
 
 function adicionarBotoesFormatacao() {
-    const linhasTabela = document.querySelectorAll('table.table-data tbody tr');
+    const linhasTabela = document.querySelectorAll('#rdo-comentario table.table-data.table-hover  tbody tr');
 
     linhasTabela.forEach(linha => {
         if (linha.querySelector('.formatar')) return;
@@ -142,7 +146,7 @@ function adicionarBotoesFormatacao() {
         // Botão de formatação
         const botaoFormatar = document.createElement('a');
         botaoFormatar.href = '#';
-        botaoFormatar.title = 'Auto formatação';
+        botaoFormatar.title = 'Auto formatação (ainda estou desenvolvendo, mas funciona bem)';
         botaoFormatar.className = 'formatar';
 
         const iconeFormatar = document.createElement('i');
@@ -153,7 +157,7 @@ function adicionarBotoesFormatacao() {
         // Botão de restauração
         const botaoRestaurar = document.createElement('a');
         botaoRestaurar.href = '#';
-        botaoRestaurar.title = 'Restaurar original';
+        botaoRestaurar.title = 'Restaurar anterior (restaura a formatação imediatamente anterior a esta)';
         botaoRestaurar.className = 'restaurar-formato';
         botaoRestaurar.style.cssText = `
         color: var(--theme-color)`;
@@ -223,7 +227,17 @@ function personalizarTamanhoEvidencias() {
         imagens.forEach(imagem => {
             imagem.style.width = '222px';
             imagem.style.height = '148px';
+            
+            // Pega a URL atual da imagem de fundo
+            const backgroundImage = imagem.style.backgroundImage;
+            if (backgroundImage) {
+                // Remove /miniatura da URL
+                const urlAltaQualidade = backgroundImage.replace('/miniatura/', '/');
+                // Define a nova URL da imagem em alta qualidade
+                imagem.style.backgroundImage = urlAltaQualidade;
+            }
         });
+        
         
         descricoes.forEach(descricao => {
             descricao.style.cssText = `

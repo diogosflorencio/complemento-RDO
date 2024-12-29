@@ -33,7 +33,7 @@ function setupGeminiKey(initialKey) {
     toggleButton.addEventListener('click', () => {
         const isVisible = geminiKeyInput.type === 'text';
         geminiKeyInput.type = isVisible ? 'password' : 'text';
-        visibilityIcon.textContent = isVisible ? 'visibility' : 'visibility_off';
+        visibilityIcon.textContent = isVisible ? 'Mostrar' : 'Esconder';
     });
     
     geminiKeyInput.addEventListener('change', function() {

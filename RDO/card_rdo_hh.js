@@ -37,14 +37,14 @@ function exibirDadosFuncionarios() {
             const linhas = document.querySelectorAll('table tbody tr');
             const containerDados = document.getElementById('containerDados');
             const mensagemCarregando = document.getElementById('mensagemCarregando');
-            const mensagemAviso = document.getElementById('mensagemAviso');
+            // const mensagemAviso = document.getElementById('mensagemAviso');
 
             // Verifica se a tabela tem linhas E se a mensagem de carregamento existe
             if (linhas.length > 0 && mensagemCarregando) {
                 // Limpa o intervalo e esconde mensagem de carregamento
                 clearInterval(intervaloVerificacao);
                 mensagemCarregando.style.display = 'none';
-                mensagemAviso.style.display = 'block';
+                // mensagemAviso.style.display = 'block';
 
                 // função para capitalizar a primeira letra de cada palavra
                 function capitalize(str) {
@@ -356,6 +356,13 @@ function addActivitiesFromHours() {
             // um de cada vez
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
+        const keyEvent = new KeyboardEvent('keydown', {
+            key: 's',
+            code: 'KeyS',
+            altKey: true,
+            bubbles: true
+        });
+        document.dispatchEvent(keyEvent);
     }
 
     processActivities();
@@ -411,11 +418,11 @@ function criarContainer() {
         </svg>
     </div>
     <div class="cabecalho" style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="margin: 15px 0px 5px; color: var(--theme-color);font-size: 25px !important; font-weight: 550 !important">Horas/Função</div>
+        <div style="margin: 15px 0px 5px; color: var(--theme-color);font-size: 25px !important; font-weight: 550 !important">ANÁLISE H/F</div>
         <!-- Deslocando apenas o botão com margin-top -->
         <button id="botaoAdicionar" style="padding: 5px 10px; background: var(--theme-color); color: white; cursor: pointer; font-size: 12px; border-radius: 8px; border: solid 2px black; box-shadow: 2px 2px rgb(0, 0, 0); outline: none; height: 30px; margin-top: 5px;">Adicionar</button>
     </div>
-    <p id="mensagemAviso" style="margin: 5px 0 5px 0; color:var(--theme-color); font-size: 0.70em; font-style: italic; display: none;">(Em teste)</p>
+    <!--<p id="mensagemAviso" style="margin: 5px 0 5px 0; color:var(--theme-color); font-size: 0.70em; font-style: italic; display: none;">(Em teste)</p>-->
     <div id="mensagemCarregando" style="color: rgb(127, 140, 141); ">pegando os dados do RDO   
     
   <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path  fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z" /><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>
@@ -529,13 +536,16 @@ function reiniciarObservacaoTabela() {
                 }
                 updateTimeout = setTimeout(() => {
                     atualizarDados();
-                }, 0);
+                }, 100);
             }
         });
 
         observerTabelaInstance.observe(tabela, {
+            childList: true,
             subtree: true,
             characterData: true,
+            attributes: true,
+            attributeFilter: ['value', 'class']
         });
     }
 }

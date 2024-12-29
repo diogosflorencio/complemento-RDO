@@ -1227,8 +1227,7 @@ function temaDark(isDarkTheme) {
 }
 
 .carregarMais[data-v-0a2936f1] {
-    text-align: center;
-    display: none;
+    text-align: center
 }
 
 .carregarMais .btn[data-v-0a2936f1] {
@@ -2635,7 +2634,7 @@ ul li[data-v-6c91c03b] {
     padding: 0;
     margin: 0;
     position: relative;
-    z-index: 0!important;
+    z-index: 999!important;
     background: ${cores.preto2};
     border-bottom: 1px solid ${cores.preto3};
     min-width: 992px
@@ -2719,126 +2718,92 @@ ul li[data-v-6c91c03b] {
 .imprimir[data-v-2fcdc294] {
     display: none
 }
-    
-/* Main Container */
-.box[data-v-d7f17f70] {
-    display: block;
+
+.application[data-v-d908a0e2] {
+    min-height: 100vh;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    position: relative
+}
+
+.application.fixed[data-v-d908a0e2] {
+    padding-top: 55px
+}
+
+.top[data-v-d908a0e2] {
     position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
+    right: 15px;
+    bottom: 15px;
+    z-index: 9;
+    background-color: ${cores.preto2};
+    width: 36px;
+    height: 36px;
     padding: 0;
-    overflow: hidden;
-    perspective: 1000px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 3px 13px -1px #b0b0b0;
+    box-shadow: 0 3px 13px -1px #b0b0b0;
+    display: none
+}
 
+.top.show[data-v-d908a0e2] {
+    display: block
+}
 
+.top i[data-v-d908a0e2] {
+    margin: 0;
+    padding: 5px;
+    color: #888
+}
+
+.top[data-v-d908a0e2]:hover {
+    background-color: #888
+}
+
+.top:hover>i[data-v-d908a0e2] {
+    color: ${cores.preto2}
+}
+
+.box[data-v-d7f17f70] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin: 10px -10px
 }
 
 .box .box-item[data-v-d7f17f70] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
     width: 20%;
-    position: absolute;
-    transform-style: preserve-3d;
-
+    padding: 0 10px;
+    margin: 0 0 20px 0
 }
 
-${Array.from({length: 50}, (_, i) => `
-.box .box-item:nth-child(${i + 1}) {
-    top: ${Math.random() * 80}vh;
-    left: ${Math.random() * 80}vw;
-    animation: 
-        bounce${(i % 5) + 1} ${20 + (i % 15)}s infinite linear ${-1 * (i * 0.2)}s;
-}`).join('\n')}
-/* Hide elements beyond 50 */
-.box .box-item:nth-child(n+51) {
-    display: none;
+.box .box-item .obra[data-v-d7f17f70] {
+    width: 100%;
+    height: 235px;
+    margin: 0;
+    cursor: pointer;
+    background: ${cores.preto2};
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
+    position: relative
 }
-@keyframes bounce1 {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(80vw, 80vh) rotate(90deg); }
-    50% { transform: translate(-80vw, 80vh) rotate(180deg); }
-    75% { transform: translate(-80vw, -80vh) rotate(270deg); }
-}
-
-@keyframes bounce2 {
-    0% { transform: translate(-80vw, -80vh) rotate(0deg); }
-    33% { transform: translate(80vw, 80vh) rotate(120deg); }
-    66% { transform: translate(80vw, -80vh) rotate(240deg); }
-    100% { transform: translate(-80vw, -80vh) rotate(360deg); }
-}
-
-@keyframes bounce3 {
-    0% { transform: translate(80vw, 80vh) rotate(0deg); }
-    50% { transform: translate(-80vw, -80vh) rotate(180deg); }
-    100% { transform: translate(80vw, 80vh) rotate(360deg); }
-}
-
-@keyframes bounce4 {
-    0% { transform: translate(0, -80vh) rotate(0deg); }
-    25% { transform: translate(80vw, 0) rotate(90deg); }
-    50% { transform: translate(0, 80vh) rotate(180deg); }
-    75% { transform: translate(-80vw, 0) rotate(270deg); }
-    100% { transform: translate(0, -80vh) rotate(360deg); }
-}
-
-@keyframes bounce5 {
-    0% { transform: translate(-80vw, 0) rotate(0deg); }
-    33% { transform: translate(0, 80vh) rotate(120deg); }
-    66% { transform: translate(80vw, 0) rotate(240deg); }
-    100% { transform: translate(-80vw, 0) rotate(360deg); }
-}
-
-
-
-
-// .box[data-v-d7f17f70] {
-//     display: -webkit-box;
-//     display: -ms-flexbox;
-//     display: flex;
-//     -webkit-box-flex: 1;
-//     -ms-flex: 1;
-//     flex: 1;
-//     -webkit-box-orient: horizontal;
-//     -webkit-box-direction: normal;
-//     -ms-flex-direction: row;
-//     flex-direction: row;
-//     -ms-flex-wrap: wrap;
-//     flex-wrap: wrap;
-//     margin: 10px -10px
-// }
-
-// .box .box-item[data-v-d7f17f70] {
-//     display: -webkit-box;
-//     display: -ms-flexbox;
-//     display: flex;
-//     width: 20%;
-//     padding: 0 10px;
-//     margin: 0 0 20px 0
-// }
-
-// .box .box-item .obra[data-v-d7f17f70] {
-//     width: 100%;
-//     height: 235px;
-//     margin: 0;
-//     cursor: pointer;
-//     background: ${cores.preto2};
-//     border-radius: 3px;
-//     -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
-//     box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
-//     position: relative
-// }
-
-// // .box .box-item .obra .imagem[data-v-d7f17f70] {
-// //     display: block;
-// //     width: 100%;
-// //     height: 140px;
-// //     border-radius: 3px 3px 0 0;
-// //     padding: 10px 15px;
-// //     background-color: ${cores.verde5};
-// //     border-bottom: 1px solid ${cores.preto1}
-// //     filter: brightness(10%);
-// // } anteriormente este era o css do box de cada obra
 
 // .box .box-item .obra .imagem[data-v-d7f17f70] {
 //     display: block;
@@ -2846,103 +2811,114 @@ ${Array.from({length: 50}, (_, i) => `
 //     height: 140px;
 //     border-radius: 3px 3px 0 0;
 //     padding: 10px 15px;
-//     background-color: rgba(0, 0, 0, 0.2);
-//     border-bottom: 1px solid rgba(0, 0, 0, 0.8);
-//     filter: brightness(80%) contrast(90%);
-//     transition: filter 0.3s ease;
-// }
+//     background-color: ${cores.verde5};
+//     border-bottom: 1px solid ${cores.preto1}
+//     filter: brightness(10%);
+// } anteriormente este era o css do box de cada
 
-// .box .box-item .obra .imagem[data-v-d7f17f70]:hover {
-//     filter: brightness(100%);
-// }
+.box .box-item .obra .imagem[data-v-d7f17f70] {
+    display: block;
+    width: 100%;
+    height: 140px;
+    border-radius: 3px 3px 0 0;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+    filter: brightness(80%) contrast(90%);
+    transition: filter 0.3s ease;
+}
+
+.box .box-item .obra .imagem[data-v-d7f17f70]:hover {
+    filter: brightness(100%);
+}
 
 
-// .box .box-item .obra:hover>.dropdown[data-v-d7f17f70] {
-//     display: block
-// }
+.box .box-item .obra:hover>.dropdown[data-v-d7f17f70] {
+    display: block
+}
 
-// .box .box-item .obra .dropdown[data-v-d7f17f70] {
-//     position: absolute;
-//     top: 15px;
-//     right: 15px;
-//     z-index: 1;
-//     display: none;
-//     min-width: 10px
-// }
+.box .box-item .obra .dropdown[data-v-d7f17f70] {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 1;
+    display: none;
+    min-width: 10px
+}
 
-// .box .box-item .obra .dropdown .btn[data-v-d7f17f70] {
-//     padding: 0;
-//     border: 1px solid ${cores.verde1};
-//     font-size: 12px;
-//     background-color: ${cores.preto2};
-//     color: ${cores.cinza1};
-//     line-height: 0
-// }
+.box .box-item .obra .dropdown .btn[data-v-d7f17f70] {
+    padding: 0;
+    border: 1px solid ${cores.verde1};
+    font-size: 12px;
+    background-color: ${cores.preto2};
+    color: ${cores.cinza1};
+    line-height: 0
+}
 
-// .box .box-item .obra .dropdown .btn i[data-v-d7f17f70] {
-//     padding: 2px 3px;
-//     margin: 0;
-//     font-size: 24px
-// }
+.box .box-item .obra .dropdown .btn i[data-v-d7f17f70] {
+    padding: 2px 3px;
+    margin: 0;
+    font-size: 24px
+}
 
-// .box .box-item .obra .dropdown .dropdown-menu[data-v-d7f17f70] {
-//     min-width: 130px
-// }
+.box .box-item .obra .dropdown .dropdown-menu[data-v-d7f17f70] {
+    min-width: 130px
+}
 
-// .box .box-item .obra .dropdown .dropdown-menu .dropdown-item[data-v-d7f17f70] {
-//     padding: 4px 15px!important;
-//     font-size: 12px!important
-// }
+.box .box-item .obra .dropdown .dropdown-menu .dropdown-item[data-v-d7f17f70] {
+    padding: 4px 15px!important;
+    font-size: 12px!important
+}
 
-// .box .box-item .obra .body[data-v-d7f17f70] {
-//     padding: 10px 15px 10px 15px
-// }
+.box .box-item .obra .body[data-v-d7f17f70] {
+    padding: 10px 15px 10px 15px
+}
 
-// .box .box-item .obra .body .quantidade[data-v-d7f17f70] {
-//     position: relative;
-//     top: -5px;
-//     left: -2px;
-//     display: -webkit-box;
-//     display: -ms-flexbox;
-//     display: flex;
-//     -webkit-box-align: center;
-//     -ms-flex-align: center;
-//     align-items: center
-// }
+.box .box-item .obra .body .quantidade[data-v-d7f17f70] {
+    position: relative;
+    top: -5px;
+    left: -2px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center
+}
 
-// .box .box-item .obra .body .quantidade ul[data-v-d7f17f70] {
-//     margin: 0;
-//     padding: 0;
-//     list-style: none
-// }
+.box .box-item .obra .body .quantidade ul[data-v-d7f17f70] {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
 
-// .box .box-item .obra .body .quantidade ul li[data-v-d7f17f70] {
-//     display: inline-block;
-//     font-size: 10px;
-//     margin: 0 5px 0 0;
-//     padding: 0;
-//     color: #888;
-//     min-width: 40px
-// }
+.box .box-item .obra .body .quantidade ul li[data-v-d7f17f70] {
+    display: inline-block;
+    font-size: 10px;
+    margin: 0 5px 0 0;
+    padding: 0;
+    color: #888;
+    min-width: 40px
+}
 
-// .box .box-item .obra .body .quantidade ul li i[data-v-d7f17f70] {
-//     font-size: 14px;
-//     position: relative;
-//     top: 3px
-// }
+.box .box-item .obra .body .quantidade ul li i[data-v-d7f17f70] {
+    font-size: 14px;
+    position: relative;
+    top: 3px
+}
 
-// .box .box-item .obra .body h5[data-v-d7f17f70] {
-//     margin: 0;
-//     padding: 0;
-//     font-size: 14px;
-//     max-height: 50px;
-//     overflow: hidden;
-//     color: ${cores.verde4}
-// }
+.box .box-item .obra .body h5[data-v-d7f17f70] {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    max-height: 50px;
+    overflow: hidden;
+    color: ${cores.verde4}
+}
 
-// .box .box-item:hover .obra .body h5[data-v-d7f17f70] {
-//     color: ${cores.cinza1}
-// }
+.box .box-item:hover .obra .body h5[data-v-d7f17f70] {
+    color: ${cores.cinza1}
+}
 
 .nenhum-registro[data-v-d7f17f70] {
     -webkit-box-orient: vertical;

@@ -212,7 +212,6 @@ input:checked+.slider:before {
     padding: 8px;
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .input-group {
@@ -221,6 +220,8 @@ input:checked+.slider:before {
     background: #2d2d2d;
     border-radius: 4px;
     border: 1px solid #3d3d3d;
+    gap: 10px;
+    margin-top: 7px;
 }
 
 .input-group input {
@@ -249,7 +250,7 @@ input:checked+.slider:before {
 .form-text {
     font-size: 12px;
     color: #888;
-    margin-top: 5px;
+    margin-top: 7px;
 }
 
 .future-features-list {
