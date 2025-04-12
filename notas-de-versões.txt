@@ -1,80 +1,99 @@
-Versão [Beta 0.6]
+𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟴] - 𝗦𝗹𝗶𝗱𝗲𝗿 𝗱𝗲 𝗜𝗺𝗮𝗴𝗲𝗻𝘀 𝗱𝗮𝘀 𝗢𝗯𝗿𝗮𝘀:
 
-- ajustes no card de HH, agora tbm atualiza quando alguem é adicionado ou removido da lista de colaboradores.
+𝐒𝐥𝐢𝐝𝐞𝐫 𝐝𝐞 𝐈𝐦𝐚𝐠𝐞𝐧𝐬 🖼️:
+• Visualização dinâmica das últimas fotos das obras em andamento
+• Transição suave com efeito fade entre as imagens
+• Sistema inteligente de cache para otimização de carregamento
+• Preservação da imagem original da obra
+• Ativação/desativação da funcionalidade via popup
 
-- correção de bug na cor tema do card de HH e extrator
+𝐈𝐧𝐭𝐞𝐠𝐫𝐚𝐜̧𝐚̃𝐨 𝐜𝐨𝐦 𝐀𝐏𝐈 🔄:
+• Sincronização automática com a API do Diário de Obra
+• Cache inteligente com validade de 30 minutos
+• Pré-carregamento de imagens para transição suave
+• Tratamento de erros e fallback para imagem padrão
 
-- Adicionado a funcionalidade de salvamento após a adicção automatica de horas no campo de atividades
+𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐞 𝐔𝐬𝐚𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞 🎨:
+• Interação por hover para visualização das imagens
+• Delay inteligente para evitar ativações indesejadas
+• Transições suaves entre as imagens
+• Preservação da tag "Em andamento"
+• Interface responsiva e adaptativa
 
-
-
-
-𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟱] - 𝗔𝘂𝘁𝗼𝗳𝗼𝗿𝗺𝗮𝘁𝗮𝗰̧𝗮̃𝗼 𝗲 𝗘𝘀𝘁𝗮𝗯𝗶𝗹𝗶𝗱𝗮𝗱𝗲:
-
-𝐀𝐮𝐭𝐨𝐟𝐨𝐫𝐦𝐚𝐭𝐚𝐜̧𝐚̃𝐨 𝐈𝐧𝐭𝐞𝐥𝐢𝐠𝐞𝐧𝐭𝐞 📝: 
-• Novo sistema de auto formatação de textos com API individual por usuário 
-• Possibilidade de restaurar texto anterior para maior consistência e segurança
-
-𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐞 𝐔𝐬𝐚𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞 🎨: 
-• Ajuste dinâmico do tamanho das evidências nos relatórios (imagens maiores)
-• Card de horas com wrap aprimorado para melhor visualização (mantendo estado durante o uso)
-• Cor padrão inicial do cabeçalho otimizada 
-
-𝐌𝐞𝐥𝐡𝐨𝐫𝐢𝐚𝐬 𝐓𝐞́𝐜𝐧𝐢𝐜𝐚𝐬 🔧: 
-• Correção no cálculo de horas considerando período de intervalo e suas variações individuais 
-• Otimização do observer para prevenir problemas de reload do complemento
-• Aprimoramento no cálculo de horas extras (K1, K2, K3)
+𝐌𝐞𝐥𝐡𝐨𝐫𝐢𝐚𝐬 𝐓𝐞́𝐜𝐧𝐢𝐜𝐚𝐬 🔧:
+• Sistema de cache otimizado para melhor performance
+• Gerenciamento eficiente de memória
+• Controle preciso de estados e transições
+• Verificações inteligentes de URL para otimização
 
 𝐂𝐨𝐫𝐫𝐞𝐜̧𝐨̃𝐞𝐬 𝐝𝐞 𝐁𝐮𝐠𝐬 🐛:
-• Correção no tratamento de intervalos vazios 
-• Ajustes na lógica de categorização de horas extras 
-• Estabilização do observer após reload da extensão
+• Correção de sobreposição de imagens durante transições
+• Ajustes na preservação da imagem original
+• Melhorias na estabilidade do slider
+• Otimização do tratamento de erros da API
 
-𝐏𝐫𝐨𝐛𝐥𝐞𝐦𝐚𝐬 𝐂𝐨𝐧𝐡𝐞𝐜𝐢𝐝𝐨𝐬 ⚠️: 
-• Implementar a atualização das informações do card também para quando um colaborador for adicionado ou removido
-• Necessidade de implementação de salvamento automático após adição de horas no campo de atividade
+𝐏𝐞𝐫𝐬𝐨𝐧𝐚𝐥𝐢𝐳𝐚𝐜̧𝐚̃𝐨 ⚙️:
+• Controle de ativação/desativação no popup
+• Estado persistente das preferências do usuário
+• Integração com o sistema de tema personalizado
+• Configurações individuais por usuário
 
-𝐂𝐨𝐦𝐩𝐚𝐭𝐢𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞: 
-• Chrome 88+ 
-• Versão 5.8.0 do app de RDO
+𝐂𝐨𝐦𝐩𝐚𝐭𝐢𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞:
+• Chrome 88+
+• Versão 5.8.0+ do app de RDO
+• Necessário token de integração ativo
 
-𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰̧𝗮̃𝗼: A versão 0.5 marca um avanço significativo na autoformatação e estabilidade, com foco especial no tratamento inteligente de dados e melhor experiência do usuário.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟰] - 𝗡𝗼𝘃𝗮𝘀 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗲 𝗠𝗲𝗹𝗵𝗼𝗿𝗶𝗮𝘀:
-
-𝐏𝐞𝐫𝐬𝐨𝐧𝐚𝐥𝐢𝐳𝐚𝐜̧𝐚𝐨 𝐚 𝐠𝐨𝐬𝐭𝐨 📄: 
-• Escolha da cor do tema pelo usuário, permitindo personalizar a aparência da extensão e do site conforme preferências.
-
-𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐞 𝐔𝐬𝐚𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞 🎨: 
-• Tema escuro em reformulação para maior consistência visual.
-• Novos itens nos checkboxes do popup, oferecendo mais flexibilidade de configurações.
-
-𝐌𝐞𝐥𝐡𝐨𝐫𝐢𝐚𝐬 𝐧𝐨 𝐏𝐨𝐩𝐮𝐩 🔍: 
-• Lista de funções futuras e concluídas atualizada, com visão clara do progresso. 
-
-𝐌𝐞𝐥𝐡𝐨𝐫𝐢𝐚𝐬 𝐓𝐞𝐜𝐧𝐢𝐜𝐚𝐬 🔧: 
-• Filtro de tipo de relatório no Unificador de Relatórios corrigido para melhor precisão. 
-• Melhorias no desempenho e otimização de recursos.
-
-𝐂𝐨𝐫𝐫𝐞𝐜𝐨𝐞𝐬 𝐝𝐞 𝐁𝐮𝐠𝐬 🐛: 
-• Correção no comportamento do filtro de tipo de relatório.
-• Ajustes no popup para maior estabilidade e consistência.
-
-𝐏𝐫𝐨𝐛𝐥𝐞𝐦𝐚𝐬 𝐂𝐨𝐧𝐡𝐞𝐜𝐢𝐝𝐨𝐬 ⚠️: 
-• Ausência de verificação pós adição ainda não resolvida (um controle de tempo será adicionado para reduzir erros). 
-• Cores do tema escuro despadronizadas, sendo necessário retroceder em alguns pontos antes de avançar.
-
-𝐂𝐨𝐦𝐩𝐚𝐭𝐢𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞: 
-• Chrome 88+ 
-• Versão 5.8.0 do app de RDO
-
-𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰𝗮𝗼: A versão 0.4 traz melhorias importantes na interface e funcionalidades, incluindo a personalização de cor do tema e correção no filtro de relatórios, com foco em maior flexibilidade e precisão.
+𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰̧𝗮𝗼: A versão 0.8 traz uma experiência mais rica na visualização de obras, permitindo aos usuários acompanhar o progresso visual diretamente na interface principal, com foco em performance e usabilidade.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟯] - 𝗡𝗼𝘃𝗮𝘀 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗲 𝗠𝗲𝗹𝗵𝗼𝗿𝗶𝗮𝘀:
+𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟳] - 𝗜𝗻𝘁𝗲𝗿𝗮𝘁𝗶𝘃𝗶𝗱𝗮𝗱𝗲 𝗲 𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗶𝘇𝗮𝗰̧𝗮̃𝗼:
+
+𝐍𝐨𝐯𝐚𝐬 𝐅𝐮𝐧𝐜𝐢𝐨𝐧𝐚𝐥𝐢𝐝𝐚𝐝𝐞𝐬 ⭐:
+• Sistema de scroll suave estilo touch para melhor navegação
+• Teclas de atalho para navegação rápida no sistema
+• Sistema de extração e compilação de PDFs por obra
+• Interface aprimorada do popup com controles individuais
+
+𝐏𝐞𝐫𝐬𝐨𝐧𝐚𝐥𝐢𝐳𝐚𝐜̧𝐚̃𝐨 🎨:
+• Seletor de cores personalizado para tema do aplicativo
+• Opções predefinidas de cores para rápida customização
+• Persistência das preferências de tema do usuário
+• Novo sistema de ativação/desativação de funcionalidades
+
+𝐂𝐚𝐫𝐝 𝐝𝐞 𝐇𝐨𝐫𝐚𝐬 𝐞 𝐀𝐮𝐭𝐨𝐟𝐨𝐫𝐦𝐚𝐭𝐚𝐜̧𝐚̃𝐨 📊:
+• Aprimoramento na exibição de horas por função
+• Melhorias na formatação automática de textos
+• Campo dedicado para chave da API do Gemini
+• Salvamento automático das configurações
+
+𝐌𝐞𝐥𝐡𝐨𝐫𝐢𝐚𝐬 𝐓𝐞́𝐜𝐧𝐢𝐜𝐚𝐬 🔧:
+• Reestruturação completa do código para melhor performance
+• Sistema de cache para otimização de recursos
+• Melhor gerenciamento de estado das funcionalidades
+• Novo sistema de feedback visual para ações
+
+𝐂𝐨𝐫𝐫𝐞𝐜̧𝐨̃𝐞𝐬 𝐝𝐞 𝐁𝐮𝐠𝐬 🐛:
+• Correções no tema escuro (ainda em desenvolvimento)
+• Ajustes na consistência visual dos elementos
+• Melhorias na estabilidade geral
+• Otimização do uso de memória
+
+𝐍𝐨𝐯𝐚 𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐝𝐞 𝐂𝐨𝐧𝐭𝐫𝐨𝐥𝐞 🎛️:
+• Popup redesenhado com nova organização
+• Lista detalhada de funcionalidades
+• Controles individuais para cada feature
+• Disclaimer de responsabilidade
+
+𝐂𝐨𝐦𝐩𝐚𝐭𝐢𝐛𝐢𝐥𝐢𝐝𝐚𝐝𝐞:
+• Chrome 88+
+• Versão 5.8.0+ do app de RDO
+
+𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰̧𝗮𝗼: A versão 0.7 representa um salto significativo em termos de personalização e controle do usuário, com novas funcionalidades focadas em produtividade e experiência do usuário.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝗧𝗮 𝟬.𝟯] - 𝗡𝗼𝘃𝗮𝘀 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗲 𝗠𝗲𝗹𝗵𝗼𝗿𝗶𝗮𝘀:
 
 𝐔𝐧𝐢𝐟𝐢𝐜𝐚𝐝𝐨𝐫 𝐝𝐞 𝐑𝐞𝐥𝐚𝐭𝐨𝐫𝐢𝐨𝐬 📄: 
 • Novo card flutuante para unificação de PDFs 
@@ -125,11 +144,11 @@ Versão [Beta 0.6]
 • Chrome 88+ 
 • Versão 5.8.0 do app de RDO
 
-𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰𝗮𝗼: Está versão apresenta funcionalidades consistentes e úteis para mais pessoas, sendo assim, será disponibilizada publicamente.
+𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰̧𝗮𝗼: Está versão apresenta funcionalidades consistentes e úteis para mais pessoas, sendo assim, será disponibilizada publicamente.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟮] - 𝗡𝗼𝘃𝗮𝘀 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗲 𝗠𝗲𝗹𝗵𝗼𝗿𝗶𝗮𝘀: 
+𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝗧𝗮 𝟬.𝟮] - 𝗡𝗼𝘃𝗮𝘀 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗲 𝗠𝗲𝗹𝗵𝗼𝗿𝗶𝗮𝘀: 
 
 𝐈𝐧𝐭𝐞𝐫𝐟𝐚𝐜𝐞 𝐌𝐨𝐝𝐮𝐥𝐚𝐫 🎯: 
 • Nova interface organizada em módulos distintos
@@ -146,7 +165,7 @@ Versão [Beta 0.6]
 • Implementação inicial de atalhos 
 • Navegação mais rápida entre funcionalidades
 
-𝐏𝐞𝐫𝐬𝐨𝐧𝐚𝐥𝐢𝐳𝐚𝐜𝐚𝐨 🎨: 
+𝐏𝐞𝐫𝐬𝐨𝐧𝐚𝐥𝐢𝐳𝐚𝐜̧𝐚𝐨 🎨: 
 • Correções no tema escuro 
 • Preparação para sistema de temas personalizáveis 
 • Sistema de variáveis globais para cores
@@ -169,11 +188,11 @@ Versão [Beta 0.6]
 • Chrome 88+ 
 • Versão 5.8.0 do app de RDO
 
-𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰𝗮𝗼: Está extensão deve ser utilizada com cautela. As informações oferecidas por elas, apesar de toda verificação e empenho pra torná-las confiáveis e úteis, podem ser inconsistentes dada as incontáveis possibilidades/cenários que há em um período de medição. Sobre está versão, ela representa um avanço significativo na usabilidade e organização da extensão, preparando o terreno para funcionalidades mais avançadas no futuro.  
+𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗰̧𝗮𝗼: Está extensão deve ser utilizada com cautela. As informações oferecidas por elas, apesar de toda verificação e empenho pra torná-las confiáveis e úteis, podem ser inconsistentes dada as incontáveis possibilidades/cenários que há em um período de medição. Sobre está versão, ela representa um avanço significativo na usabilidade e organização da extensão, preparando o terreno para funcionalidades mais avançadas no futuro.  
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝘁𝗮 𝟬.𝟭] - 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗣𝗿𝗶𝗻𝗰𝗶𝗽𝗮𝗶𝘀:
+𝗩𝗲𝗿𝘀𝗮𝗼 [𝗕𝗲𝗧𝗮 𝟬.𝟭] - 𝗙𝘂𝗻𝗰𝗶𝗼𝗻𝗮𝗹𝗶𝗱𝗮𝗱𝗲𝘀 𝗣𝗿𝗶𝗻𝗰𝗶𝗽𝗮𝗶𝘀:
 
 1. 𝐀𝐧𝐚𝐥𝐢𝐬𝐞 𝐝𝐞 𝐇𝐨𝐫𝐚𝐬 𝐀𝐮𝐭𝐨𝐦𝐚𝐭𝐢𝐜𝐨 ⏱️:
    • Realiza a soma automática de horas por função em RDOs de HH e identifica horas extras em fins de semana (K2).  
@@ -208,10 +227,10 @@ Versão [Beta 0.6]
    • Permite a alteração dinâmica das cores da plataforma, proporcionando uma experiência visual mais agradável durante o uso noturno.  
    • A personalização de elementos DOM específicos é feita através de uma função que altera as cores de cabeçalhos e outros elementos:
 
- 𝘧𝘶𝘯𝘤𝘵𝘪𝘰𝘯 𝘢𝘱𝘭𝘪𝘤𝘢𝘳𝘊𝘰𝘳𝘦𝘴(𝘤𝘢𝘣𝘦𝘤𝘢𝘭𝘩𝘰𝘴𝘈𝘵𝘪𝘷𝘢𝘥𝘰𝘴) {
+ 𝘧𝘶𝘯𝘤𝘵𝘪𝘰𝘯 𝘢𝘱𝘭𝘪𝘤𝘢𝘳𝘊𝘰𝘳𝘦𝘴(𝘤𝘢𝘣𝘦𝘤𝘢𝘭𝘩𝘰𝘴𝘈𝘛𝘪𝘷𝘢𝘥𝘰𝘴) {
     𝘤𝘰𝘯𝘴𝘵 𝘩𝘦𝘢𝘥𝘪𝘯𝘨𝘴 = 𝘥𝘰𝘤𝘶𝘮𝘦𝘯𝘵.𝘲𝘶𝘦𝘳𝘺𝘚𝘦𝘭𝘦𝘤𝘵𝘰𝘳𝘈𝘭𝘭('𝘩𝟷, 𝘩𝟸, 𝘩𝟹');
     𝘩𝘦𝘢𝘥𝘪𝘯𝘨𝘴.𝘧𝘰𝘳𝘌𝘢𝘤𝘩(𝘩𝘦𝘢𝘥𝘪𝘯𝘨 => {
-        𝘩𝘦𝘢𝘥𝘪𝘯𝘨.𝘴𝘵𝘺𝘭𝘦.𝘤𝘰𝘭𝘰𝘳 = 𝘤𝘢𝘣𝘦𝘤𝘢𝘭𝘩𝘰𝘴𝘈𝘵𝘪𝘷𝘢𝘥𝘰𝘴 ? "#𝘥𝟾𝘥𝟾𝘥𝟾" : '';
+        𝘩𝘦𝘢𝘥𝘪𝘯𝘨.𝘴𝘵𝘺𝘭𝘦.𝘤𝘰𝘭𝘰𝘳 = 𝘤𝘢𝘣𝘦𝘤𝘢𝘭𝘩𝘰𝘴𝘈𝘛𝘪𝘷𝘢𝘥𝘰𝘴 ? "#𝘥𝟾𝘥𝟾𝘥𝟾" : '';
     });
 }
 

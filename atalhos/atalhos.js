@@ -1,8 +1,36 @@
-document.addEventListener("keydown", (evento) => {
+let keyboardShortcutsEnabled = true;
+
+chrome.storage.sync.get('keyboardShortcuts', function (data) {
+    keyboardShortcutsEnabled = data.keyboardShortcuts ?? true;
+    if (keyboardShortcutsEnabled) {
+        enableKeyboardShortcuts();
+    }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+    if ('keyboardShortcuts' in message) {
+        keyboardShortcutsEnabled = message.keyboardShortcuts;
+        if (keyboardShortcutsEnabled) {
+            enableKeyboardShortcuts();
+        } else {
+            disableKeyboardShortcuts();
+        }
+    }
+});
+
+function enableKeyboardShortcuts() {
+    document.addEventListener("keydown", handleKeydown);
+}
+
+function disableKeyboardShortcuts() {
+    document.removeEventListener("keydown", handleKeydown);
+}
+
+function handleKeydown(evento) {
     // Botão para salvar - Alt + S
     if (document.querySelector('button.btn.btn-success.btn-icon.animation')) {
         if ((evento.key).toLowerCase() == "s" && evento.altKey) {
-            document.querySelector('button.btn.btn-success.btn-icon.animation').click()
+            document.querySelector('button.btn.btn-success.btn-icon.animation').click();
         }
     }
     
@@ -12,17 +40,21 @@ document.addEventListener("keydown", (evento) => {
             document.querySelector('[title="Obras"]').click();
         }
     }
-});
 
- // Adiciona o comportamento de mostrar e esconder o painel
- document.addEventListener('keydown', function(e) {
     // Exibir o painel ao pressionar Alt + ;
-    if (e.altKey && e.key === ';') {
+    if (evento.altKey && evento.key === ';') {
         shortcutPanel.style.display = 'block';
     }
 
     // Fechar o painel ao pressionar ESC
-    if (e.key === 'Escape') {
+    if (evento.key === 'Escape') {
         shortcutPanel.style.display = 'none';
     }
-});
+}
+
+// Initial setup to ensure the correct state of keyboard shortcuts
+if (keyboardShortcutsEnabled) {
+    enableKeyboardShortcuts();
+} else {
+    disableKeyboardShortcuts();
+}

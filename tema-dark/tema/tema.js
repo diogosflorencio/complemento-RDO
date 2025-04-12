@@ -20,7 +20,7 @@ function updateThemeColor(color) {
     document.documentElement.style.setProperty('--theme-color', color);
     
     // Update specific elements that use the theme color
-    const themeElements = document.querySelectorAll('.module-header, .beta-banner, .shortcutPanel');
+    const themeElements = document.querySelectorAll('.module-header, .beta-banner, .shortcutPanel, .conteiner_hora, #cardFiltro');
     themeElements.forEach(element => {
         element.style.backgroundColor = color;
     });

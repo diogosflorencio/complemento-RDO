@@ -259,11 +259,47 @@ function personalizarTamanhoEvidencias() {
 
 personalizarTamanhoEvidencias();
 
+let autoFormatEnabled = true;
 
-
-
-const observerRelatorio = new MutationObserver(() => {
-    identificaRelatorio();
+chrome.storage.sync.get('autoFormat', function (data) {
+    autoFormatEnabled = data.autoFormat ?? true;
+    if (autoFormatEnabled) {
+        enableAutoFormat();
+    }
 });
 
-observerRelatorio.observe(document.body, { childList: true, subtree: true });
+chrome.runtime.onMessage.addListener((message) => {
+    if ('autoFormat' in message) {
+        autoFormatEnabled = message.autoFormat;
+        if (autoFormatEnabled) {
+            enableAutoFormat();
+        } else {
+            disableAutoFormat();
+        }
+    }
+});
+
+function enableAutoFormat() {
+    observerRelatorio.observe(document.body, { childList: true, subtree: true });
+    identificaRelatorio();
+}
+
+function disableAutoFormat() {
+    observerRelatorio.disconnect();
+    removeFormatButtons();
+}
+
+function removeFormatButtons() {
+    const formatButtons = document.querySelectorAll('.formatar, .restaurar-formato');
+    formatButtons.forEach(button => button.remove());
+}
+
+const observerRelatorio = new MutationObserver(() => {
+    if (autoFormatEnabled) {
+        identificaRelatorio();
+    }
+});
+
+if (autoFormatEnabled) {
+    observerRelatorio.observe(document.body, { childList: true, subtree: true });
+}

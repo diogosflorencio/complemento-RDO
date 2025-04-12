@@ -2,24 +2,31 @@
 <html lang="pt-br">
 
 <head>
+    <!-- Configurações básicas do documento -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RDO</title>
+    <!-- Recursos externos -->
     <link rel="shortcut icon" href="../imagens/icon48.png" type="image/x-icon">
     <link rel="stylesheet" href="styles/styles-popup.css">
-    <script src="script/popup.js"></script>
+    <script src="script/popup.js" defer></script>
+    <script src="script/pdfLib.js" defer></script>
+    <script src="script/extrairPDFs.js" defer></script>
 </head>
 
 <body>
+    <!-- Banner de versão beta -->
     <div class="beta-banner">
         <div class="banner-content">
             <h2 class="titulo">Complemento RDO</h2>
             <span class="message">🚧 Em desenvolvimento - Algumas funções podem estar instáveis 🚧</span>
         </div>
-        <span class="version-tag">beta 0.5</span>
+        <span class="version-tag">beta 0.7</span>
     </div>
 
+    <!-- Grid principal de módulos -->
     <div class="module-grid">
+        <!-- Módulos de funcionalidades -->
         <!-- modulo das funções gerais do complemento -->
         <div class="module half">
             <div class="module-header">Geral</div>
@@ -27,15 +34,29 @@
                 <div class="feature-item">
                     <span>Extração de</br>PDFs</span>
                     <label class="switch">
-                        <input type="checkbox" id="PDFExtractor" checked>
+                        <input type="checkbox" id="PDFExtractor" checked aria-label="Extração de PDFs">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="feature-item">
                     <span>Teclas de </br> atalho</span>
                     <label class="switch">
-                        <input type="checkbox" id="keyboardShortcuts" checked>
-                        <span class="slider andamento" title="Em desenvolvimento. Função sempre ativa."></span>
+                        <input type="checkbox" id="keyboardShortcuts" aria-label="Teclas de atalho">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Scroll estilo</br>touch</span>
+                    <label class="switch">
+                        <input type="checkbox" id="touchScroll" aria-label="Scroll estilo touch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Slider de</br>imagens</span>
+                    <label class="switch">
+                        <input type="checkbox" id="obrasSlider" checked aria-label="Slider de imagens das obras">
+                        <span class="slider"></span>
                     </label>
                 </div>
             </div>
@@ -58,21 +79,21 @@
                 <div class="feature-item">
                     <span>Card Horas/</br>Função</span>
                     <label class="switch">
-                        <input type="checkbox" id="hoursCard" checked>
+                        <input type="checkbox" id="hoursCard" checked aria-label="Card Horas/Função">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="feature-item" title="Em desenvolvimento.">
                     <span>Formatação</br> automática</span>
                     <label class="switch">
-                        <input type="checkbox" id="AutoFormat" disabled>
+                        <input type="checkbox" id="AutoFormat1" aria-label="Formatação automática">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="feature-item" title="Em desenvolvimento.">
                     <span>Validação de</br> campos</span>
                     <label class="switch">
-                        <input type="checkbox" id="AutoFormat" disabled>
+                        <input type="checkbox" id="AutoFormat2" disabled aria-label="Validação de campos">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -85,14 +106,14 @@
                 <div class="feature-item">
                     <span>Expansão do</br> comentário</span>
                     <label class="switch" title="Em desenvolvimento. Função sempre ativa. ">
-                        <input type="checkbox" id="textareaExpand" checked>
+                        <input type="checkbox" id="textareaExpand" checked aria-label="Expansão do comentário">
                         <span class="slider andamento"></span>
                     </label>
                 </div>
                 <div class="feature-item" title="Em desenvolvimento.">
                     <span>Visualização</br> de .xlsx</span>
                     <label class="switch">
-                        <input type="checkbox" id="AutoFormat" disabled>
+                        <input type="checkbox" id="xlsxView" disabled aria-label="Visualização de .xlsx">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -103,9 +124,9 @@
             <div class="module-header">Personalização</div>
             <div class="module-content">
                 <div class="feature-item">
-                    <span>Tema Escuro (em desenvolvimento. Favor não usar)</span>
+                    <span>Tema Escuro (Faltam ajustes)</span>
                     <label class="switch">
-                        <input type="checkbox" id="darkTheme">
+                        <input type="checkbox" id="darkTheme" title="Tema Escuro" aria-label="Tema Escuro">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -116,7 +137,7 @@
                     <div class="color-option" style="background: #8e44ad"></div>
                     <div class="color-option" style="background: #c0392b"></div>
                     <p>Escolha:</p>
-                    <input type="color" class="custom-color" value="#1d5b50">    
+                    <input type="color" class="custom-color" value="#1d5b50" aria-label="Escolha de cor personalizada">    
                 </div>
             </div>
         </div>
@@ -133,6 +154,7 @@
                             id="geminiKey" 
                             class="form-control" 
                             placeholder="Insira sua chave API do Gemini"
+                            aria-label="Campo para chave da API"
                         >
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" type="button" id="toggleKey">
@@ -200,6 +222,14 @@
                         <input type="checkbox" checked disabled>
                     </li>
 
+                    <li class="feito">Scroll estilo touch com inércia e movimentação suave<div class="separador"></div>
+                        <input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="feito">Slider automático de imagens nas obras em andamento<div class="separador"></div><input
+                            type="checkbox" checked disabled>
+                    </li>
+
                     <li>Sistema de versionamento com histórico de alterações (via API ou uso do complemento)<div
                             class="separador"></div><input type="checkbox" disabled>
                     </li>
@@ -217,21 +247,53 @@
                     </li>
 
                 </ul>
-                <div class="ideas-welcome">
-                    <h3>Tem alguma ideia?</h3>
-                    <p>Este complemento está em constante evolução. Se você tem ideias ou sugestões, ficarei feliz em saber!</p>
+                <div class="disclaimer">
+                    
+                    <div class="disclaimer-header">
+                        <h3>Disclaimer de Responsabilidade</h3>
+                        <button class="collapse-button-eye" onclick="toggleDisclaimer()" aria-label="Expandir/Recolher">
+                            <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="disclaimer-content" class="disclaimer-content" style="display: none;">
+                        <div class="disclaimer-purpose">
+                            <p>Esta extensão foi desenvolvida por mim, utilizando recursos próprios, incluindo tempo pessoal (fora do trabalho), conhecimento técnico, infraestrutura e investimento financeiro.</p>
+                            <br>
+                            <p>É uma ferramenta para otimizar tarefas específicas. Seu compartilhamento é realizado de forma voluntária, sem garantias ou compromissos de manutenção, não tendo como objetivo ser uma solução corporativa ou de uso geral.</p>
+                        </div>
+
+                        <div class="disclaimer-important">
+                            <h4>IMPORTANTE</h4>
+                            <ul class="disclaimer-list">
+                                <li>A extensão passa por atualizações conforme minhas necessidades</li>
+                                <li>Funcionalidades podem ser alteradas ou descontinuadas sem aviso prévio</li>
+                                <li>Não há garantia de precisão dos dados ou resultados gerados (sei até onde posso considerar as informações geradas pelos meus códigos)</li>
+                                <li>Não me responsabilizo por eventuais inconsistências ou erros no uso de outrem</li>
+                                <li>Servidores e serviços de processamento mantidos por mim, para que tudo funcione, podem ser descontinuados a qualquer momento, conforme não mais necessidade</li>
+                                <li>Não existe obrigação de manutenção, suporte ou qualquer tipo de coisa relacionada ao complemento</li>
+                            </ul>
+                        </div>
+
+                        <p class="disclaimer-footer">
+                            O uso desta extensão por terceiros é permitido, porém sob total responsabilidade do usuário, ciente das condições aqui estabelecidas.
+                        </p>
+                    </div>
+                    <small class="disclaimer-subtitle" id="disclaimer-subtitle" style="display: block;">
+                        Necessário devido certas insinuações e natureza do uso
+                    </small>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Rodapé -->
     <footer class="module full">
         <p class="footer-text">
             Desenvolvido por
             <a href="#" target="_self" class="dev-link" >Diogo</a>.
         </p>
     </footer>
-
-
 </body>
-
 </html>

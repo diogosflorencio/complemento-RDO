@@ -1,28 +1,59 @@
+// Aguarda o carregamento completo do DOM
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Popup carregado");
-    const defaultColor = '#1d5b50';
+    const defaultColor = '#1d5b50';  // Cor padrão do tema
 
-    // Apply default color immediately
+    // Aplica cor padrão imediatamente
     document.documentElement.style.setProperty('--theme-color', defaultColor);
 
+    // Recupera configurações salvas
     chrome.storage.sync.get([
         'darkTheme',
         'cardRDOHH',
         'PDFExtractor',
         'themeColor',
-        'geminiApiKey'
+        'geminiApiKey',
+        'keyboardShortcuts',
+        'autoFormat',
+        'touchScroll',  // Adicionado
+        'obrasSlider'   // Adicionado
     ], function (data) {
+        // Inicializa cada funcionalidade com valores padrão caso não existam
         setupDarkTheme(data.darkTheme ?? false);
         setupHoursCard(data.cardRDOHH ?? true);
         setupPDFExtractor(data.PDFExtractor ?? false);
         setupThemeColor(data.themeColor ?? defaultColor);
         setupGeminiKey(data.geminiApiKey ?? '');
+        setupKeyboardShortcuts(data.keyboardShortcuts ?? true);
+        setupAutoFormat(data.autoFormat ?? true);
+        setupTouchScroll(data.touchScroll ?? false); // Adicionado
+        setupObrasSlider(data.obrasSlider ?? true);  // Adicionado
     });
+
+    // Configuração do Disclaimer
+    const content = document.getElementById('disclaimer-content');
+    const subtitle = document.getElementById('disclaimer-subtitle');
+    const button = document.querySelector('.collapse-button-eye');
+    const header = document.querySelector('.disclaimer-header');
+
+    // Função para alternar visibilidade do disclaimer
+    function toggleDisclaimer() {
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            subtitle.style.display = 'none';
+            button.classList.add('active');
+        } else {
+            content.style.display = 'none';
+            subtitle.style.display = 'block';
+            button.classList.remove('active');
+        }
+    }
+
+    // Adiciona listener para o clique no header
+    header.addEventListener('click', toggleDisclaimer);
 });
 
-
-// functio to setup the key value 
-
+// Configuração da chave API do Gemini
 function setupGeminiKey(initialKey) {
     const geminiKeyInput = document.getElementById('geminiKey');
     const toggleButton = document.getElementById('toggleKey');
@@ -42,8 +73,7 @@ function setupGeminiKey(initialKey) {
     });
 }
 
-
-// the dark theme function
+// Configuração do tema escuro
 function setupDarkTheme(initialState) {
     const darkThemeCheckbox = document.getElementById('darkTheme');
     if (!darkThemeCheckbox) return;
@@ -60,7 +90,7 @@ function setupDarkTheme(initialState) {
     });
 }
 
-// hour card function
+// Configuração do card de horas
 function setupHoursCard(initialState) {
     const hoursCardCheckbox = document.getElementById('hoursCard');
     if (!hoursCardCheckbox) return;
@@ -75,7 +105,7 @@ function setupHoursCard(initialState) {
     });
 }
 
-// Funçõe do PDF Extractor 
+// Configuração do extrator de PDF
 function setupPDFExtractor(initialState) {
     const PDFExtractorCheckbox = document.getElementById('PDFExtractor');
     if (!PDFExtractorCheckbox) return;
@@ -90,7 +120,37 @@ function setupPDFExtractor(initialState) {
     });
 }
 
-// a função para aplicar a cor do tema
+// Configuração dos atalhos de teclado
+function setupKeyboardShortcuts(initialState) {
+    const keyboardShortcutsCheckbox = document.getElementById('keyboardShortcuts');
+    if (!keyboardShortcutsCheckbox) return;
+
+    keyboardShortcutsCheckbox.checked = initialState;
+
+    keyboardShortcutsCheckbox.addEventListener('change', function () {
+        const isShortcutsEnabled = keyboardShortcutsCheckbox.checked;
+        chrome.storage.sync.set({ keyboardShortcuts: isShortcutsEnabled }, () => {
+            notifyContentScript({ keyboardShortcuts: isShortcutsEnabled });
+        });
+    });
+}
+
+// Configuração da formatação automática
+function setupAutoFormat(initialState) {
+    const autoFormatCheckbox = document.getElementById('AutoFormat1');
+    if (!autoFormatCheckbox) return;
+
+    autoFormatCheckbox.checked = initialState;
+
+    autoFormatCheckbox.addEventListener('change', function () {
+        const isAutoFormatEnabled = autoFormatCheckbox.checked;
+        chrome.storage.sync.set({ autoFormat: isAutoFormatEnabled }, () => {
+            notifyContentScript({ autoFormat: isAutoFormatEnabled });
+        });
+    });
+}
+
+// Funções de gerenciamento de cores do tema
 function setupThemeColor(initialColor) {
     applyThemeColor(initialColor);
     
@@ -107,7 +167,6 @@ function setupThemeColor(initialColor) {
     });
 }
 
-
 function saveThemeColor(color) {
     chrome.storage.sync.set({ themeColor: color }, () => {
         applyThemeColor(color);
@@ -115,6 +174,7 @@ function saveThemeColor(color) {
     });
 }
 
+// Função auxiliar para converter RGB para Hexadecimal (peguei do stackoverflow)
 function rgbToHex(rgb) {
     // Handle rgb(r, g, b) format
     const matches = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -145,11 +205,65 @@ function applyThemeColor(color) {
     document.querySelector('.custom-color').value = hexColor;
 }
 
-
-
-// Utility Functions
+// Função utilitária para notificar content script
 function notifyContentScript(message) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, message);
     });
 }
+
+// Adicionar nova função de setup
+function setupTouchScroll(initialState) {
+    const touchScrollCheckbox = document.getElementById('touchScroll');
+    if (!touchScrollCheckbox) return;
+
+    touchScrollCheckbox.checked = initialState;
+    
+    touchScrollCheckbox.addEventListener('change', function () {
+        const isTouchScrollEnabled = touchScrollCheckbox.checked;
+        chrome.storage.sync.set({ touchScroll: isTouchScrollEnabled }, () => {
+            notifyContentScript({ touchScroll: isTouchScrollEnabled });
+        });
+    });
+}
+
+// Configuração do slider de imagens
+function setupObrasSlider(initialState) {
+    const obrasSliderCheckbox = document.getElementById('obrasSlider');
+    if (!obrasSliderCheckbox) return;
+
+    obrasSliderCheckbox.checked = initialState;
+    
+    obrasSliderCheckbox.addEventListener('change', function () {
+        const isObrasSliderEnabled = obrasSliderCheckbox.checked;
+        chrome.storage.sync.set({ obrasSlider: isObrasSliderEnabled }, () => {
+            notifyContentScript({ obrasSlider: isObrasSliderEnabled });
+        });
+    });
+}
+
+// Configurações padrão
+const defaultSettings = {
+    darkTheme: false,
+    cardRDOHH: true,
+    PDFExtractor: false,
+    themeColor: '#1d5b50',
+    geminiApiKey: '',
+    keyboardShortcuts: true,
+    autoFormat: true,
+    touchScroll: false,
+    obrasSlider: true,
+};
+
+// Lista de IDs dos elementos de configuração
+const configIds = [
+    'darkTheme',
+    'cardRDOHH',
+    'PDFExtractor',
+    'themeColor',
+    'geminiApiKey',
+    'keyboardShortcuts',
+    'autoFormat',
+    'touchScroll',
+    'obrasSlider',
+];
