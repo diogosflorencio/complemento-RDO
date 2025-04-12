@@ -1,4 +1,3 @@
-```markdown
 # Versão [Beta 0.8] - Slider de Imagens das Obras
 
 ## Slider de Imagens 🖼️
