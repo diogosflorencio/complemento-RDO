@@ -280,7 +280,7 @@ async function processarRelatorios() {
             // Processa RSP
             await processarGrupoRelatorios(relatoriosRSP, 'RSP_');
         }
-        await atualizarStatus("Download(s) concluído(s)!");
+        await atualizarStatus("Downloads concluídos");
         console.log('Processo finalizado.');
     } catch (error) {
         atualizarStatus(`Erro: ${error.message}`);

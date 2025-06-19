@@ -133,7 +133,7 @@ async function processarExtracaoDados() {
             await atualizarStatus('Nenhuma atividade encontrada para exportar.');
             return;
         }
-        await atualizarStatus('Gerando arquivo XLSX...');
+        await atualizarStatus('Compilando dados e gerando o arquivo .xlsx');
         const ws = XLSX.utils.json_to_sheet(atividadesExtraidas);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Atividades');

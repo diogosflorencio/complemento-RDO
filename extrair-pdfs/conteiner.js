@@ -34,13 +34,13 @@ function criarCardFiltro() {
                             </div>
                             <div id="wrap-explicacao-content" style="padding: 0 12px 8px 24px; max-height: 180px; overflow-y: auto;">
                                 <ul style="margin: 8px 0 0 0; padding: 0; font-size: 0.90rem;">
-                                    <li>Busca <b>todas as obras</b> da empresa e filtra apenas as que estão com <b>status em andamento</b> e foram modificadas no período selecionado.</li>
-                                    <li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos.</li>
+                                    <li>Busca <b>todas as obras</b> e filtra apenas as que estão com status <b>em andamento</b></li>
+                                    <li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos (ou seja, tirando M3, só aprovados, etc).</li>
                                     <li>Mescla todos os PDFs dos relatórios de cada obra em um único arquivo, renomeando conforme o tipo: <b>RDO</b> ou <b>RSP</b>.</li>
-                                    <li>Extrai de todos os relatórios as informações do campo <b>atividade</b> e salva em formato <b>XLSX</b>.</li>
-                                    <li>Faz a extração exata (linha a linha) de todas as <b>horas</b> dos relatórios que têm "HH" no nome.</li>
+                                    <li>Extrai de todos os relatórios as informações do campo <b>Atividades</b> e salva em formato <b>.XLSX</b>.</li>
+                                    <li>(ainda desenvolvendo) Faz a extração exata (linha a linha) de todas as <b>horas</b> dos relatórios que têm "HH" no nome.</li>
                                 </ul>
-                                <span style="font-size: 0.85rem; color: #888;">Funciona automaticamente com a API de qualquer empresa, desde que tenha o token de integração gerado.</span>
+                                <span style="font-size: 0.85rem; color: #888;">Funciona automaticamente com a API de qualquer empresa/contrato, desde que tenha o token de integração gerado.</span>
                             </div>
                         </div>
                     </div>

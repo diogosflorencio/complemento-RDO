@@ -28,68 +28,83 @@ function identificaRelatorio() {
 }
 
 async function formatarTextoComIA(texto) {
+    let apiKey;
     try {
         const data = await chrome.storage.sync.get('geminiApiKey');
-        const apiKey = data.geminiApiKey;
-        
+        apiKey = data.geminiApiKey;
+
         if (!apiKey) {
             throw new Error('Key não encontrada.');
         }
 
+        // Defina o modelo Gemini a ser utilizado
+        const GEMINI_MODEL = 'gemini-2.5-flash';
+        // Endpoint da API Gemini
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
         const prompt = `
-            Formate o seguinte texto seguindo este padrão de formatação, mas considerando as informações passadas no campo "texto para formatar":
-            
-            Local/Equipamento ou Período do dia
-            
-            (A listagem de atividades devem ser uma por linha, com ponto e vírgula no final):
-            Tratamento ST2 - ST3; (por exemplo)
-            Jato ou jateamento abrasivo SA1 - SA2½; (por exemplo)
-            Limpeza com solvente; (por exemplo)
-            Aplicação de primer; (por exemplo)
-            Organização e limpeza. (este, mesmo que no texto original não tenha, ponha sempre este item na liste de serviços executados. lembrando que o ultimo item finaliza com ponto final.)
-            
-            COLABORADORES: Nome1, Nome2. (por exemplo)
-            
-            Texto para formatar: ${texto}
-            
-            Regras importantes:
-            1. Mantenha TODAS as informações originais
-            2. Use letras maiúsculas para títulos quando for o local da atividade ou equipamento
-            3. Use ponto e vírgula no final de cada atividade
-            4. Mantenha a formatação em lista simples
-            5. Não adicione cabeçalhos ou seções extras
-            6. Não adicione comentários ou sugestões
-            7. Caso no texto original não tenha algo, como colaboradores, não precisa deixar o campo, simplesmente o remova. E no caso de haver colaboradores, liste eles assim: "Nome1." ou "Nome1 e Nome2." ou ainda: "Nome1, Nome2 e Nome3." etc. "colaboradores" deve variar em grau de acordo com a quantidade de colaboradores.
-            8. Caso na listagem de serviços executados nos texto tenha a informação de que houve lavagem, troque por "Lavagem de estrutura" e, no fim do texto todo ponha "Conforme acordado entre o cliente e a executante, a água utilizada para a lavagem é de reuso, com pH médio de 8,75 e salinidade de 0,38."
-            9. É importante você saber que se trata de uma empresa de pintura e o comentario destina-se ao relatório da obra do dia RDO. Com isso, é importante seguir as regras que coloquei e saber que o que é executado durante o dia deve se listado individualmente e de forma coerente.
-            10. Se houver erros grandes de portugues e gramatica, não hesite em corrigir`;
+Você é um formatador especializado em Relatórios Diários de Obra (RDO) de pintura industrial. Analise o texto e formate-o adequadamente mantendo TODAS as informações originais.
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
+INSTRUÇÃO PRIORITÁRIA: Se houver texto entre duplos parênteses ((instrução)) no conteúdo, execute essa instrução específica e ignore todas as outras regras.
+
+CONTEXTO: Serviços de pintura industrial e manutenção. Corrija apenas termos mal escritos (ex: "trapiamento" → "trapeamento").
+
+FORMATAÇÃO DE TÍTULO:
+- Se houver local/equipamento específico mencionado: "Realizado durante o dia na/no/em [local]:"
+- Se NÃO houver local específico (apenas "Realizado durante o dia", "manhã", "tarde", etc.): "Realizado durante o dia:"
+
+FORMATAÇÃO DAS ATIVIDADES:
+- Mantenha o texto original das atividades, apenas ajustando a gramática
+- Uma atividade por linha, terminando com ponto e vírgula
+- Última atividade termina com ponto final
+- Preserve especificações técnicas completas (ex: "Lavagem das estruturas" não vira apenas "Lavagem")
+- Preserve códigos e normas (ex: "SA1-SA2½" mantém exatamente assim)
+
+REGRAS IMPORTANTES:
+- PRESERVE todas as informações técnicas do texto original
+- NÃO simplifique ou reduza descrições técnicas
+- NÃO remova detalhes importantes das atividades
+- Se não houver "Organização e limpeza" mencionado, adicione "Organização e limpeza da área." no final
+- Mantenha especificações de materiais e processos completas
+
+EXEMPLO:
+Texto: "Período do dia: Lavagem das estruturas. Jateamento abrasivo SA-1-SA-2½. Aplicação de Acabamento."
+
+Resultado:
+"Realizado período de trabalho:
+
+Lavagem das estruturas;
+Jateamento abrasivo SA-1-SA-2½;
+Aplicação de acabamento;
+Organização e limpeza da área."
+
+TEXTO PARA FORMATAR:
+${texto}
+
+Formate preservando todas as informações técnicas originais.`;
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
                     }]
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('API request failed');
-            }
-    
-            const responseData = await response.json();
-            return responseData.candidates[0].content.parts[0].text;
-        } catch (erro) {
-            console.error('Erro na formatação:', erro);
-            alert('Erro ao formatar texto. Para essa funcionalidade você precisa ter uma chave de API do Google Gemini. Verifique o campo "Gemini API Key" no menu de configurações da extensão (pop-up).');
-            return texto;
-        }
+                }]
+            })
+        });
+        const responseData = await response.json();
+        console.log('Resposta da API Gemini:', responseData);
+        return responseData.candidates[0].content.parts[0].text;
+    } catch (erro) {
+        console.error('Erro na formatação:', erro, { apiKey });
+        alert('Erro ao formatar texto. Para essa funcionalidade você precisa ter uma chave de API do Google Gemini. Verifique o campo "Gemini API Key" no menu de configurações da extensão (pop-up).');
+        return texto;
     }
+}
 
 async function atualizarComentario(elementoOriginal, textoFormatado) {
     // Encontra o botão de editar do comentário atual
@@ -141,7 +156,7 @@ function adicionarBotoesFormatacao() {
             align-items: center;
             gap: 5px;
         `;
-        
+
 
         // Botão de formatação
         const botaoFormatar = document.createElement('a');
@@ -162,7 +177,7 @@ function adicionarBotoesFormatacao() {
         botaoRestaurar.style.cssText = `
         color: var(--theme-color)`;
         botaoRestaurar.style.display = 'none';
-  
+
         const iconeRestaurar = document.createElement('i');
         iconeRestaurar.className = 'material-icons';
         iconeRestaurar.textContent = 'restore';
@@ -178,39 +193,39 @@ function adicionarBotoesFormatacao() {
 
         botaoFormatar.addEventListener('click', async (e) => {
             e.preventDefault();
-            
+
             botaoFormatar.classList.add('loading');
             iconeFormatar.textContent = 'sync';
-            
+
             const conteudoOriginal = linha.querySelector('p.white-space');
             textosOriginais.set(conteudoOriginal, conteudoOriginal.textContent);
-            
+
             const textoFormatado = await formatarTextoComIA(conteudoOriginal.textContent);
-            
+
             if (textoFormatado && textoFormatado !== conteudoOriginal.textContent) {
                 await atualizarComentario(conteudoOriginal, textoFormatado);
                 botaoRestaurar.style.display = 'block';
             }
-            
+
             botaoFormatar.classList.remove('loading');
             iconeFormatar.textContent = 'autorenew';
         });
 
         botaoRestaurar.addEventListener('click', async (e) => {
             e.preventDefault();
-            
+
             botaoRestaurar.classList.add('loading');
             iconeRestaurar.textContent = 'sync';
-            
+
             const conteudoOriginal = linha.querySelector('p.white-space');
             const textoOriginal = textosOriginais.get(conteudoOriginal);
-            
+
             if (textoOriginal) {
                 await atualizarComentario(conteudoOriginal, textoOriginal);
                 botaoRestaurar.style.display = 'none';
                 textosOriginais.delete(conteudoOriginal);
             }
-            
+
             botaoRestaurar.classList.remove('loading');
             iconeRestaurar.textContent = 'restore';
         });
@@ -223,11 +238,11 @@ function personalizarTamanhoEvidencias() {
         const imagens = document.querySelectorAll('.galeria .box .imagem');
         const descricoes = document.querySelectorAll('.galeria .box .descricao textarea[data-v-c0ee0298]');
         const botaoAcao = document.querySelectorAll('.galeria .box .acao[data-v-c0ee0298]');
-        
+
         imagens.forEach(imagem => {
             imagem.style.width = '222px';
             imagem.style.height = '148px';
-            
+
             // Pega a URL atual da imagem de fundo
             const backgroundImage = imagem.style.backgroundImage;
             if (backgroundImage) {
@@ -237,8 +252,8 @@ function personalizarTamanhoEvidencias() {
                 imagem.style.backgroundImage = urlAltaQualidade;
             }
         });
-        
-        
+
+
         descricoes.forEach(descricao => {
             descricao.style.cssText = `
                 height: 148px !important;
@@ -251,9 +266,9 @@ function personalizarTamanhoEvidencias() {
         });
     });
 
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true 
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 }
 

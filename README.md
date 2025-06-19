@@ -24,6 +24,7 @@
 - Uso de variáveis globais e armazenamento local para maior compatibilidade entre empresas
 - Gerenciamento eficiente de estados e listeners para ativação/desativação do extrator
 - Preparação para futura descontinuação do extrator antigo, com aviso integrado na interface
+- Removido o slide de imagens por razões de estar bugando alguns elementos, fazendo com que ficassem sobrepostos a outros
 
 ### Correções de Bugs 🐛
 - Ajustes na filtragem de obras e relatórios para evitar duplicidades e erros de seleção
