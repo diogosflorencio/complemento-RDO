@@ -1,3 +1,43 @@
+## Versão [Beta 0.9] - Novo Extrator de Dados e Unificação de Relatórios
+
+### Extrator de Dados e Relatórios 📄
+- Novo sistema de extração de dados dos relatórios, exportando atividades diretamente para **XLSX**
+- Extração detalhada de todas as atividades e horas dos relatórios, com filtragem por período, status e obras específicas
+- Interface de filtro totalmente redesenhada, com seleção de datas, ordem, tipos de relatório e exclusão de obras
+- Exportação de dados e PDFs agora integradas em um único painel flutuante, acessível em qualquer obra
+- Possibilidade de extrair apenas relatórios **100% aprovados**
+
+### Unificação e Otimização de PDFs 🔗
+- Mesclagem automática de todos os PDFs dos relatórios de uma obra em um único arquivo, com nomeação inteligente (**RDO/RSP**)
+- Novo método de fetch paralelo para buscar relatórios, tornando o processo muito mais rápido e eficiente
+- Suporte a diferentes tipos de relatórios: **Diário de Obra, Semanal de Produção, Orçamentos**, entre outros
+- Download otimizado e status detalhado do progresso da extração
+
+### Interface e Usabilidade 🎨
+- Card de filtro flutuante com modo duplo: exportação de dados (**XLSX**) ou **PDFs**
+- Explicação interativa sobre o funcionamento do extrator, acessível diretamente no painel
+- Inputs para exclusão de obras por sigla e extração de obras específicas por ID
+- Feedback visual de status e progresso durante todo o processo de extração
+
+### Melhorias Técnicas 🔧
+- Refatoração completa dos scripts de extração, separando lógica de dados e interface
+- Uso de variáveis globais e armazenamento local para maior compatibilidade entre empresas
+- Gerenciamento eficiente de estados e listeners para ativação/desativação do extrator
+- Preparação para futura descontinuação do extrator antigo, com aviso integrado na interface
+
+### Correções de Bugs 🐛
+- Ajustes na filtragem de obras e relatórios para evitar duplicidades e erros de seleção
+- Melhor tratamento de erros de API e feedback ao usuário
+- Correção de problemas de interface ao alternar entre modos de extração
+
+### Compatibilidade
+- Chrome 88+
+- Versão 5.8.0+ do app de RDO
+- Necessário token de integração ativo
+
+> **Observação:**  
+> A versão 0.9 inaugura um novo padrão de extração e compilação de dados e PDFs, tornando o processo mais rápido, intuitivo e flexível. O usuário agora tem controle total sobre o que extrair, com filtros avançados e interface unificada, além de performance significativamente superior.
+
 # Versão [Beta 0.8] - Slider de Imagens das Obras
 
 ## Slider de Imagens 🖼️
