@@ -29,14 +29,14 @@ function disableKeyboardShortcuts() {
 function handleKeydown(evento) {
     // Botão para salvar - Alt + S
     if (document.querySelector('button.btn.btn-success.btn-icon.animation')) {
-        if ((evento.key).toLowerCase() == "s" && evento.altKey) {
+        if (evento.key && evento.key.toLowerCase() == "s" && evento.altKey) {
             document.querySelector('button.btn.btn-success.btn-icon.animation').click();
         }
     }
     
     // Botão para acessar Obras - Alt + H
     if(document.querySelector('[title="Obras"]')){
-        if ((evento.key).toLowerCase() == "h" && evento.altKey) {
+        if (evento.key && evento.key.toLowerCase() == "h" && evento.altKey) {
             document.querySelector('[title="Obras"]').click();
         }
     }

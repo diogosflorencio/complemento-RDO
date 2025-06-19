@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Complemento RDO [BETA]",
   "short_name": "Complemento RDO",
-  "version": "0.7",
-  "version_name": "0.7 beta",
+  "version": "0.8",
+  "version_name": "0.8 beta",
   "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
   "action": {
     "default_popup": "popup/popup.html"
@@ -25,13 +25,18 @@
       ],
       "css": [],
       "js": [
-        "tema-dark/tema/tema.js",
+        // "tema-dark/tema/tema.js",
+        // "tema-dark/tema_dark.js",
         "RDO/card_rdo_hh.js",
-        "tema-dark/tema_dark.js",
         "RSP/scripts/rsp_script.js",
         "atalhos/atalhos.js",
         "atalhos/card_atalhos.js",
+        "extrair-pdfs/lib-extrator.js",
+        "extrair-pdfs/sheetjs.js",
+        "extrair-pdfs/conteiner.js",
         "extrair-pdfs/extrairPDFs.js",
+        "extrair-pdfs/extrairPDFsRelatorios.js",
+        "extrair-pdfs/extrairDadosRelatorios.js",
         "relatorios/relatorios.js",
         "relatorios/scroll.js",
         "obras/obras-imagens.js"
