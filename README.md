@@ -1,3 +1,26 @@
+## Versão [1.0 - Compilador de Medição]
+
+### Novidades e Melhorias 🚀
+- Lançamento oficial da versão 1.0, consolidando todas as funcionalidades essenciais para o fechamento de medição de forma rápida, precisa e intuitiva.
+- Refinamento dos fluxos de extração e compilação de dados, tornando o processo mais ágil e confiável.
+- Otimização do painel de controle e filtros, facilitando a seleção de obras, períodos e tipos de relatório.
+- Integração aprimorada com o sistema de exportação para XLSX e PDFs, garantindo maior compatibilidade e performance.
+- Interface redesenhada para melhor usabilidade, com feedbacks visuais claros e navegação simplificada.
+
+### Correções de Problemas 🛠️
+- Ajustes em bugs reportados nas versões beta, incluindo falhas na filtragem de obras, duplicidade de relatórios e erros de interface.
+- Melhoria no tratamento de erros de API e mensagens ao usuário.
+- Correção de inconsistências na exportação de dados e geração de relatórios.
+
+### Funcionalidades Adicionadas ✨
+- Novos atalhos e cards para facilitar operações recorrentes.
+- Expansão das opções de personalização do tema e preferências do usuário.
+- Sistema de atualização automática de cards e relatórios, reduzindo etapas manuais.
+- Melhor integração com o app de RDO, suportando novas versões e requisitos.
+
+### Observação
+A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e uma experiência refinada para o usuário que busca fechar medições de forma eficiente e sem complicações.
+
 ## Versão [Beta 0.9] - Novo Extrator de Dados e Unificação de Relatórios
 
 ### Extrator de Dados e Relatórios 📄

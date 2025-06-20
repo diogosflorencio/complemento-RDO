@@ -10,6 +10,33 @@ function criarCardFiltro() {
         const isDados = modo === 'dados';
         container.innerHTML = `
             <div class="container" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; min-width: 300px; width: fit-content; box-sizing: border-box; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; content-align: center; flex-direction: column; gap: 10px; font-size: 14px;">
+               
+                <div id="overlay-desenvolvimento" style="display: flex; flex-direction: column; align-items: center; bottom: 80px; justify-content: center; position: absolute; left: 0;  width: 100%; height: 295px; background: rgb(255, 255, 255); z-index: 100000;">
+                    <span style="font-size: 1.3rem; font-weight: bold; color: #b00; margin-bottom: 18px;">EM DESENVOLVIMENTO</span>
+                    <input id="senha-desenvolvimento" type="password" placeholder="" style="
+                        background: transparent !important;
+                        border: none !important;
+                        outline: none !important;
+                        color: transparent !important;
+                        caret-color: transparent !important;
+                        width: 200px !important;
+                        height: 40px !important;
+                        font-size: 1rem !important;
+                        margin-bottom: 8px !important;
+                        cursor: default !important;
+                        -webkit-appearance: none !important;
+                        -moz-appearance: none !important;
+                        appearance: none !important;
+                        box-shadow: none !important;
+                        -webkit-box-shadow: none !important;
+                        -moz-box-shadow: none !important;
+                        border-radius: 0 !important;
+                        -webkit-border-radius: 0 !important;
+                        -moz-border-radius: 0 !important;
+                        -webkit-focus-ring-color: transparent !important;
+                        -webkit-tap-highlight-color: transparent !important;
+                    " onfocus="this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');" onblur="this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');">
+                </div>
                 <div class="modo-switch-wrap">
                     <div id="modo-switch" class="modo-switch ${isDados ? 'dados' : 'pdf'}" style="width: 120px; height: 30px; position: relative;">
                         <div class="modo-switch-slider"></div>
@@ -77,7 +104,7 @@ function criarCardFiltro() {
                             <label for="aprovados-100" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair apenas relatórios 100% aprovados</label>
                         </div>
                         <button class="${isDados ? 'btn-extrair-dados' : 'btn-extrair-pdf'}" style="width: 100%; padding: 8px; background: var(--theme-color); color: white; border: 2px solid black; border-radius: 8px; box-shadow: 2px 2px rgb(0, 0, 0); cursor: pointer; margin-top: 5px;">
-                            ${isDados ? 'EXPORTAR DADOS (XLSX)' : 'EXTRAIR PDF(s)'}
+                            ${isDados ? 'EXTRAIR DADOS' : 'EXTRAIR PDFs'}
                         </button>
                     </div>
                     <div id="status-extracao" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
@@ -113,7 +140,7 @@ function criarCardFiltro() {
                 if (expanded) {
                     content.style.display = 'block';
                     wrap.style.maxHeight = '500px';
-                    toggleSvg.style.transform = 'rotate(180deg)';
+                    toggleSvg.style.transform = 'rotate(180deg)';      
                 } else {
                     content.style.display = 'none';
                     wrap.style.maxHeight = '50px';
@@ -134,6 +161,20 @@ function criarCardFiltro() {
             localStorage.setItem('pdf_card_colapsado', colapsado);
             aplicarEstadoColapso(colapsado);
         });
+        // Lógica do overlay de desenvolvimento
+        const overlay = container.querySelector('#overlay-desenvolvimento');
+        const inputSenha = container.querySelector('#senha-desenvolvimento');
+
+        if (overlay && inputSenha) {
+            function entrar() {
+                if (inputSenha.value === 'hermione') {
+                    overlay.style.display = 'none';
+                }
+            };
+            inputSenha.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') entrar();
+            });
+        }
     }
 
     renderizarConteudo('pdf');
@@ -146,18 +187,21 @@ function criarCardFiltro() {
             container.style.overflow = 'hidden';
             container.style.minWidth = '120px';
             container.style.width = 'fit-content';
-            //container.querySelector('.cabecalho').style.display = 'none';
+            container.querySelector('#overlay-desenvolvimento').style.display = 'none';
             container.querySelector('.filtro-content').style.display = 'none';
             container.querySelector('.modo-switch-wrap').style.display = 'none';
             container.querySelector('#wrap-explicacao').style.display = 'none';
+            container.querySelector('.wrapper-container').style.transform = 'rotate(0deg)';
         } else {
             container.style.height = '';
             container.style.overflow = '';
             container.style.minWidth = '300px';
+            container.querySelector('#overlay-desenvolvimento').style.display = 'flex';
             container.querySelector('.cabecalho').style.display = '';
             container.querySelector('.filtro-content').style.display = '';
             container.querySelector('.modo-switch-wrap').style.display = '';
             container.querySelector('#wrap-explicacao').style.display = '';
+            container.querySelector('.wrapper-container').style.transform = 'rotate(180deg)';
         }
     }
 
