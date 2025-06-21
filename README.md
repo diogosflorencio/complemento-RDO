@@ -1,3 +1,16 @@
+## Versão [1.1 - Extração de Horas Linha a Linha]
+
+### Novidades e Melhorias 🚀
+- **Extração de Horas Detalhada**: Agora é possível extrair as horas trabalhadas de cada colaborador, linha a linha, diretamente de todas as obras e dos relatórios delas em um período especifico.
+- **Maior Granularidade na Análise**: A nova funcionalidade permite uma análise mais precisa e detalhada das horas, facilitando a verificação e o faturamento.
+- **Otimização da Exportação**: O processo de exportação para XLSX foi aprimorado para incluir os dados de horas por linha, mantendo a clareza e organização da planilha.
+
+### Funcionalidades Adicionadas ✨
+- **Compatibilidade Aprimorada**: Melhorias na compatibilidade com as versões mais recentes do sistema de RDO, garantindo uma extração de dados estável e confiável.
+
+### Observação
+A versão 1.1 foca em fornecer um nível de detalhe sem precedentes na extração de dados de medição, atendendo a uma necessidade crítica para a análise precisa das horas e simplificando processos de auditoria e faturamento.
+
 ## Versão [1.0 - Compilador de Medição]
 
 ### Novidades e Melhorias 🚀
@@ -438,4 +451,57 @@ const observer = new MutationObserver(() => {
 - Versão 5.7.3 do app de RDO.
 
 **Boa mediação!**
-```
+
+<!-- Lista geral de funcionalidades da extensão -->
+
+<details>
+<summary><strong>1. Cálculo e Automação de Horas em RDO HH</strong></summary>
+
+Faz o cálculo automático das horas trabalhadas em relatórios do tipo HH, somando tudo em decimal e separando por função (ex: pintor, ajudante, etc). Identifica e separa horas normais, horas extras (K1, K2, K3, K4) e mostra tudo colorido e fácil de entender. Permite adicionar essas informações automaticamente no próprio relatório, sem precisar digitar nada manualmente.
+
+</details>
+
+<details>
+<summary><strong>2. Extração e Mesclagem de PDFs de Relatórios</strong></summary>
+
+Permite que o usuário selecione uma obra e faça o download de todos os PDFs dos relatórios dela, já mesclados em um único arquivo, considerando o período que quiser. O usuário pode escolher o intervalo de datas e o sistema junta tudo em um PDF só, pronto para enviar ou arquivar.
+
+</details>
+
+<details>
+<summary><strong>3. Extração Geral de PDFs e Dados de Todas as Obras</strong></summary>
+
+Faz a extração dos PDFs de todas as obras que tenham relatórios no período escolhido, não só da obra atual. O processo é muito mais rápido porque busca vários relatórios ao mesmo tempo (fetch paralelo). Além dos PDFs, também extrai todas as informações do campo de atividades e das horas linha a linha dos relatórios, gerando uma planilha (XLSX) organizada.
+
+</details>
+
+<details>
+<summary><strong>4. Revisão e Aplicação de Horas a partir do Arquivo de Ponto</strong></summary>
+
+Permite carregar um arquivo de ponto (geralmente em CSV) e comparar as horas batidas no ponto com as que estão no relatório. Mostra para cada colaborador as horas antes, as do ponto, e as "arredondadas" (ex: entrada arredondada para 06:30, saída para 16:18). Com um clique, aplica automaticamente as horas do ponto (arredondadas) nos campos do relatório, marcando quem já foi revisado.
+
+</details>
+
+<details>
+<summary><strong>5. Atalhos de Teclado e Painel de Ajuda</strong></summary>
+
+Vários atalhos de teclado para agilizar tarefas comuns, como salvar, acessar obras, abrir painéis, etc. Painel flutuante que mostra todos os atalhos disponíveis, fácil de consultar.
+
+</details>
+
+<details>
+<summary><strong>6. Personalização Visual e Tema Escuro</strong></summary>
+
+Permite ativar tema escuro para toda a extensão e o site, deixando a visualização mais confortável. O usuário pode escolher a cor principal do tema. Todas as telas e cards seguem o padrão visual, com bordas, sombras e colapso.
+
+</details>
+
+<details>
+<summary><strong>7. Painéis Flutuantes Inteligentes</strong></summary>
+
+Cards flutuantes aparecem automaticamente quando você está em um relatório ou tela relevante. Os cards podem ser colapsados para não atrapalhar a visualização. Preferências e estados dos cards ficam salvos para a próxima vez.
+
+<details>
+<summary><strong>8. Configurações e Popup</strong></summary>
+
+A extensão possui um popup fácil de acessar, onde você pode ativar ou desativar funções, mudar o tema, ver instruções e créditos. Suas preferências ficam salvas, mesmo se fechar o navegador.

@@ -11,7 +11,7 @@ function criarCardFiltro() {
         container.innerHTML = `
             <div class="container" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; min-width: 300px; width: fit-content; box-sizing: border-box; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; content-align: center; flex-direction: column; gap: 10px; font-size: 14px;">
                
-                <div id="overlay-desenvolvimento" style="display: flex; flex-direction: column; align-items: center; bottom: 80px; justify-content: center; position: absolute; left: 0;  width: 100%; height: 295px; background: rgb(255, 255, 255); z-index: 100000;">
+                <div id="overlay-desenvolvimento" style="display: flex; flex-direction: column; align-items: center; bottom: 80px; justify-content: center; position: absolute; left: 0;  width: 100%; height: 295px; background: rgb(255, 255, 255); z-index: 0;">
                     <span style="font-size: 1.3rem; font-weight: bold; color: #b00; margin-bottom: 18px;">EM DESENVOLVIMENTO</span>
                     <input id="senha-desenvolvimento" type="password" placeholder="" style="
                         background: transparent !important;

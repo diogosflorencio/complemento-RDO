@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Complemento RDO",
   "short_name": "Complemento RDO",
-  "version": "1.0",
-  "version_name": "1.0 - Compilador de Medição",
+  "version": "1.1",
+  "version_name": "1.1 - Extrair Linha a Linha",
   "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
   "action": {
     "default_popup": "popup/popup.html"
@@ -28,6 +28,7 @@
         "tema-dark/tema/tema.js",
         "tema-dark/tema_dark.js",
         "RDO/card_rdo_hh.js",
+        "RDO/card_rdo_hh_linha_a_linha.js",
         "RSP/scripts/rsp_script.js",
         "atalhos/atalhos.js",
         "atalhos/card_atalhos.js",

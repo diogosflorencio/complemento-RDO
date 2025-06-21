@@ -96,6 +96,7 @@ async function processarExtracaoDados() {
         const obras = await obterObrasFiltradas();
         if (!obras.length) throw new Error('Nenhuma obra encontrada.');
         let atividadesExtraidas = [];
+        let maoDeObraHH = [];
         for (let obra of obras) {
             await atualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`, 0);
             const relatorios = await obterRelatoriosObra(obra._id, dataInicio, dataFim, ordem);
@@ -114,6 +115,7 @@ async function processarExtracaoDados() {
                 const relatorio = relatoriosNoPeriodo[i];
                 await atualizarStatus(`Extraindo relatório ${i + 1}/${relatoriosNoPeriodo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
                 const detalhes = await obterDetalhesRelatorio(obra._id, relatorio._id);
+                // Atividades (aba Atividades)
                 if (Array.isArray(detalhes.atividades)) {
                     for (let atividade of detalhes.atividades) {
                         atividadesExtraidas.push({
@@ -127,18 +129,63 @@ async function processarExtracaoDados() {
                         });
                     }
                 }
+                // Mão de obra personalizada (aba HH)
+                if ((obra.nome || '').toUpperCase().includes('HH') && detalhes.maoDeObra && Array.isArray(detalhes.maoDeObra.personalizada)) {
+                    for (let pessoa of detalhes.maoDeObra.personalizada) {
+                        maoDeObraHH.push({
+                            'Data': relatorio.data || '', // Coluna A
+                            'Nome': pessoa.nome || '',     // Coluna D
+                            'Funcao': pessoa.funcao || '', // Coluna E
+                            'HoraInicio': pessoa.horaInicio || '', // Coluna F
+                            'HoraFim': pessoa.horaFim || '',       // Coluna G
+                            'Intervalo': pessoa.horasIntervalo || '', // Coluna H
+                            'Obra': obra.nome || ''        // Coluna P
+                        });
+                    }
+                }
             }
         }
-        if (atividadesExtraidas.length === 0) {
-            await atualizarStatus('Nenhuma atividade encontrada para exportar.');
+        if (atividadesExtraidas.length === 0 && maoDeObraHH.length === 0) {
+            await atualizarStatus('Nenhuma atividade ou mão de obra encontrada para exportar.');
             return;
         }
         await atualizarStatus('Compilando dados e gerando o arquivo .xlsx');
         const ws = XLSX.utils.json_to_sheet(atividadesExtraidas);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
+        // Se houver dados de HH, cria a aba HH com colunas específicas
+        if (maoDeObraHH.length > 0) {
+            const dadosHHParaPlanilha = [
+                // Cabeçalho - Linha 1
+                [
+                    'Data', // A
+                    'Nome', // B
+                    'Função', // C
+                    'Hora de Entrada', // D
+                    'Hora de Saída', // E
+                    'Intervalo', // F
+                    'Obra', // G
+                ]
+            ];
+
+            // Adiciona os dados
+            maoDeObraHH.forEach(item => {
+                dadosHHParaPlanilha.push([
+                    item.Data,
+                    item.Nome,
+                    item.Funcao,
+                    item.HoraInicio,
+                    item.HoraFim,
+                    item.Intervalo,
+                    item.Obra
+                ]);
+            });
+
+            const wsHH = XLSX.utils.aoa_to_sheet(dadosHHParaPlanilha);
+            XLSX.utils.book_append_sheet(wb, wsHH, 'HH');
+        }
         XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_diogosflorencio.xlsx');
-        await atualizarStatus('Extração completa gerada!');
+        await atualizarStatus('Extração completa gerada. Hmm, acho que é isso');
     } catch (error) {
         await atualizarStatus(`Erro: ${error.message}`);
         console.error('Erro no processamento:', error);
