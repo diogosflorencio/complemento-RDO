@@ -501,7 +501,9 @@ Permite ativar tema escuro para toda a extensão e o site, deixando a visualiza�
 
 Cards flutuantes aparecem automaticamente quando você está em um relatório ou tela relevante. Os cards podem ser colapsados para não atrapalhar a visualização. Preferências e estados dos cards ficam salvos para a próxima vez.
 
+</details>
 <details>
 <summary><strong>8. Configurações e Popup</strong></summary>
 
 A extensão possui um popup fácil de acessar, onde você pode ativar ou desativar funções, mudar o tema, ver instruções e créditos. Suas preferências ficam salvas, mesmo se fechar o navegador.
+</details>
