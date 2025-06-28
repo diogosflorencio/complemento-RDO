@@ -1,3 +1,12 @@
+## Versão [1.2 - Correções e Melhorias Gerais]
+
+### Novidades e Correções 🛠️
+- **Lista de Colaboradores Não Utilizados**: Agora é possível visualizar e copiar facilmente uma lista de colaboradores presentes no arquivo de ponto (CSV) que não aparecem nos RDOs, facilitando o controle e conferência de faltantes.
+- **Ajuste na Formatação UTF-8 dos Nomes**: Melhorado o tratamento de nomes com caracteres especiais no arquivo CSV, utilizando uma alternativa ao localStorage para garantir a correta leitura e gravação dos dados, evitando problemas de encoding.
+- **Adição e Correção do Extrator Geral**: O extrator geral foi revisado e finalizado, permitindo a extração consolidada de dados de todas as obras e relatórios, com maior estabilidade e precisão.
+- **Remoção do Aviso 'Em Desenvolvimento'**: O extrator geral e demais funcionalidades principais foram finalizados, removendo o status de 'em desenvolvimento' e tornando o sistema mais robusto e confiável para uso diário.
+
+
 ## Versão [1.1 - Extração de Horas Linha a Linha]
 
 ### Novidades e Melhorias 🚀
@@ -500,10 +509,11 @@ Permite ativar tema escuro para toda a extensão e o site, deixando a visualiza�
 <summary><strong>7. Painéis Flutuantes Inteligentes</strong></summary>
 
 Cards flutuantes aparecem automaticamente quando você está em um relatório ou tela relevante. Os cards podem ser colapsados para não atrapalhar a visualização. Preferências e estados dos cards ficam salvos para a próxima vez.
-
 </details>
+
 <details>
 <summary><strong>8. Configurações e Popup</strong></summary>
 
 A extensão possui um popup fácil de acessar, onde você pode ativar ou desativar funções, mudar o tema, ver instruções e créditos. Suas preferências ficam salvas, mesmo se fechar o navegador.
 </details>
+

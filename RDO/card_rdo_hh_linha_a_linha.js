@@ -1,32 +1,111 @@
-// card_rdo_hh_linha_a_linha.js - NOVO WORKFLOW
+// card_rdo_hh_linha_a_linha.js - VERSÃO FINAL
 
 // Identifica se está em um RDO de HH
 function identificaRelatorioRDO_HH() {
     const titulo = document.querySelector('td.rdo-title h5 b');
     const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
     const datalhesRelatorio = document.querySelector(".card-header h4");
-    return !!(titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio && nomeObra.includes('HH'));
+    return !!(titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio);
 }
 
-// Utilitário para persistir e recuperar CSV do localStorage
+// Utilitário para persistir e recuperar dados do localStorage com encoding correto
 const CSV_STORAGE_KEY = 'csv_hh_linha_a_linha';
 const REVISADOS_KEY = 'csv_hh_linha_a_linha_revisados';
+const UTILIZADOS_KEY = 'csv_hh_linha_a_linha_utilizados';
 
+// Função para salvar dados com encoding UTF-8 preservado
 function salvarCSVLocal(csv) {
-    localStorage.setItem(CSV_STORAGE_KEY, csv);
+    try {
+        // Converte para base64 para preservar caracteres especiais
+        const encodedCSV = btoa(unescape(encodeURIComponent(csv)));
+        localStorage.setItem(CSV_STORAGE_KEY, encodedCSV);
+    } catch (error) {
+        console.error('Erro ao salvar CSV:', error);
+        // Fallback: salva diretamente
+        localStorage.setItem(CSV_STORAGE_KEY, csv);
+    }
 }
+
 function lerCSVLocal() {
-    return localStorage.getItem(CSV_STORAGE_KEY) || '';
+    try {
+        const encodedCSV = localStorage.getItem(CSV_STORAGE_KEY);
+        if (!encodedCSV) return '';
+        
+        // Tenta decodificar do base64
+        try {
+            return decodeURIComponent(escape(atob(encodedCSV)));
+        } catch {
+            // Se falhar, assume que foi salvo diretamente
+            return encodedCSV;
+        }
+    } catch (error) {
+        console.error('Erro ao ler CSV:', error);
+        return '';
+    }
 }
+
 function salvarRevisados(revisados) {
     localStorage.setItem(REVISADOS_KEY, JSON.stringify(revisados));
 }
+
 function lerRevisados() {
     try {
         return JSON.parse(localStorage.getItem(REVISADOS_KEY)) || [];
     } catch {
         return [];
     }
+}
+
+function salvarUtilizados(utilizados) {
+    localStorage.setItem(UTILIZADOS_KEY, JSON.stringify(utilizados));
+}
+
+function lerUtilizados() {
+    try {
+        return JSON.parse(localStorage.getItem(UTILIZADOS_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+// Função melhorada para normalizar nomes para comparação
+function normalizarNome(nome) {
+    if (!nome) return '';
+    
+    return nome
+        .normalize('NFD') // Decompõe caracteres acentuados
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacríticos
+        .replace(/[^\w\s]/g, '') // Remove caracteres especiais
+        .replace(/\s+/g, ' ') // Normaliza espaços
+        .trim()
+        .toUpperCase();
+}
+
+// Função para criar variações do nome para busca
+function criarVariacoesNome(nome) {
+    const nomeBase = normalizarNome(nome);
+    const variacoes = new Set([nomeBase]);
+    
+    // Adiciona variações comuns
+    const palavras = nomeBase.split(' ');
+    
+    // Nome sem partículas (DE, DA, DO, DOS, DAS)
+    const semParticulas = palavras.filter(p => !['DE', 'DA', 'DO', 'DOS', 'DAS'].includes(p));
+    if (semParticulas.length !== palavras.length) {
+        variacoes.add(semParticulas.join(' '));
+    }
+    
+    // Apenas primeiro e último nome
+    if (palavras.length > 2) {
+        variacoes.add(`${palavras[0]} ${palavras[palavras.length - 1]}`);
+    }
+    
+    // Primeiros dois nomes
+    if (palavras.length > 1) {
+        variacoes.add(`${palavras[0]} ${palavras[1]}`);
+    }
+    
+    return Array.from(variacoes);
 }
 
 // Parseia o relatório de colaboradores no formato da CONAMI
@@ -38,15 +117,13 @@ function parseCSVColaboradores(csv) {
         const linha = linhas[i];
         
         // Busca por linhas que contêm ID e nome do colaborador
-        // Formato: "    11127,ABDIEL MILAGRE GAMBINE"
         const matchColaborador = linha.match(/^\s*(\d+),(.+)$/);
         
         if (matchColaborador) {
             const id = matchColaborador[1].trim();
-            const nome = matchColaborador[2].trim();
+            const nomeOriginal = matchColaborador[2].trim();
             
             // Procura pela linha de marcações nas próximas linhas
-            // Busca por linha que contém data, dia da semana e horários
             for (let j = i + 1; j < Math.min(i + 5, linhas.length); j++) {
                 const linhaMarcacao = linhas[j];
                 
@@ -63,32 +140,35 @@ function parseCSVColaboradores(csv) {
                         const intervaloFim = horarios[2] || '';
                         const saida = horarios[3] || '';
                         
-                        // Calcula intervalo em minutos
                         let intervalo = calcularIntervalo(entrada, intervaloIni, intervaloFim, saida);
                         
-                        colaboradores[nome] = {
+                        // Salva com o nome original preservado
+                        colaboradores[nomeOriginal] = {
                             id,
                             entrada,
                             intervaloIni,
                             intervaloFim,
                             saida,
-                            intervalo
+                            intervalo,
+                            nomeNormalizado: normalizarNome(nomeOriginal),
+                            variacoesNome: criarVariacoesNome(nomeOriginal)
                         };
                     } else if (horarios.length >= 2) {
-                        // Casos com menos horários (saída antecipada, etc.)
                         const entrada = horarios[0] || '';
                         const ultimoHorario = horarios[horarios.length - 1] || '';
                         
-                        colaboradores[nome] = {
+                        colaboradores[nomeOriginal] = {
                             id,
                             entrada,
                             intervaloIni: horarios[1] || '',
                             intervaloFim: horarios[2] || '',
                             saida: ultimoHorario,
-                            intervalo: horarios.length < 4 ? 'Incompleto' : ''
+                            intervalo: horarios.length < 4 ? 'Incompleto' : '',
+                            nomeNormalizado: normalizarNome(nomeOriginal),
+                            variacoesNome: criarVariacoesNome(nomeOriginal)
                         };
                     }
-                    break; // Encontrou a marcação, sai do loop interno
+                    break;
                 }
             }
         }
@@ -114,16 +194,13 @@ function calcularIntervalo(entrada, intervaloIni, intervaloFim, saida) {
         let minIntIni = hIntIni * 60 + mIntIni;
         let minIntFim = hIntFim * 60 + mIntFim;
         
-        // Ajusta para casos onde o horário cruza a meia-noite
         if (minSaida < minEntrada) minSaida += 24 * 60;
         if (minIntFim < minIntIni) minIntFim += 24 * 60;
         
-        // Verifica se o expediente é muito curto (menos de 4h30)
         if ((minSaida - minEntrada) < 270) {
             return '00:00';
         }
         
-        // Calcula o intervalo
         const minIntervalo = minIntFim - minIntIni;
         const horas = Math.floor(minIntervalo / 60);
         const minutos = minIntervalo % 60;
@@ -134,21 +211,61 @@ function calcularIntervalo(entrada, intervaloIni, intervaloFim, saida) {
     }
 }
 
+// Função melhorada para encontrar colaborador no CSV
+function encontrarColaboradorCSV(nomeDOM, dadosCSV) {
+    const nomeDOMNormalizado = normalizarNome(nomeDOM);
+    const variacoesDOMNome = criarVariacoesNome(nomeDOM);
+    
+    // Busca exata primeiro
+    for (const [nomeCSV, dados] of Object.entries(dadosCSV)) {
+        if (dados.nomeNormalizado === nomeDOMNormalizado) {
+            return { nomeCSV, dados };
+        }
+    }
+    
+    // Busca por variações do nome do DOM
+    for (const variacaoDOM of variacoesDOMNome) {
+        for (const [nomeCSV, dados] of Object.entries(dadosCSV)) {
+            if (dados.variacoesNome.includes(variacaoDOM)) {
+                return { nomeCSV, dados };
+            }
+        }
+    }
+    
+    // Busca por similaridade (contém)
+    for (const [nomeCSV, dados] of Object.entries(dadosCSV)) {
+        for (const variacaoCSV of dados.variacoesNome) {
+            for (const variacaoDOM of variacoesDOMNome) {
+                if (variacaoCSV.includes(variacaoDOM) || variacaoDOM.includes(variacaoCSV)) {
+                    return { nomeCSV, dados };
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
 // Busca os colaboradores do DOM
 function getColaboradoresDOM() {
-    // Considera apenas quem está dentro de #rdo-maodeobra
     const rdoMaoDeObra = document.querySelector('#rdo-maodeobra');
     if (!rdoMaoDeObra) return [];
     const linhas = rdoMaoDeObra.querySelectorAll('table.table tbody tr');
     const colaboradores = [];
+    
     linhas.forEach(linha => {
         const nomeTd = linha.querySelector('td');
-        const nome = nomeTd?.childNodes[0]?.textContent?.trim() || '';
+        let nome = nomeTd?.textContent?.trim() || '';
+        
+        // Remove "Mão de Obra Direta" do final do nome
+        nome = nome.replace(/\s+Mão de Obra Direta\s*$/i, '');
+        
         const funcao = linha.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
         const entrada = linha.querySelector('input[name="hInicio"]')?.value || '';
         const saida = linha.querySelector('input[name="hFim"]')?.value || '';
         const intervalo = linha.querySelector('input[name="horasIntervalo"]')?.value || '';
         const horasTrabalhadas = linha.querySelector('.horas-trabalhadas span')?.textContent?.trim() || '';
+        
         colaboradores.push({
             nome,
             funcao,
@@ -159,22 +276,21 @@ function getColaboradoresDOM() {
             linha
         });
     });
+    
     return colaboradores;
 }
 
 // Aplica as horas do CSV no DOM
 function aplicarHorasNoDOM(colab, dadosCSV) {
     if (!dadosCSV) return;
-    // Preenche os campos
+    
     if (colab.linha.querySelector('input[name="hInicio"]'))
         colab.linha.querySelector('input[name="hInicio"]').value = dadosCSV.entrada || '';
     if (colab.linha.querySelector('input[name="hFim"]'))
         colab.linha.querySelector('input[name="hFim"]').value = dadosCSV.saida || '';
     if (colab.linha.querySelector('input[name="horasIntervalo"]')) {
-        // Se houver intervalo de início e fim, calcula diferença, senão usa o campo do CSV
         let intervalo = '';
         if (dadosCSV.intervaloIni && dadosCSV.intervaloFim) {
-            // Calcula diferença em minutos
             const [h1, m1] = dadosCSV.intervaloIni.split(':').map(Number);
             const [h2, m2] = dadosCSV.intervaloFim.split(':').map(Number);
             let min = (h2 * 60 + m2) - (h1 * 60 + m1);
@@ -185,6 +301,7 @@ function aplicarHorasNoDOM(colab, dadosCSV) {
         }
         colab.linha.querySelector('input[name="horasIntervalo"]').value = intervalo;
     }
+    
     // Dispara eventos para simular digitação
     ['hInicio', 'hFim', 'horasIntervalo'].forEach(name => {
         const input = colab.linha.querySelector(`input[name="${name}"]`);
@@ -195,6 +312,24 @@ function aplicarHorasNoDOM(colab, dadosCSV) {
     });
 }
 
+// Função para identificar colaboradores não utilizados
+function getColaboradoresNaoUtilizados(dadosCSV, utilizados) {
+    const naoUtilizados = [];
+    
+    for (const [nomeCSV, dados] of Object.entries(dadosCSV)) {
+        if (!utilizados.includes(nomeCSV)) {
+            naoUtilizados.push({
+                nome: nomeCSV,
+                entrada: dados.entrada,
+                saida: dados.saida,
+                intervalo: dados.intervalo
+            });
+        }
+    }
+    
+    return naoUtilizados;
+}
+
 let containerCriadoLinhaALinha = false;
 
 function criarContainerLinhaALinha() {
@@ -202,8 +337,8 @@ function criarContainerLinhaALinha() {
     if (containerCriadoLinhaALinha) return null;
     const existente = document.querySelector('.conteiner_hora_linhaalinha');
     if (existente) return existente;
-    // Remove container antigo se existir
-        const container = document.createElement('div');
+    
+    const container = document.createElement('div');
     container.className = 'conteiner_hora_linhaalinha';
     container.style = `
         position: fixed;
@@ -222,12 +357,15 @@ function criarContainerLinhaALinha() {
         transition: height 0.3s;
         overflow-y: auto;
     `;
+    
     let csvSalvo = lerCSVLocal();
     let revisados = lerRevisados();
+    let utilizados = lerUtilizados();
     let dadosCSV = csvSalvo ? parseCSVColaboradores(csvSalvo) : {};
-    // Colapso
+    
     let isCollapsed = localStorage.getItem('rdoLinhaALinhaWrapperState') === 'collapsed';
-        container.innerHTML = `
+    
+    container.innerHTML = `
         <div class="wrapper-container-linhaalinha" style="position: absolute; z-index: 99999; top: 3px; left: 15px; width: 25px; margin: 0px; padding: 0px; color: #1d5b50; cursor: pointer;">
             <svg class="down" viewBox="0 0 24 24" style="transition: transform 0.3s; transform: rotate(${isCollapsed ? 180 : 0}deg);">
                 <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" fill="#1d5b50"></path>
@@ -240,62 +378,65 @@ function criarContainerLinhaALinha() {
         <div id="csvStatusLinhaALinha" style="font-size: 12px; color: #888; margin-bottom: 10px;"></div>
         <div id="listaColaboradoresLinhaALinha" style="max-height: 38vh; overflow-y: auto; padding-right: 10px;"></div>
     `;
-        document.body.appendChild(container);
+    
+    document.body.appendChild(container);
 
     // Colapso/expansão
     const wrapperContainer = container.querySelector('.wrapper-container-linhaalinha');
-        const svgArrow = wrapperContainer.querySelector('.down');
-        function applyCollapsedState() {
+    const svgArrow = wrapperContainer.querySelector('.down');
+    
+    function applyCollapsedState() {
         container.style.height = '30px';
         container.style.width = '30px';
         container.style.padding = '5px';
         container.style.overflow = 'hidden';
         container.style.borderRadius = '5px';
-            svgArrow.style.transform = 'rotate(180deg)';
-            wrapperContainer.style.position = 'absolute';
-            wrapperContainer.style.left = '0';
-            wrapperContainer.style.top = '0';
+        svgArrow.style.transform = 'rotate(180deg)';
+        wrapperContainer.style.position = 'absolute';
+        wrapperContainer.style.left = '0';
+        wrapperContainer.style.top = '0';
         container.style.alignItems = 'center';
         container.style.justifyContent = 'center';
-        }
-        function applyExpandedState() {
+    }
+    
+    function applyExpandedState() {
         container.style.height = 'auto';
         container.style.width = '380px';
         container.style.padding = '20px';
         container.style.overflow = 'visible';
         container.style.borderRadius = '8px';
-            svgArrow.style.transform = 'rotate(0deg)';
-            wrapperContainer.style.position = 'absolute';
-            wrapperContainer.style.left = '15px';
-            wrapperContainer.style.top = '3px';
-        }
-            if (isCollapsed) {
-                applyCollapsedState();
-            } else {
-                applyExpandedState();
-            }
-            wrapperContainer.addEventListener('click', () => {
-                isCollapsed = !isCollapsed;
+        svgArrow.style.transform = 'rotate(0deg)';
+        wrapperContainer.style.position = 'absolute';
+        wrapperContainer.style.left = '15px';
+        wrapperContainer.style.top = '3px';
+    }
+    
+    if (isCollapsed) {
+        applyCollapsedState();
+    } else {
+        applyExpandedState();
+    }
+    
+    wrapperContainer.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
         localStorage.setItem('rdoLinhaALinhaWrapperState', isCollapsed ? 'collapsed' : 'expanded');
-                if (isCollapsed) {
-                    applyCollapsedState();
-                } else {
-                    applyExpandedState();
-                }
-            });
+        if (isCollapsed) {
+            applyCollapsedState();
+        } else {
+            applyExpandedState();
+        }
+    });
 
     const csvInputArea = container.querySelector('#csvInputAreaLinhaALinha');
     const statusCSV = container.querySelector('#csvStatusLinhaALinha');
     const listaColabs = container.querySelector('#listaColaboradoresLinhaALinha');
 
     function arredondarPonto(entrada, saida) {
-        // Arredonda entrada para 06:30 se entre 06:00 e 06:30
         let entradaArred = entrada;
         let saidaArred = saida;
         if (/^06:(0[0-9]|1[0-9]|2[0-9]|30)$/.test(entrada)) {
             entradaArred = '06:30';
         }
-        // Arredonda saída para 16:18 se entre 16:18 e 16:30
         if (/^16:(1[8-9]|2[0-9]|30)$/.test(saida)) {
             saidaArred = '16:18';
         }
@@ -305,7 +446,6 @@ function criarContainerLinhaALinha() {
     function renderCSVInput() {
         csvInputArea.innerHTML = '';
         if (!csvSalvo) {
-            // Input estilizado
             const label = document.createElement('label');
             label.textContent = 'Escolher arquivo de ponto';
             label.style = 'display:inline-block; margin-bottom:10px; padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
@@ -321,66 +461,115 @@ function criarContainerLinhaALinha() {
                     const csv = evt.target.result;
                     salvarCSVLocal(csv);
                     revisados = [];
+                    utilizados = [];
                     salvarRevisados(revisados);
+                    salvarUtilizados(utilizados);
                     csvSalvo = csv;
                     dadosCSV = parseCSVColaboradores(csv);
                     statusCSV.textContent = 'Arquivo de ponto carregado!';
                     renderCSVInput();
                     atualizarLista();
                 };
-                reader.readAsText(file);
-                // Corrige bug: reseta input para permitir novo upload igual
+                reader.readAsText(file, 'UTF-8');
                 e.target.value = '';
             });
             label.appendChild(inputCSV);
-            label.addEventListener('click', () => inputCSV.click());
             csvInputArea.appendChild(label);
         } else {
-            // Botão substituir estilizado
+            const containerBotoes = document.createElement('div');
+            containerBotoes.style = 'display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start;';
+            
             const btnSubstituir = document.createElement('button');
             btnSubstituir.textContent = 'Substituir ponto';
-            btnSubstituir.style = 'margin-bottom:10px; padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
+            btnSubstituir.style = 'padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
             btnSubstituir.addEventListener('click', () => {
                 localStorage.removeItem(CSV_STORAGE_KEY);
                 localStorage.removeItem(REVISADOS_KEY);
+                localStorage.removeItem(UTILIZADOS_KEY);
                 csvSalvo = '';
                 revisados = [];
+                utilizados = [];
                 dadosCSV = {};
                 statusCSV.textContent = 'Nenhum arquivo de ponto carregado.';
                 renderCSVInput();
                 atualizarLista();
             });
-            csvInputArea.appendChild(btnSubstituir);
+            
+            const btnCopiarRestantes = document.createElement('button');
+            const naoUtilizados = getColaboradoresNaoUtilizados(dadosCSV, utilizados);
+            const totalCSV = Object.keys(dadosCSV).length;
+            btnCopiarRestantes.innerHTML = `Nomes restantes: <small style="font-size:10px;">${naoUtilizados.length}/${totalCSV}</small>`;
+            // | Rev: ${revisados.length}
+            // btnCopiarRestantes.style = 'padding:4px 8px; border-radius:8px; background:#d2691e; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:12px; line-height:1.2;';
+            btnCopiarRestantes.style = 'padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px; line-height:1.2;';
+            btnCopiarRestantes.addEventListener('click', () => {
+                const naoUtilizados = getColaboradoresNaoUtilizados(dadosCSV, utilizados);
+                if (naoUtilizados.length === 0) {
+                    alert('Todo mundo do relatorio de ponto foi adicionado ao rdo');
+                    return;
+                }
+                
+                let texto = `COLABORADORES NÃO UTILIZADOS (${naoUtilizados.length}):\n\n`;
+                naoUtilizados.forEach((colab, index) => {
+                    texto += `${index + 1}. ${colab.nome}\n`;
+                    texto += `   Entrada: ${colab.entrada} | Saída: ${colab.saida} | Intervalo: ${colab.intervalo}\n\n`;
+                });
+                
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert('Lista de nomes copiadas (nomes que n foram adicionados ao rdo)');
+                }).catch(() => {
+                    // Fallback para navegadores que não suportam clipboard API
+                    const textarea = document.createElement('textarea');
+                    textarea.value = texto;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Lista de nomes copiadas (nomes que n foram adicionados ao rdo)');
+                });
+            });
+            
+            containerBotoes.appendChild(btnSubstituir);
+            containerBotoes.appendChild(btnCopiarRestantes);
+            csvInputArea.appendChild(containerBotoes);
         }
     }
 
     function atualizarLista() {
         const colaboradores = getColaboradoresDOM();
         listaColabs.innerHTML = '';
+        
         colaboradores.forEach(colab => {
-            const normalizar = s => s.normalize('NFD').replace(/[^\w\s]/g, '').replace(/\s+/g, '').toLowerCase();
-            const nomeColab = normalizar(colab.nome);
-            let nomeCSV = Object.keys(dadosCSV).find(n => normalizar(n) === nomeColab);
-            const dados = nomeCSV ? dadosCSV[nomeCSV] : null;
+            const resultado = encontrarColaboradorCSV(colab.nome, dadosCSV);
+            const dados = resultado?.dados;
+            const nomeCSV = resultado?.nomeCSV;
             const revisado = revisados.includes(colab.nome);
+            
+            // Adiciona à lista de utilizados se encontrou no CSV
+            if (nomeCSV && !utilizados.includes(nomeCSV)) {
+                utilizados.push(nomeCSV);
+                salvarUtilizados(utilizados);
+            }
+            
             let pontoArred = { entradaArred: '', saidaArred: '' };
             if (dados) {
                 pontoArred = arredondarPonto(dados.entrada, dados.saida);
             }
+            
             const div = document.createElement('div');
             div.style = `border: 1.5px solid #222; border-radius: 8px; margin-bottom: 7px; padding: 8px; background: ${revisado ? '#e0ffe0' : '#fff'}; box-shadow:2px 2px #000;`;
-            // <span style=\"color:#888\">(${colab.funcao})</span>
             div.innerHTML = `
                 <b>${colab.nome}</b> <br>
-                <span style=\"font-size:12px;\">Horário padrão: <b>${colab.entrada}</b> | <b>${colab.saida}</b> | <b>${colab.intervalo}</b></span><br>
-                <span style=\"font-size:12px;\">${dados ? `Horário do ponto: <b>${dados.entrada}</b> | <b>${dados.intervalo}</b> | <b>${dados.saida}</b>` : '<span style=\"color:#c00\">Não encontrado no relatório de ponto (faltou ou o nome do diariodeobra está diferente do csv)</span>'}</span><br>
-                ${dados ? `<span style=\"font-size:12px; color:#1d5b50;\">Horário ajustado: <b>${pontoArred.entradaArred}</b> | <b>${dados.intervalo}</b> | <b>${pontoArred.saidaArred}</b></span><br>` : ''}
-                <button class=\"btn-aplicar-horas\" style=\"margin-top:4px; padding:2px 8px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;\" ${revisado || !dados ? 'disabled' : ''}>Aplicar horas do ponto</button>
+                <span style="font-size:12px;">Horário padrão: <b>${colab.entrada}</b> | <b>${colab.saida}</b> | <b>${colab.intervalo}</b></span><br>
+                <span style="font-size:12px;">${dados ? `Horário do ponto: <b>${dados.entrada}</b> | <b>${dados.intervalo}</b> | <b>${dados.saida}</b>` : '<span style="color:#c00">Não encontrado no relatório de ponto</span>'}</span><br>
+                ${dados ? `<span style="font-size:12px; color:#1d5b50;">Horário ajustado: <b>${pontoArred.entradaArred}</b> | <b>${dados.intervalo}</b> | <b>${pontoArred.saidaArred}</b></span><br>` : ''}
+                ${nomeCSV ? `<span style="font-size:10px; color:#666;">Encontrado como: ${nomeCSV}</span><br>` : ''}
+                <button class="btn-aplicar-horas" style="margin-top:4px; padding:2px 8px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;" ${revisado || !dados ? 'disabled' : ''}>Aplicar horas do ponto</button>
             `;
+            
             const btn = div.querySelector('.btn-aplicar-horas');
             if (btn && !revisado && dados) {
                 btn.addEventListener('click', () => {
-                    // Aplica o ponto arredondado
                     aplicarHorasNoDOM(colab, {
                         entrada: pontoArred.entradaArred,
                         saida: pontoArred.saidaArred,
@@ -389,8 +578,10 @@ function criarContainerLinhaALinha() {
                     revisados.push(colab.nome);
                     salvarRevisados(revisados);
                     atualizarLista();
+                    renderCSVInput(); // Atualiza o botão com os novos status
                 });
             }
+            
             listaColabs.appendChild(div);
         });
     }
