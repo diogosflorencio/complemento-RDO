@@ -1,11 +1,21 @@
 // card_rdo_hh_linha_a_linha.js - VERSÃO FINAL
 
 // Identifica se está em um RDO de HH
-function identificaRelatorioRDO_HH() {
+async function identificaRelatorioRDO_HH() {
     const titulo = document.querySelector('td.rdo-title h5 b');
     const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
     const datalhesRelatorio = document.querySelector(".card-header h4");
-    return !!(titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio);
+
+    if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio) {
+        // Verifica se o servidor está disponível para funcionalidades
+        const available = await isServerAvailable();
+        if (!available) {
+            console.log('Servidor indisponível - funcionalidades de RDO HH não executadas');
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 // Utilitário para persistir e recuperar dados do localStorage com encoding correto
@@ -108,7 +118,7 @@ function criarVariacoesNome(nome) {
     return Array.from(variacoes);
 }
 
-// Parseia o relatório de colaboradores no formato da CONAMI
+// Parseia o relatório de colaboradores no formato
 function parseCSVColaboradores(csv) {
     const linhas = csv.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     const colaboradores = {};
@@ -259,6 +269,7 @@ function getColaboradoresDOM() {
         
         // Remove "Mão de Obra Direta" do final do nome
         nome = nome.replace(/\s+Mão de Obra Direta\s*$/i, '');
+        nome = nome.replace(/\s+Mão de Obra Indireta\s*$/i, '');
         
         const funcao = linha.querySelector('td:nth-child(2)')?.textContent?.trim() || '';
         const entrada = linha.querySelector('input[name="hInicio"]')?.value || '';
@@ -306,8 +317,11 @@ function aplicarHorasNoDOM(colab, dadosCSV) {
     ['hInicio', 'hFim', 'horasIntervalo'].forEach(name => {
         const input = colab.linha.querySelector(`input[name="${name}"]`);
         if (input) {
+            input.value = input.value; // Garante que o valor está atualizado
             input.dispatchEvent(new Event('input', { bubbles: true }));
             input.dispatchEvent(new Event('change', { bubbles: true }));
+            input.focus();
+            input.dispatchEvent(new Event('blur', { bubbles: true }));
         }
     });
 }
@@ -332,8 +346,8 @@ function getColaboradoresNaoUtilizados(dadosCSV, utilizados) {
 
 let containerCriadoLinhaALinha = false;
 
-function criarContainerLinhaALinha() {
-    if (!identificaRelatorioRDO_HH()) return null;
+async function criarContainerLinhaALinha() {
+    if (!(await identificaRelatorioRDO_HH())) return null;
     if (containerCriadoLinhaALinha) return null;
     const existente = document.querySelector('.conteiner_hora_linhaalinha');
     if (existente) return existente;
@@ -366,15 +380,15 @@ function criarContainerLinhaALinha() {
     let isCollapsed = localStorage.getItem('rdoLinhaALinhaWrapperState') === 'collapsed';
     
     container.innerHTML = `
-        <div class="wrapper-container-linhaalinha" style="position: absolute; z-index: 99999; top: 3px; left: 15px; width: 25px; margin: 0px; padding: 0px; color: #1d5b50; cursor: pointer;">
+        <div class="wrapper-container-linhaalinha" style="position: absolute; z-index: 99999; top: 3px; left: 15px; width: 25px; margin: 0px; padding: 0px; color: var(--theme-color); cursor: pointer;">
             <svg class="down" viewBox="0 0 24 24" style="transition: transform 0.3s; transform: rotate(${isCollapsed ? 180 : 0}deg);">
-                <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" fill="#1d5b50"></path>
+                <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" fill="var(--theme-color)"></path>
         </svg>
     </div>
     <div class="cabecalho" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="margin: 15px 0px 5px; color: #1d5b50; font-size: 22px; font-weight: 550;">REVISÃO DE HORAS (ponto)</div>
+            <div style="margin: 15px 0px 5px; color: var(--theme-color); font-size: 22px; font-weight: 550;">REVISÃO DE HORAS (ponto)</div>
     </div>
-        <div id="csvInputAreaLinhaALinha"></div>
+        <div id="csvInputAreaLinhaALinha" ></div>
         <div id="csvStatusLinhaALinha" style="font-size: 12px; color: #888; margin-bottom: 10px;"></div>
         <div id="listaColaboradoresLinhaALinha" style="max-height: 38vh; overflow-y: auto; padding-right: 10px;"></div>
     `;
@@ -448,7 +462,7 @@ function criarContainerLinhaALinha() {
         if (!csvSalvo) {
             const label = document.createElement('label');
             label.textContent = 'Escolher arquivo de ponto';
-            label.style = 'display:inline-block; margin-bottom:10px; padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
+            label.style = 'display:inline-block; margin-bottom:10px; padding:4px 12px; border-radius:8px; background:var(--theme-color); color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
             const inputCSV = document.createElement('input');
             inputCSV.type = 'file';
             inputCSV.accept = '.csv';
@@ -477,11 +491,11 @@ function criarContainerLinhaALinha() {
             csvInputArea.appendChild(label);
         } else {
             const containerBotoes = document.createElement('div');
-            containerBotoes.style = 'display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-start;';
+            containerBotoes.style = 'display: flex; gap: 8px; margin-bottom: 10px; align-items:normal; height: 45px;';
             
             const btnSubstituir = document.createElement('button');
             btnSubstituir.textContent = 'Substituir ponto';
-            btnSubstituir.style = 'padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;';
+            btnSubstituir.style = 'padding: 4px 12px; border-radius: 8px; background: var(--theme-color); color: rgb(255, 255, 255); border: 2px solid black; box-shadow: rgb(0, 0, 0) 2px 2px; cursor: pointer; font-size: 14px; line-height: 1.2;';
             btnSubstituir.addEventListener('click', () => {
                 localStorage.removeItem(CSV_STORAGE_KEY);
                 localStorage.removeItem(REVISADOS_KEY);
@@ -500,8 +514,8 @@ function criarContainerLinhaALinha() {
             const totalCSV = Object.keys(dadosCSV).length;
             btnCopiarRestantes.innerHTML = `Nomes restantes: <small style="font-size:10px;">${naoUtilizados.length}/${totalCSV}</small>`;
             // | Rev: ${revisados.length}
-            // btnCopiarRestantes.style = 'padding:4px 8px; border-radius:8px; background:#d2691e; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:12px; line-height:1.2;';
-            btnCopiarRestantes.style = 'padding:4px 12px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px; line-height:1.2;';
+            // btnCopiarRestantes.style = 'padding:4px 8px; border-radius:8px; background:var(--theme-color); color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:12px; line-height:1.2;';
+            btnCopiarRestantes.style = 'padding:4px 12px; border-radius:8px; background:var(--theme-color); color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px; line-height:1.2;';
             btnCopiarRestantes.addEventListener('click', () => {
                 const naoUtilizados = getColaboradoresNaoUtilizados(dadosCSV, utilizados);
                 if (naoUtilizados.length === 0) {
@@ -509,10 +523,10 @@ function criarContainerLinhaALinha() {
                     return;
                 }
                 
-                let texto = `COLABORADORES NÃO UTILIZADOS (${naoUtilizados.length}):\n\n`;
+                let texto = `COLABORADORES QUE NÃO APARECERAM NOS RDOs (${naoUtilizados.length}):\n\n`;
                 naoUtilizados.forEach((colab, index) => {
                     texto += `${index + 1}. ${colab.nome}\n`;
-                    texto += `   Entrada: ${colab.entrada} | Saída: ${colab.saida} | Intervalo: ${colab.intervalo}\n\n`;
+                   
                 });
                 
                 navigator.clipboard.writeText(texto).then(() => {
@@ -529,8 +543,72 @@ function criarContainerLinhaALinha() {
                 });
             });
             
+            const btnAdicionarTodos = document.createElement('button');
+            const colaboradores = getColaboradoresDOM();
+            const colaboradoresParaAdicionar = colaboradores.filter(colab => {
+                const resultado = encontrarColaboradorCSV(colab.nome, dadosCSV);
+                const dados = resultado?.dados;
+                const revisado = revisados.includes(colab.nome);
+                return dados && !revisado;
+            });
+            
+            btnAdicionarTodos.innerHTML = `Adicionar todos (${colaboradoresParaAdicionar.length})`;
+            btnAdicionarTodos.style = 'padding:4px 12px; border-radius:8px; background:var(--theme-color); color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px; line-height:1.2;';
+            btnAdicionarTodos.addEventListener('click', async () => {
+                if (colaboradoresParaAdicionar.length === 0) {
+                    alert('Não tem ninguem pra adicionar');
+                    return;
+                }
+                
+                btnAdicionarTodos.disabled = true;
+                btnAdicionarTodos.textContent = 'Adicionando...';
+                
+                for (let i = 0; i < colaboradoresParaAdicionar.length; i++) {
+                    const colab = colaboradoresParaAdicionar[i];
+                    const resultado = encontrarColaboradorCSV(colab.nome, dadosCSV);
+                    const dados = resultado?.dados;
+                    
+                    if (dados) {
+                        const pontoArred = arredondarPonto(dados.entrada, dados.saida);
+                        aplicarHorasNoDOM(colab, {
+                            entrada: pontoArred.entradaArred,
+                            saida: pontoArred.saidaArred,
+                            intervalo: dados.intervalo
+                        });
+                        revisados.push(colab.nome);
+                        salvarRevisados(revisados);
+                        
+                        // Atualiza o progresso no botão
+                        btnAdicionarTodos.textContent = `Adicionando... (${i + 1}/${colaboradoresParaAdicionar.length})`;
+                        
+                        // Aguarda 1 segundo antes da próxima adição
+                        if (i < colaboradoresParaAdicionar.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    }
+                }
+                
+                // Atualiza a lista e o botão
+                atualizarLista();
+                renderCSVInput();
+                btnAdicionarTodos.disabled = false;
+                btnAdicionarTodos.textContent = 'Concluído!';
+                
+                setTimeout(() => {
+                    const colaboradoresAtualizados = getColaboradoresDOM();
+                    const colaboradoresParaAdicionarAtualizados = colaboradoresAtualizados.filter(colab => {
+                        const resultado = encontrarColaboradorCSV(colab.nome, dadosCSV);
+                        const dados = resultado?.dados;
+                        const revisado = revisados.includes(colab.nome);
+                        return dados && !revisado;
+                    });
+                    btnAdicionarTodos.innerHTML = `Adicionar todos (${colaboradoresParaAdicionarAtualizados.length})`;
+                }, 2000);
+            });
+            
             containerBotoes.appendChild(btnSubstituir);
             containerBotoes.appendChild(btnCopiarRestantes);
+            containerBotoes.appendChild(btnAdicionarTodos);
             csvInputArea.appendChild(containerBotoes);
         }
     }
@@ -562,9 +640,9 @@ function criarContainerLinhaALinha() {
                 <b>${colab.nome}</b> <br>
                 <span style="font-size:12px;">Horário padrão: <b>${colab.entrada}</b> | <b>${colab.saida}</b> | <b>${colab.intervalo}</b></span><br>
                 <span style="font-size:12px;">${dados ? `Horário do ponto: <b>${dados.entrada}</b> | <b>${dados.intervalo}</b> | <b>${dados.saida}</b>` : '<span style="color:#c00">Não encontrado no relatório de ponto</span>'}</span><br>
-                ${dados ? `<span style="font-size:12px; color:#1d5b50;">Horário ajustado: <b>${pontoArred.entradaArred}</b> | <b>${dados.intervalo}</b> | <b>${pontoArred.saidaArred}</b></span><br>` : ''}
+                ${dados ? `<span style="font-size:12px; color:var(--theme-color);">Horário ajustado: <b>${pontoArred.entradaArred}</b> | <b>${dados.intervalo}</b> | <b>${pontoArred.saidaArred}</b></span><br>` : ''}
                 ${nomeCSV ? `<span style="font-size:10px; color:#666;">Encontrado como: ${nomeCSV}</span><br>` : ''}
-                <button class="btn-aplicar-horas" style="margin-top:4px; padding:2px 8px; border-radius:8px; background:#1d5b50; color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;" ${revisado || !dados ? 'disabled' : ''}>Aplicar horas do ponto</button>
+                <button class="btn-aplicar-horas" style="margin-top:4px; padding:2px 8px; border-radius:8px; background:var(--theme-color); color:#fff; border:2px solid black; box-shadow:2px 2px #000; cursor:pointer; font-size:14px;" ${revisado || !dados ? 'disabled' : ''}>Aplicar horas do ponto</button>
             `;
             
             const btn = div.querySelector('.btn-aplicar-horas');
@@ -598,15 +676,18 @@ function removerContainerLinhaALinha() {
     containerCriadoLinhaALinha = false;
 }
 
-const observerLinhaALinha = new MutationObserver(() => {
-    if (identificaRelatorioRDO_HH()) {
-        criarContainerLinhaALinha();
+const observerLinhaALinha = new MutationObserver(async () => {
+    if (await identificaRelatorioRDO_HH()) {
+        await criarContainerLinhaALinha();
     } else {
         removerContainerLinhaALinha();
     }
 });
 observerLinhaALinha.observe(document.body, { childList: true, subtree: true });
 
-if (identificaRelatorioRDO_HH()) {
-    criarContainerLinhaALinha();
-}
+// Initial check
+(async () => {
+    if (await identificaRelatorioRDO_HH()) {
+        await criarContainerLinhaALinha();
+    }
+})();

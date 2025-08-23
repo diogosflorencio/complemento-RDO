@@ -84,6 +84,13 @@ async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
 
 // Função principal: extrai dados dos relatórios e exporta XLSX
 async function processarExtracaoDados() {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - extração de dados não executada');
+        return;
+    }
+    
     const btnExtrair = document.querySelector('.btn-extrair-dados');
     try {
         if (btnExtrair) btnExtrair.disabled = true;

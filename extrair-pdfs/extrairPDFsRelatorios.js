@@ -204,6 +204,13 @@ async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
 // ===== FLUXO PRINCIPAL =====
 
 async function processarRelatorios() {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - processamento de relatórios não executado');
+        return;
+    }
+    
     const btnExtrair = document.querySelector('.btn-extrair-pdf');
     try {
         if (!window.PDFLib) {

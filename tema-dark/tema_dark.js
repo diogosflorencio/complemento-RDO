@@ -8960,7 +8960,14 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 });
 
 // Função principal para aplicar o tema escuro
-function applyDarkMode(isEnabled) {
+async function applyDarkMode(isEnabled) {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - tema escuro não aplicado');
+        return;
+    }
+
     temaDark(isEnabled);
     document.body.style.backgroundColor = isEnabled ? '#121212' : '';
 }

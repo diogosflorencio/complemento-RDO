@@ -14,21 +14,40 @@ const unificador_headers = {
 let unificador_PDFExtractorAtivo = true;
 let unificador_cardFiltroCreated = false;
 
-// Load initial state
-chrome.storage.sync.get('PDFExtractor', function (data) {
-    unificador_PDFExtractorAtivo = data.PDFExtractor ?? true;
-    if (!unificador_PDFExtractorAtivo) {
-        const container = document.querySelector('.container_pdf_filtro');
-        if (container) {
-            container.remove();
-            unificador_cardFiltroCreated = false;
-        }
+// Função para inicializar o extrator apenas se o servidor estiver disponível
+async function initializePDFExtractor() {
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - extrator de PDFs não habilitado');
+        return;
     }
-});
+
+    // Load initial state
+    chrome.storage.sync.get('PDFExtractor', function (data) {
+        unificador_PDFExtractorAtivo = data.PDFExtractor ?? true;
+        if (!unificador_PDFExtractorAtivo) {
+            const container = document.querySelector('.container_pdf_filtro');
+            if (container) {
+                container.remove();
+                unificador_cardFiltroCreated = false;
+            }
+        }
+    });
+}
+
+// Inicializa o extrator
+initializePDFExtractor();
 
 // Message listener
-chrome.runtime.onMessage.addListener((mensagem, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (mensagem, sender, sendResponse) => {
     if ('PDFExtractor' in mensagem) {
+        // Verifica se o servidor está disponível antes de processar
+        const available = await isServerAvailable();
+        if (!available) {
+            console.log('Servidor indisponível - mensagem PDFExtractor ignorada');
+            return;
+        }
+
         unificador_PDFExtractorAtivo = mensagem.PDFExtractor;
         if (!unificador_PDFExtractorAtivo) {
             const container = document.querySelector('.container_pdf_filtro');
@@ -45,7 +64,14 @@ chrome.runtime.onMessage.addListener((mensagem, sender, sendResponse) => {
     }
 });
 
-function unificador_criarCardFiltro() {
+async function unificador_criarCardFiltro() {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - card de filtro não criado');
+        return null;
+    }
+
     if (!unificador_PDFExtractorAtivo) return null;
     console.log('Criando card filtro');
     const container = document.createElement('div');

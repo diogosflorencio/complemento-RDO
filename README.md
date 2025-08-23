@@ -1,3 +1,23 @@
+## Versão [1.4 - Revisão Geral de Relatórios e Melhorias no Servidor]
+
+### Novidades e Correções 🛠️
+- **Revisão Geral de Relatórios**: Revisão completa do sistema de relatórios com melhorias na precisão e confiabilidade dos dados extraídos
+- **Melhorias no Servidor**: Otimizações no servidor para melhor performance e estabilidade
+- **Aprimoramento da Estabilidade**: Correções gerais que aumentam a robustez do sistema
+
+### Observação
+A versão 1.4 traz uma revisão completa dos relatórios e melhorias significativas no servidor, resultando em um sistema mais confiável e eficiente.
+
+## Versão [1.3 - Correções Gerais]
+
+### Novidades e Correções 🛠️
+- **Correções de Bugs Diversos**: Resolução de vários bugs identificados na versão anterior
+- **Melhorias na Estabilidade**: Ajustes que aumentam a estabilidade geral do sistema
+- **Aprimoramentos de Interface**: Melhorias na usabilidade e experiência do usuário
+
+### Observação
+A versão 1.3 foca em correções gerais e melhorias de estabilidade, garantindo uma experiência mais confiável para os usuários.
+
 ## Versão [1.2 - Correções e Melhorias Gerais]
 
 ### Novidades e Correções 🛠️

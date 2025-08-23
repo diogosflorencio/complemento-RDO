@@ -2,7 +2,14 @@
  * Módulo de Atalhos de Teclado
  * Cria e gerencia um painel flutuante que exibe os atalhos de teclado disponíveis na aplicação
  */
-(function() {
+(async function() {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - painel de atalhos não criado');
+        return;
+    }
+
     // Cria o elemento principal do painel de atalhos
     const shortcutPanel = document.createElement('div');
     shortcutPanel.id = 'shortcutPanel';

@@ -30,27 +30,27 @@ document.addEventListener('DOMContentLoaded', function () {
         setupObrasSlider(data.obrasSlider ?? true);  // Adicionado
     });
 
-    // Configuração do Disclaimer
-    const content = document.getElementById('disclaimer-content');
-    const subtitle = document.getElementById('disclaimer-subtitle');
-    const button = document.querySelector('.collapse-button-eye');
-    const header = document.querySelector('.disclaimer-header');
+    // // Configuração do Disclaimer
+    // const content = document.getElementById('disclaimer-content');
+    // const subtitle = document.getElementById('disclaimer-subtitle');
+    // const button = document.querySelector('.collapse-button-eye');
+    // const header = document.querySelector('.disclaimer-header');
 
-    // Função para alternar visibilidade do disclaimer
-    function toggleDisclaimer() {
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
-            subtitle.style.display = 'none';
-            button.classList.add('active');
-        } else {
-            content.style.display = 'none';
-            subtitle.style.display = 'block';
-            button.classList.remove('active');
-        }
-    }
+    // // Função para alternar visibilidade do disclaimer
+    // function toggleDisclaimer() {
+    //     if (content.style.display === 'none') {
+    //         content.style.display = 'block';
+    //         subtitle.style.display = 'none';
+    //         button.classList.add('active');
+    //     } else {
+    //         content.style.display = 'none';
+    //         subtitle.style.display = 'block';
+    //         button.classList.remove('active');
+    //     }
+    // }
 
-    // Adiciona listener para o clique no header
-    header.addEventListener('click', toggleDisclaimer);
+    // // Adiciona listener para o clique no header
+    // header.addEventListener('click', toggleDisclaimer);
 });
 
 // Configuração da chave API do Gemini

@@ -1,4 +1,11 @@
-function criarCardFiltro() {
+async function criarCardFiltro() {
+      // Verifica se o servidor está disponível para funcionalidades
+      const available = await isServerAvailable();
+      if (!available) {
+          console.log('Servidor indisponível - processamento de relatórios não executado');
+          return;
+      }
+
     if (document.querySelector('.container_pdf_filtro')) return;
     if (!PDFExtractorAtivo) return null;
     console.log('Criando card filtro');

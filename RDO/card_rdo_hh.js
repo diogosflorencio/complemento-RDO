@@ -1,4 +1,11 @@
-function identificaRelatorioRDO() {
+async function identificaRelatorioRDO() {
+    // Verifica se o servidor está disponível para funcionalidades
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - funcionalidades de RDO HH não executadas');
+        return false;
+    }
+
     const titulo = document.querySelector('td.rdo-title h5 b');
     const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
     const datalhesRelatorio = document.querySelector(".card-header h4"); // Essa tag só aparce quando o RDO está no modo de edição serve pra apenas mostrar o card no momento certo
@@ -529,8 +536,8 @@ function reiniciarObservacaoTabela() {
 
     const tabela = document.querySelector(".table.table-hover.table-sm");
     if (tabela) {
-        observerTabelaInstance = new MutationObserver(() => {
-            if (identificaRelatorioRDO()) {
+        observerTabelaInstance = new MutationObserver(async () => {
+            if (await identificaRelatorioRDO()) {
                 if (updateTimeout) {
                     clearTimeout(updateTimeout);
                 }
@@ -550,8 +557,8 @@ function reiniciarObservacaoTabela() {
     }
 }
 
-const observerRDO = new MutationObserver(() => {
-    if (!containerCriado && identificaRelatorioRDO()) {
+const observerRDO = new MutationObserver(async () => {
+    if (!containerCriado && await identificaRelatorioRDO()) {
         const container = criarContainer();
         if (container) {
             containerCriado = true;
@@ -566,8 +573,8 @@ observerRDO.observe(document.body, {
     subtree: true
 });
 
-const observernaoRDO = new MutationObserver(() => {
-    if (containerCriado && !identificaRelatorioRDO()) {
+const observernaoRDO = new MutationObserver(async () => {
+    if (containerCriado && !(await identificaRelatorioRDO())) {
         const container = document.querySelector('.conteiner_hora');
         if (container) {
             container.remove();
@@ -586,11 +593,14 @@ observernaoRDO.observe(document.body, {
 });
 
 
-if (identificaRelatorioRDO()) {
-    const container = criarContainer();
-    if (container) {
-        containerCriado = true;
-        reiniciarObservacaoTabela();
-        atualizarDados();
+// Verificação inicial
+(async function() {
+    if (await identificaRelatorioRDO()) {
+        const container = criarContainer();
+        if (container) {
+            containerCriado = true;
+            reiniciarObservacaoTabela();
+            atualizarDados();
+        }
     }
-}
+})();

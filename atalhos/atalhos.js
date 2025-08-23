@@ -1,14 +1,33 @@
 let keyboardShortcutsEnabled = true;
 
-chrome.storage.sync.get('keyboardShortcuts', function (data) {
-    keyboardShortcutsEnabled = data.keyboardShortcuts ?? true;
-    if (keyboardShortcutsEnabled) {
-        enableKeyboardShortcuts();
+// Função para inicializar atalhos apenas se o servidor estiver disponível
+async function initializeKeyboardShortcuts() {
+    const available = await isServerAvailable();
+    if (!available) {
+        console.log('Servidor indisponível - atalhos de teclado não habilitados');
+        return;
     }
-});
 
-chrome.runtime.onMessage.addListener((message) => {
+    chrome.storage.sync.get('keyboardShortcuts', function (data) {
+        keyboardShortcutsEnabled = data.keyboardShortcuts ?? true;
+        if (keyboardShortcutsEnabled) {
+            enableKeyboardShortcuts();
+        }
+    });
+}
+
+// Inicializa os atalhos
+initializeKeyboardShortcuts();
+
+chrome.runtime.onMessage.addListener(async (message) => {
     if ('keyboardShortcuts' in message) {
+        // Verifica se o servidor está disponível antes de processar
+        const available = await isServerAvailable();
+        if (!available) {
+            console.log('Servidor indisponível - mensagem keyboardShortcuts ignorada');
+            return;
+        }
+
         keyboardShortcutsEnabled = message.keyboardShortcuts;
         if (keyboardShortcutsEnabled) {
             enableKeyboardShortcuts();
