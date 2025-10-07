@@ -1,0 +1,27 @@
+{
+   "action": {
+      "default_popup": "popup/popup.html"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "css": [  ],
+      "js": [ "utils/server-check.js", "tema-dark/tema/tema.js", "tema-dark/tema_dark.js", "RDO/card_rdo_hh.js", "RDO/card_rdo_hh_linha_a_linha.js", "RSP/scripts/rsp_script.js", "atalhos/atalhos.js", "atalhos/card_atalhos.js", "extrair-pdfs/lib-extrator.js", "extrair-pdfs/sheetjs.js", "extrair-pdfs/conteiner.js", "extrair-pdfs/extrairPDFs.js", "extrair-pdfs/extrairPDFsRelatorios.js", "extrair-pdfs/extrairDadosRelatorios.js", "relatorios/relatorios.js", "relatorios/scroll.js" ],
+      "matches": [ "*://web.diariodeobra.app/*" ],
+      "run_at": "document_idle"
+   } ],
+   "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
+   "host_permissions": [ "*://web.diariodeobra.app/*", "https://unpleasant-ingaborg-diogosflorencio-baf2a414.koyeb.app/*" ],
+   "icons": {
+      "48": "imagens/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyKc5iS1SMHpS87t2XORD73tzR90k7RKYtDyW9LRvVmB8FbD9MqqvLYFXknJtLa7yYJvppFob/WEQDha2BwnUVESZnfq2MJBoBnDg8itwteKK2civ/dTVlAZLU5eUetNG60B632UOXA/teytxts+tcyB2wSBTzM4pohpU+fE8h8fvz7z8N7VMVG7nsLOZhdIBvcIi/4yf8XJCXCBtQ/42IsOcoE+1SnonGNflXj9f66P+K39nXeLYy8nTbrOjnG9lIAXO/nPeKCa12j2q+NFOcwyla9MeUr3o4PqNqG5agqnNJOiM87jnpyBlt8fa/2FWzAkFxT9gL51Qd1k9V7umLwIDAQAB",
+   "manifest_version": 3,
+   "name": "Complemento RDO",
+   "permissions": [ "activeTab", "storage" ],
+   "short_name": "Complemento RDO",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.8",
+   "version_name": "1.8 - Link pra cada linha"
+}
