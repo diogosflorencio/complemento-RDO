@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Complemento RDO",
+  "short_name": "Complemento RDO",
+  "version": "1.4",
+  "version_name": "1.4 - Revisão Geral de Relatórios (Faço mais nada kkkk)",
+  "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "icons": {
+    "48": "imagens/icon48.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "*://web.diariodeobra.app/*",
+    "https://sua-api-koyeb.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://web.diariodeobra.app/*"
+      ],
+      "css": [],
+      "js": [
+        "utils/server-check.js",
+        "tema-dark/tema/tema.js",
+        "tema-dark/tema_dark.js",
+        "RDO/card_rdo_hh.js",
+        "RDO/card_rdo_hh_linha_a_linha.js",
+        "RSP/scripts/rsp_script.js",
+        "atalhos/atalhos.js",
+        "atalhos/card_atalhos.js",
+        "extrair-pdfs/lib-extrator.js",
+        "extrair-pdfs/sheetjs.js",
+        "extrair-pdfs/conteiner.js",
+        "extrair-pdfs/extrairPDFs.js",
+        "extrair-pdfs/extrairPDFsRelatorios.js",
+        "extrair-pdfs/extrairDadosRelatorios.js",
+        "relatorios/relatorios.js",
+        "relatorios/scroll.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

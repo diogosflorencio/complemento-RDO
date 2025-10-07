@@ -1,0 +1,269 @@
+/**
+ * Script para slider de imagens de projetos usando API (com fade cruzado via variáveis CSS)
+ */
+(function() {
+    console.log('[ProjectSlider] Iniciando script...');
+
+    // Configurações
+    const API_BASE_URL = 'https://apiexterna.diariodeobra.app/v1';
+    const SLIDER_INTERVAL = 2000;
+    const CACHE_EXPIRATION = 30 * 60 * 1000;
+    const DEFAULT_IMAGE = 'https://cdndiariodeobra.azureedge.net/obras-foto/607489ec47884751d57325e2/65afc3a3a0070f4e7407f052/0e3ed2d5.png';
+    const galleryCache = {};
+    let isInitialized = false;
+
+    // Adiciona estilo CSS para transição com fade cruzado usando variáveis CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .imagem.bg {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        .imagem.bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: var(--before-image);
+            background-size: cover;
+            background-position: center;
+            transition: opacity 0.5s ease-in-out;
+            opacity: var(--before-opacity, 1);
+            z-index: 1;
+        }
+        .imagem.bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: var(--after-image);
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 1. Função para pré-carregar imagens
+    function preloadImages(imageUrls) {
+        console.log('[ProjectSlider] Pré-carregando imagens:', imageUrls);
+        imageUrls.forEach(url => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => console.log(`[ProjectSlider] Imagem carregada: ${url}`);
+            img.onerror = () => console.error(`[ProjectSlider] Erro ao carregar imagem: ${url}`);
+        });
+    }
+
+    // 2. Função para obter o token da API
+    function getApiToken() {
+        try {
+            const empresaData = localStorage.getItem('RDOEmpresa');
+            if (!empresaData) return null;
+            const parsedData = JSON.parse(empresaData);
+            return parsedData?.tokenApiExterna || null;
+        } catch (error) {
+            console.error('[ProjectSlider] ERRO ao obter token:', error);
+            return null;
+        }
+    }
+
+    // 3. Função para fazer requisições à API
+    async function apiFetch(endpoint) {
+        const token = getApiToken();
+        if (!token) throw new Error('Token não disponível');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                headers: { 'token': token }
+            });
+            if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.warn(`[ProjectSlider] Falha na requisição para ${endpoint}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    // 4. Função para extrair ID do projeto do href
+    function extractProjectId(href) {
+        if (!href) return null;
+        const match = href.match(/\/app\/obras\/([a-f0-9]+)/);
+        return match ? match[1] : null;
+    }
+
+    // 5. Função para buscar imagens da visão geral via API
+    async function fetchGalleryImagesFromAPI(projectId) {
+        if (!projectId) return [DEFAULT_IMAGE];
+
+        if (galleryCache[projectId]?.timestamp && 
+            (Date.now() - galleryCache[projectId].timestamp) < CACHE_EXPIRATION) {
+            return galleryCache[projectId].images;
+        }
+
+        try {
+            const obra = await apiFetch(`/obras/${projectId}`);
+            let images = [];
+
+            if (obra?.visaoGeral?.ultimasFotos?.length) {
+                images = obra.visaoGeral.ultimasFotos
+                    .map(foto => foto?.url)
+                    .filter(Boolean);
+                console.log(`[ProjectSlider] Imagens da visão geral para ${projectId}:`, images);
+            }
+
+            const filteredImages = [...new Set(images)]
+                .filter(url => url && !url.includes('miniatura') && /^https?:\/\//.test(url));
+
+            const finalImages = filteredImages.length > 0 ? filteredImages : [DEFAULT_IMAGE];
+
+            galleryCache[projectId] = {
+                images: finalImages,
+                timestamp: Date.now()
+            };
+
+            console.log(`[ProjectSlider] Imagens finais para ${projectId}:`, finalImages);
+            preloadImages(finalImages);
+            return finalImages;
+        } catch (error) {
+            console.error(`[ProjectSlider] ERRO ao buscar imagens para ${projectId}:`, error);
+            return [DEFAULT_IMAGE];
+        }
+    }
+
+    // 6. Função para configurar o efeito hover com fade cruzado
+    function setupHoverEffect(imageDiv, galleryImages) {
+        if (!imageDiv || !galleryImages?.length) return;
+
+        const defaultImage = galleryImages.find(url => 
+            url === imageDiv.getAttribute('data-src') || 
+            url === imageDiv.style.backgroundImage.match(/url\(['"]?(.*?)['"]?\)/)?.[1]
+        ) || galleryImages[0];
+
+        // Define as imagens iniciais usando variáveis CSS
+        imageDiv.style.setProperty('--before-image', `url("${defaultImage}")`);
+        imageDiv.style.setProperty('--after-image', `url("${defaultImage}")`);
+        imageDiv.style.setProperty('--before-opacity', '1');
+        console.log(`[ProjectSlider] Imagem padrão aplicada: ${defaultImage}`);
+
+        let currentIndex = 0;
+        let intervalId = null;
+
+        function updateBackgroundImage() {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            if (galleryImages.length > 1 && galleryImages[currentIndex] === defaultImage) {
+                currentIndex = (currentIndex + 1) % galleryImages.length;
+            }
+            const newImage = galleryImages[currentIndex];
+
+            // Fade cruzado: muda a imagem de fundo e ajusta a opacidade da camada superior
+            imageDiv.style.setProperty('--after-image', `url("${newImage}")`);
+            imageDiv.style.setProperty('--before-opacity', '0');
+            setTimeout(() => {
+                imageDiv.style.setProperty('--before-image', `url("${newImage}")`);
+                imageDiv.style.setProperty('--before-opacity', '1');
+            }, 500); // Sincroniza com a duração da transição
+
+            console.log(`[ProjectSlider] Imagem alternada para: ${newImage}`);
+        }
+
+        imageDiv.addEventListener('mouseenter', () => {
+            if (galleryImages.length > 1 && !intervalId) {
+                intervalId = setInterval(updateBackgroundImage, SLIDER_INTERVAL);
+                updateBackgroundImage();
+            }
+        });
+
+        imageDiv.addEventListener('mouseleave', () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            imageDiv.style.setProperty('--before-image', `url("${defaultImage}")`);
+            imageDiv.style.setProperty('--after-image', `url("${defaultImage}")`);
+            imageDiv.style.setProperty('--before-opacity', '1');
+            console.log(`[ProjectSlider] Retornou para imagem padrão: ${defaultImage}`);
+            currentIndex = 0;
+        });
+    }
+
+    // 7. Função principal para configurar sliders
+    async function setupProjectImageSliders() {
+        const projectElements = document.querySelectorAll('div.obra');
+        console.log(`[ProjectSlider] Encontrados ${projectElements.length} projetos`);
+
+        for (const projectElement of projectElements) {
+            try {
+                const projectLink = projectElement.querySelector('a.router-link');
+                if (!projectLink) continue;
+
+                const href = projectLink.getAttribute('href');
+                const projectId = extractProjectId(href);
+                if (!projectId) continue;
+
+                const imageDiv = projectElement.querySelector('div.imagem.bg');
+                if (!imageDiv) continue;
+
+                const badgeElement = imageDiv.querySelector('span.badge.badge-primary');
+                if (!badgeElement || badgeElement.textContent.trim() !== 'Em andamento') continue;
+
+                projectElement.setAttribute('data-id', projectId);
+
+                if (imageDiv.hasAttribute('data-hover-setup')) continue;
+                imageDiv.setAttribute('data-hover-setup', 'true');
+
+                const galleryImages = await fetchGalleryImagesFromAPI(projectId);
+
+                if (galleryImages.length > 0) {
+                    console.log(`[ProjectSlider] Configurando slider para projeto ${projectId} com ${galleryImages.length} imagens`);
+                    setupHoverEffect(imageDiv, galleryImages);
+                }
+            } catch (error) {
+                console.error(`[ProjectSlider] ERRO ao processar projeto:`, error);
+            }
+        }
+    }
+
+    // 8. Configuração para SPA com MutationObserver
+    function setupSPANavigation() {
+        if (isInitialized) return;
+        isInitialized = true;
+
+        if (!getApiToken()) {
+            console.error('[ProjectSlider] Token não disponível, abortando inicialização');
+            return;
+        }
+
+        function processProjects() {
+            setupProjectImageSliders();
+        }
+
+        processProjects();
+
+        const observer = new MutationObserver((mutations) => {
+            if (mutations.some(mutation => mutation.addedNodes.length)) {
+                processProjects();
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // 9. Inicialização
+    function initialize() {
+        console.log('[ProjectSlider] Inicializando...');
+        setupSPANavigation();
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        initialize();
+    } else {
+        document.addEventListener('DOMContentLoaded', initialize);
+    }
+})();
