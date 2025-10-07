@@ -14,22 +14,38 @@ document.head.appendChild(styleSheet);
 async function identificaRelatorio() {
     const titulo = document.querySelector('td.rdo-title h5 b');
     const detalhesRelatorio = document.querySelector(".card-header h4");
+<<<<<<< HEAD
     
 
     if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && detalhesRelatorio) {
+=======
+
+    if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && detalhesRelatorio) {
+        // Verifica se o servidor está disponível para funcionalidades
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         const available = await isServerAvailable();
         if (!available) {
             console.log('Servidor indisponível - funcionalidades de relatório não executadas');
             return false;
         }
 
+<<<<<<< HEAD
+=======
+        // Desconecta o observer temporariamente antes de modificar o DOM
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         observerRelatorio.disconnect();
 
         adicionarBotoesFormatacao();
         adicionarBotaoHoraPadrao();
+<<<<<<< HEAD
         adicionarBotoesEquipamentos();
         adicionarBotaoRevisaoGeral();
 
+=======
+        adicionarBotoesEquipamentos(); // Adiciona a nova função aqui
+
+        // Reconecta o observer após as modificações
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         observerRelatorio.observe(document.body, { childList: true, subtree: true });
         return true;
     }
@@ -46,7 +62,13 @@ async function formatarTextoComIA(texto, tipo = 'comentario') {
             throw new Error('Key não encontrada.');
         }
 
+<<<<<<< HEAD
         const GEMINI_MODEL = 'gemini-2.5-flash';
+=======
+        // Defina o modelo Gemini a ser utilizado
+        const GEMINI_MODEL = 'gemini-2.5-flash';
+        // Endpoint da API Gemini
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
         let prompt;
@@ -66,8 +88,11 @@ FORMATAÇÃO PARA OCORRÊNCIAS:
 - Preserve especificações técnicas completas
 - Preserve códigos e normas (ex: "SA1-SA2½" mantém exatamente assim)
 - Se a ocorrência for uma lista, mantenha a estrutura de lista
+<<<<<<< HEAD
 - Se tiver uma lista de pessoas, coloque o nome delas embaixo de tudo separados por vírgula, assim: Diogo, Pedro e João.
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 REGRAS IMPORTANTES:
 - PRESERVE todas as informações técnicas do texto original
@@ -75,9 +100,12 @@ REGRAS IMPORTANTES:
 - NÃO remova detalhes importantes das ocorrências
 - Mantenha especificações de materiais e processos completas
 - Corrija apenas erros gramaticais e ortográficos
+<<<<<<< HEAD
 - Você não deve formatar, deve organizer e corrigir conforme as regras. não use * ou -. E você deve retornar apenas o conteudo conforme pedido, nada de "Aqui está o que você pediu..."!
 - Não esqueça do ponto final.
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 EXEMPLO:
 Texto: "Foi identificado um problema na aplicação da tinta. Necessario fazer retrabalho."
@@ -90,6 +118,10 @@ ${texto}
 
 Formate preservando todas as informações técnicas originais, corrigindo apenas erros gramaticais e ortográficos.`;
         } else {
+<<<<<<< HEAD
+=======
+            // Prompt original para comentários
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             prompt = `
 Você é um formatador especializado em Relatórios Diários de Obra (RDO) de pintura industrial. Analise o texto e formate-o adequadamente mantendo TODAS as informações originais.
 
@@ -100,6 +132,10 @@ CONTEXTO: Serviços de pintura industrial e manutenção. Corrija apenas termos 
 FORMATAÇÃO DE TÍTULO:
 - Se houver local/equipamento específico mencionado: "Realizado durante o dia na/no/em [local]:"
 - Se NÃO houver local específico (apenas "Realizado durante o dia", "manhã", "tarde", etc.): "Realizado durante o dia:"
+<<<<<<< HEAD
+=======
+- Se tiver uma lista de pessoas, coloque o nome delas separados por vírgula, assim: Diogo, Pedro e João.
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 FORMATAÇÃO DAS ATIVIDADES:
 - Mantenha o texto original das atividades, apenas ajustando a gramática
@@ -107,7 +143,10 @@ FORMATAÇÃO DAS ATIVIDADES:
 - Última atividade termina com ponto final
 - Preserve especificações técnicas completas (ex: "Lavagem das estruturas" não vira apenas "Lavagem")
 - Preserve códigos e normas (ex: "SA1-SA2½" mantém exatamente assim)
+<<<<<<< HEAD
 - Se tiver uma lista de pessoas, coloque o nome delas embaixo de tudo separados por vírgula, assim: Diogo, Pedro e João.
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 REGRAS IMPORTANTES:
 - PRESERVE todas as informações técnicas do texto original
@@ -115,8 +154,11 @@ REGRAS IMPORTANTES:
 - NÃO remova detalhes importantes das atividades
 - Se não houver "Organização e limpeza" mencionado, adicione "Organização e limpeza da área." no final
 - Mantenha especificações de materiais e processos completas
+<<<<<<< HEAD
 - Você não deve formatar, deve organizer e corrigir conforme as regras. não use * ou -. E você deve retornar apenas o conteudo conforme pedido, nada de "Aqui está o que você pediu..."!
 - Não esqueça do ponto final.
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 EXEMPLO:
 Texto: "Período do dia: Lavagem das estruturas. Jateamento abrasivo SA-1-SA-2½. Aplicação de Acabamento."
@@ -159,9 +201,17 @@ Formate preservando todas as informações técnicas originais.`;
 }
 
 async function atualizarComentario(elementoOriginal, textoFormatado) {
+<<<<<<< HEAD
     const btnEditar = elementoOriginal.closest('tr').querySelector('[data-target="#modalComentariosForm"]');
     btnEditar.click();
 
+=======
+    // Encontra o botão de editar do comentário atual
+    const btnEditar = elementoOriginal.closest('tr').querySelector('[data-target="#modalComentariosForm"]');
+    btnEditar.click();
+
+    // Aguarda o modal abrir
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     await new Promise(resolve => setTimeout(resolve, 200));
 
     const modal = document.querySelector('#modalComentariosForm');
@@ -169,25 +219,48 @@ async function atualizarComentario(elementoOriginal, textoFormatado) {
     const textarea = form.querySelector('textarea[name="descrica"]');
     const btnSalvar = form.querySelector('button[type="submit"]');
 
+<<<<<<< HEAD
     textarea.value = textoFormatado;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
+=======
+    // Atualiza o valor do textarea
+    textarea.value = textoFormatado;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Submete o formulário de forma nativa
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const submitEvent = new Event('submit', {
         bubbles: true,
         cancelable: true
     });
     form.dispatchEvent(submitEvent);
 
+<<<<<<< HEAD
     await new Promise(resolve => setTimeout(resolve, 500));
 
+=======
+    // Aguarda processamento
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Fecha o modal manualmente
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const btnFechar = modal.querySelector('[data-dismiss="modal"]');
     btnFechar.click();
 }
 
 async function atualizarOcorrencia(elementoOriginal, textoFormatado) {
+<<<<<<< HEAD
     const btnEditar = elementoOriginal.closest('tr').querySelector('[data-target="#modalOcorrenciaForm"]');
     btnEditar.click();
 
+=======
+    // Encontra o botão de editar da ocorrência atual
+    const btnEditar = elementoOriginal.closest('tr').querySelector('[data-target="#modalOcorrenciaForm"]');
+    btnEditar.click();
+
+    // Aguarda o modal abrir
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     await new Promise(resolve => setTimeout(resolve, 200));
 
     const modal = document.querySelector('#modalOcorrenciaForm');
@@ -195,25 +268,48 @@ async function atualizarOcorrencia(elementoOriginal, textoFormatado) {
     const textarea = form.querySelector('textarea[name="descrica"]');
     const btnSalvar = form.querySelector('button[type="submit"]');
 
+<<<<<<< HEAD
     textarea.value = textoFormatado;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
+=======
+    // Atualiza o valor do textarea
+    textarea.value = textoFormatado;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Submete o formulário de forma nativa
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const submitEvent = new Event('submit', {
         bubbles: true,
         cancelable: true
     });
     form.dispatchEvent(submitEvent);
 
+<<<<<<< HEAD
     await new Promise(resolve => setTimeout(resolve, 500));
 
+=======
+    // Aguarda processamento
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Fecha o modal manualmente
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const btnFechar = modal.querySelector('[data-dismiss="modal"]');
     btnFechar.click();
 }
 
+<<<<<<< HEAD
 const textosOriginais = new Map();
 
 function adicionarBotoesFormatacao() {
     const linhasTabela = document.querySelectorAll('#rdo-ocorrencias table.table-data.table-hover tbody tr, #rdo-comentario table.table-data.table-hover tbody tr');
+=======
+// Armazena os textos originais
+const textosOriginais = new Map();
+
+function adicionarBotoesFormatacao() {
+    const linhasTabela = document.querySelectorAll('table.table-data.table-hover  tbody tr');
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
     linhasTabela.forEach(linha => {
         if (linha.querySelector('.formatar')) return;
@@ -229,6 +325,10 @@ function adicionarBotoesFormatacao() {
         `;
 
 
+<<<<<<< HEAD
+=======
+        // Botão de formatação
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         const botaoFormatar = document.createElement('a');
         botaoFormatar.href = '#';
         botaoFormatar.title = 'Auto formatação (nos comentários, faz formatação automática dos textos para o padrão de RDO do TAC. Nas ocorrências, corrige apenas erros de gramática e ortografia. Se usado (("Qualquer pedido")), faz o que foi ordenado entre parênteses duplo)';
@@ -239,6 +339,10 @@ function adicionarBotoesFormatacao() {
         iconeFormatar.textContent = 'autorenew';
         botaoFormatar.appendChild(iconeFormatar);
 
+<<<<<<< HEAD
+=======
+        // Botão de restauração
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         const botaoRestaurar = document.createElement('a');
         botaoRestaurar.href = '#';
         botaoRestaurar.title = 'Restaurar anterior (restaura a formatação imediatamente anterior a esta)';
@@ -269,6 +373,10 @@ function adicionarBotoesFormatacao() {
             const conteudoOriginal = linha.querySelector('p.white-space');
             textosOriginais.set(conteudoOriginal, conteudoOriginal.textContent);
 
+<<<<<<< HEAD
+=======
+            // Verifica se é comentário ou ocorrência
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             const tipoSecao = verificarTipoSecao(linha);
             const textoFormatado = await formatarTextoComIA(conteudoOriginal.textContent, tipoSecao);
 
@@ -295,6 +403,10 @@ function adicionarBotoesFormatacao() {
             const textoOriginal = textosOriginais.get(conteudoOriginal);
 
             if (textoOriginal) {
+<<<<<<< HEAD
+=======
+                // Verifica se é comentário ou ocorrência para usar a função apropriada
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                 const tipoSecao = verificarTipoSecao(linha);
                 if (tipoSecao === 'ocorrencia') {
                     await atualizarOcorrencia(conteudoOriginal, textoOriginal);
@@ -312,6 +424,10 @@ function adicionarBotoesFormatacao() {
 }
 
 function adicionarBotaoHoraPadrao() {
+<<<<<<< HEAD
+=======
+    // Procura pela div específica onde o botão deve ser adicionado
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const divHoraPadrao = document.querySelector('div[data-v-7997c890].card-header');
     
     if (divHoraPadrao && !divHoraPadrao.querySelector('.hora-padrao')) {
@@ -337,16 +453,28 @@ function adicionarBotaoHoraPadrao() {
          
         botaoHoraPadrao.innerHTML = '<b>Hora Padrão</b><br><small>06:30 16:18 10:45 11:45</small>';
 
+<<<<<<< HEAD
+=======
+        // Função para simular digitação
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         function simularDigitacao(elemento, valor) {
             if (!elemento) return;
 
             elemento.focus();
             elemento.value = '';
 
+<<<<<<< HEAD
+=======
+            // Simula digitação caractere por caractere
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             for (let i = 0; i < valor.length; i++) {
                 setTimeout(() => {
                     elemento.value = valor.substring(0, i + 1);
                     
+<<<<<<< HEAD
+=======
+                    // Dispara eventos de digitação
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                     elemento.dispatchEvent(new KeyboardEvent('keydown', { 
                         key: valor[i], 
                         bubbles: true 
@@ -357,6 +485,10 @@ function adicionarBotaoHoraPadrao() {
                         bubbles: true 
                     }));
 
+<<<<<<< HEAD
+=======
+                    // No último caractere
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                     if (i === valor.length - 1) {
                         setTimeout(() => {
                             elemento.dispatchEvent(new Event('change', { bubbles: true }));
@@ -367,6 +499,10 @@ function adicionarBotaoHoraPadrao() {
             }
         }
 
+<<<<<<< HEAD
+=======
+        // Evento de clique do botão
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         botaoHoraPadrao.addEventListener('click', () => {
             const entrada = document.querySelector('input[name="expedienteInicio"]');
             const saida = document.querySelector('input[name="expedienteFim"]');
@@ -389,22 +525,41 @@ function adicionarBotaoHoraPadrao() {
             });
         });
 
+<<<<<<< HEAD
+=======
+        // Adiciona o botão à div
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         divHoraPadrao.appendChild(botaoHoraPadrao);
     }
 }
 
 function adicionarBotoesEquipamentos() {
+<<<<<<< HEAD
+=======
+    // Procura pela lista de equipamentos
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const listaEquipamentos = document.querySelector('div[data-v-3ac1f292].lista ul');
     
     if (listaEquipamentos) {
         const itensEquipamentos = listaEquipamentos.querySelectorAll('li');
         
         itensEquipamentos.forEach(item => {
+<<<<<<< HEAD
             if (item.querySelector('.adicionar-equipamento')) return;
             
             const descricaoElement = item.querySelector('.descricao p');
             const nomeEquipamento = descricaoElement ? descricaoElement.textContent.trim() : '';
             
+=======
+            // Verifica se já tem o botão adicionado
+            if (item.querySelector('.adicionar-equipamento')) return;
+            
+            // Pega a descrição do equipamento
+            const descricaoElement = item.querySelector('.descricao p');
+            const nomeEquipamento = descricaoElement ? descricaoElement.textContent.trim() : '';
+            
+            // Cria o botão "Adicionar"
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             const botaoAdicionar = document.createElement('button');
             botaoAdicionar.type = 'button';
             botaoAdicionar.className = 'btn btn-success btn-sm adicionar-equipamento';
@@ -426,14 +581,25 @@ function adicionarBotoesEquipamentos() {
             
        
             
+<<<<<<< HEAD
             async function adicionarEquipamentoComoAtividade() {
                 try {
+=======
+            // Função para adicionar equipamento como atividade
+            async function adicionarEquipamentoComoAtividade() {
+                try {
+                    // Abre o modal de atividade avulsa
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                     const btnAdicionarAtividade = document.querySelector('[data-target="#modalAtividadesAvulsaForm"]');
                     if (!btnAdicionarAtividade) return;
                     
                     btnAdicionarAtividade.click();
                     
+<<<<<<< HEAD
                 
+=======
+                    // Aguarda o modal abrir
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                     await new Promise(resolve => setTimeout(resolve, 250));
                     
                     // Preenche apenas a descrição
@@ -496,8 +662,15 @@ function adicionarBotoesEquipamentos() {
                 }
             }
             
+<<<<<<< HEAD
             botaoAdicionar.addEventListener('click', adicionarEquipamentoComoAtividade);
             
+=======
+            // Adiciona o evento de clique
+            botaoAdicionar.addEventListener('click', adicionarEquipamentoComoAtividade);
+            
+            // Adiciona o botão na div de ações
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             const divAcao = item.querySelector('.acao');
             if (divAcao) {
                 divAcao.appendChild(botaoAdicionar);
@@ -506,6 +679,7 @@ function adicionarBotoesEquipamentos() {
     }
 }
 
+<<<<<<< HEAD
 // function adicionarBotaoRevisaoGeral() {
 //     const divRevisaoGeral = document.querySelector('div[data-v-8de8991a] .row');
     
@@ -1219,6 +1393,9 @@ function adicionarBotaoRevisaoGeral() {
     }
 }
 
+=======
+// Função para verificar se o TR está em comentários ou ocorrências
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 function verificarTipoSecao(linha) {
     // Procura por botões de edição na linha
     const btnComentarios = linha.querySelector('[data-target="#modalComentariosForm"]');
@@ -1317,7 +1494,11 @@ function disableAutoFormat() {
 }
 
 function removeFormatButtons() {
+<<<<<<< HEAD
     const formatButtons = document.querySelectorAll('.formatar, .restaurar-formato, .hora-padrao, .adicionar-equipamento, .revisao-geral');
+=======
+    const formatButtons = document.querySelectorAll('.formatar, .restaurar-formato, .hora-padrao, .adicionar-equipamento');
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     formatButtons.forEach(button => button.remove());
 }
 

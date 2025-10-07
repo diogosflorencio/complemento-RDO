@@ -27,10 +27,13 @@
                 <span class="shortcut-key">Alt + S</span>
             </div>
             <div class="shortcut-item">
+<<<<<<< HEAD
                 <span>Aprovar Relatório</span>
                 <span class="shortcut-key">Alt + A</span>
             </div>
             <div class="shortcut-item">
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                 <span>Novo Relatório [NOK]</span>
                 <span class="shortcut-key">Alt + N</span>
             </div>

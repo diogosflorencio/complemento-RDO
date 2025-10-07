@@ -11,11 +11,19 @@ const headers = {
     'Content-Type': 'application/json'
 };
 
+<<<<<<< HEAD
 // at the beginning of the file, i have to do that para que eu consiga usar a variavel em outros arquivos
 let PDFExtractorAtivo = true;
 let cardFiltroCreated = false;
 
 // fazendo o carregamento inicial do estado
+=======
+// At the beginning of the file
+let PDFExtractorAtivo = true;
+let cardFiltroCreated = false;
+
+// Load initial state
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 chrome.storage.sync.get('PDFExtractor', function (data) {
     PDFExtractorAtivo = data.PDFExtractor ?? true;
     if (!PDFExtractorAtivo) {
@@ -27,7 +35,11 @@ chrome.storage.sync.get('PDFExtractor', function (data) {
     }
 });
 
+<<<<<<< HEAD
 // manipula a mensagem do chrome
+=======
+// Message listener
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 chrome.runtime.onMessage.addListener((mensagem, sender, sendResponse) => {
     if ('PDFExtractor' in mensagem) {
         PDFExtractorAtivo = mensagem.PDFExtractor;
@@ -133,15 +145,23 @@ async function mergePDFs(pdfUrls, statusCallback) {
         throw new Error('Nenhum relatório encontrado no período.');
     }
 
+<<<<<<< HEAD
     // Baixa todos os PDFs em paralelo, para que seja mais rapido. Anteriormente isso era feito de forma sequencial
     // ainda tenho que adicionar isso tbm na extração de dados, assim tudo será mais rapido
+=======
+    // Baixa todos os PDFs em paralelo
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const pdfBuffers = await Promise.all(pdfUrls.map(async (url, index) => {
         statusCallback(`Baixando PDF ${index + 1} de ${pdfUrls.length}`);
         const response = await fetch(url);
         return await response.arrayBuffer();
     }));
 
+<<<<<<< HEAD
     // usando a libs, faço a mesclagem total
+=======
+    // Adiciona as páginas de cada PDF
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     for (let [index, buffer] of pdfBuffers.entries()) {
         statusCallback(`Processando PDF ${index + 1} de ${pdfBuffers.length}`);
         const pdfDoc = await PDFDocument.load(buffer);
@@ -162,7 +182,11 @@ async function obterObrasPorPeriodo() {
     if (obrasExcluidasInput && obrasExcluidasInput.value.trim() !== '') {
         siglasExcluidas = obrasExcluidasInput.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     }
+<<<<<<< HEAD
     // selecionando as obras especificas
+=======
+    // Permitir múltiplos IDs separados por vírgula
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     let idsObrasEspecificas = [];
     if (obraEspecificaInput && obraEspecificaInput.value.trim() !== '') {
         idsObrasEspecificas = obraEspecificaInput.value.split(',').map(s => s.trim()).filter(Boolean);
@@ -170,7 +194,11 @@ async function obterObrasPorPeriodo() {
     const obras = await fazerRequisicao('obras');
     console.log('Obras retornadas da API:', obras);
     if (idsObrasEspecificas.length > 0) {
+<<<<<<< HEAD
         // retorna os ids
+=======
+        // Retorna todas as obras cujos IDs estejam na lista informada
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         const obrasSelecionadas = obras.filter(o => idsObrasEspecificas.includes(o._id));
         if (obrasSelecionadas.length) {
             return obrasSelecionadas;
@@ -202,10 +230,17 @@ async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
     return response;
 }
 
+<<<<<<< HEAD
 // processo principal
 
 async function processarRelatorios() {
     // Verifica se o servidor está disponível para funcionalidades (essencial!!!!!!!!!!!!!!!!!!!!!!!)
+=======
+// ===== FLUXO PRINCIPAL =====
+
+async function processarRelatorios() {
+    // Verifica se o servidor está disponível para funcionalidades
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     const available = await isServerAvailable();
     if (!available) {
         console.log('Servidor indisponível - processamento de relatórios não executado');
@@ -232,10 +267,13 @@ async function processarRelatorios() {
         if (!obras.length) {
             throw new Error('Nenhuma obra encontrada.');
         }
+<<<<<<< HEAD
         
         // Lista para coletar relatórios não aprovados
         let relatoriosNaoAprovados = [];
         
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         for (let obra of obras) {
             await atualizarStatus(`Relatórios da obra:<br><b> ${obra.nome.substring(0,33)}</b>`);
             console.log('Processando obra:', obra.nome, obra._id);
@@ -249,6 +287,7 @@ async function processarRelatorios() {
                 const fim = new Date(dataFim);
                 return dataRelatorio >= inicio && dataRelatorio <= fim;
             });
+<<<<<<< HEAD
             // Filtro de aprovados 100% e coleta de não aprovados
             if (apenasAprovados) {
                 // Coletar relatórios não aprovados para lista
@@ -263,6 +302,10 @@ async function processarRelatorios() {
                 });
                 
                 // Filtrar apenas aprovados para processamento
+=======
+            // Filtro de aprovados 100%
+            if (apenasAprovados) {
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                 relatoriosNoPeriodo = relatoriosNoPeriodo.filter(r => r.status && r.status.descricao && r.status.descricao.toLowerCase() === 'aprovado');
             }
             await atualizarStatus(`Achados ${relatoriosNoPeriodo.length} relatórios em:<br><b> ${obra.nome.substring(0,33)}</b>`, 0);
@@ -270,10 +313,13 @@ async function processarRelatorios() {
             // Separar por tipo RDO e RSP
             const relatoriosRDO = relatoriosNoPeriodo.filter(r => r.modeloDeRelatorioGlobal && r.modeloDeRelatorioGlobal.descricao && r.modeloDeRelatorioGlobal.descricao.toUpperCase().includes('RDO'));
             const relatoriosRSP = relatoriosNoPeriodo.filter(r => r.modeloDeRelatorioGlobal && r.modeloDeRelatorioGlobal.descricao && r.modeloDeRelatorioGlobal.descricao.toUpperCase().includes('RSP'));
+<<<<<<< HEAD
             
             // Obter tipo de extração selecionado
             const tipoExtrair = localStorage.getItem('tipoExtrairPDF') || 'tudo';
             
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
             // Função para processar cada grupo
             async function processarGrupoRelatorios(relatoriosGrupo, prefixoArquivo) {
                 if (!relatoriosGrupo.length) return;
@@ -295,8 +341,11 @@ async function processarRelatorios() {
                         .replace(/^_|_$/g, '');
                     nomeObra = prefixoArquivo + nomeObra;
                     await atualizarStatus(`Finalizando download <br><b> (${obra.nome.substring(0,33)})</b>`, 1);
+<<<<<<< HEAD
                     
                     // Usar download padrão do Chrome
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                     const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
@@ -305,6 +354,7 @@ async function processarRelatorios() {
                     console.log('Download concluído:', nomeObra);
                 }
             }
+<<<<<<< HEAD
             
             // Processa conforme o tipo selecionado
             if (tipoExtrair === 'tudo' || tipoExtrair === 'rdo') {
@@ -351,6 +401,14 @@ async function processarRelatorios() {
             await atualizarStatus(`Download concluído! <br> Mas houveram ${relatoriosNaoAprovados.length} relatórios não aprovados!`);
         }
         
+=======
+            // Processa RDO
+            await processarGrupoRelatorios(relatoriosRDO, 'RDO_');
+            // Processa RSP
+            await processarGrupoRelatorios(relatoriosRSP, 'RSP_');
+        }
+        await atualizarStatus("Downloads concluídos");
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         console.log('Processo finalizado.');
     } catch (error) {
         atualizarStatus(`Erro: ${error.message}`);
@@ -359,7 +417,11 @@ async function processarRelatorios() {
         btnExtrair.disabled = false;
     }
 }
+<<<<<<< HEAD
 // observers pra saber quando o conteiner deve ser criado ou removido
+=======
+// ===== OBSERVERS E INICIALIZAÇÃO =====
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
 const observerRelatorios = new MutationObserver(() => {
     if (!cardFiltroCreated && PDFExtractorAtivo && window.location.href.includes('/app/notificacoes')) {

@@ -10,6 +10,10 @@ const unificador_headers = {
     'Content-Type': 'application/json'
 };
 
+<<<<<<< HEAD
+=======
+// At the beginning of the file
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 let unificador_PDFExtractorAtivo = true;
 let unificador_cardFiltroCreated = false;
 

@@ -5,9 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Aplica cor padrão imediatamente
     document.documentElement.style.setProperty('--theme-color', defaultColor);
+<<<<<<< HEAD
     
     // Atualiza a versão automaticamente do manifest
     atualizarVersaoDoManifest();
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 
     // Recupera configurações salvas
     chrome.storage.sync.get([
@@ -270,6 +273,7 @@ const configIds = [
     'touchScroll',
     'obrasSlider',
 ];
+<<<<<<< HEAD
 
 function atualizarVersaoDoManifest() {
     fetch(chrome.runtime.getURL('manifest.json'))
@@ -284,3 +288,5 @@ function atualizarVersaoDoManifest() {
             console.error('erro ao carregar manifest:', erro);
         });
 }
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae

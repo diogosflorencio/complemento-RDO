@@ -60,11 +60,14 @@ function handleKeydown(evento) {
         }
     }
 
+<<<<<<< HEAD
     // Aprovar relatório - Alt + A
     if (evento.altKey && evento.key.toLowerCase() === 'a') {
         aprovarRelatorio();
     }
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     // Exibir o painel ao pressionar Alt + ;
     if (evento.altKey && evento.key === ';') {
         shortcutPanel.style.display = 'block';
@@ -76,6 +79,7 @@ function handleKeydown(evento) {
     }
 }
 
+<<<<<<< HEAD
 // Função para aprovar relatório automaticamente
 async function aprovarRelatorio() {
     try {
@@ -155,6 +159,8 @@ async function aprovarRelatorio() {
     }
 }
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 // Initial setup to ensure the correct state of keyboard shortcuts
 if (keyboardShortcutsEnabled) {
     enableKeyboardShortcuts();

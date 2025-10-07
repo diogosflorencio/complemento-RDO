@@ -208,7 +208,11 @@ function calcularIntervalo(entrada, intervaloIni, intervaloFim, saida) {
         if (minIntFim < minIntIni) minIntFim += 24 * 60;
         
         if ((minSaida - minEntrada) < 270) {
+<<<<<<< HEAD
             return '';
+=======
+            return '00:00';
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         }
         
         const minIntervalo = minIntFim - minIntIni;
@@ -301,6 +305,7 @@ function aplicarHorasNoDOM(colab, dadosCSV) {
         colab.linha.querySelector('input[name="hFim"]').value = dadosCSV.saida || '';
     if (colab.linha.querySelector('input[name="horasIntervalo"]')) {
         let intervalo = '';
+<<<<<<< HEAD
         // Referências de entrada/saída que serão aplicadas
         const entradaRef = (dadosCSV.entrada || '').trim() || colab.linha.querySelector('input[name="hInicio"]')?.value || '';
         const saidaRef = (dadosCSV.saida || '').trim() || colab.linha.querySelector('input[name="hFim"]').value || '';
@@ -326,6 +331,14 @@ function aplicarHorasNoDOM(colab, dadosCSV) {
             } else {
                 intervalo = colab.linha.querySelector('input[name="horasIntervalo"]').value;
             }
+=======
+        if (dadosCSV.intervaloIni && dadosCSV.intervaloFim) {
+            const [h1, m1] = dadosCSV.intervaloIni.split(':').map(Number);
+            const [h2, m2] = dadosCSV.intervaloFim.split(':').map(Number);
+            let min = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (min < 0) min += 24 * 60;
+            intervalo = `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         } else {
             intervalo = colab.linha.querySelector('input[name="horasIntervalo"]').value;
         }
@@ -602,7 +615,11 @@ async function criarContainerLinhaALinha() {
                         
                         // Aguarda 1 segundo antes da próxima adição
                         if (i < colaboradoresParaAdicionar.length - 1) {
+<<<<<<< HEAD
                             await new Promise(resolve => setTimeout(resolve, 400));
+=======
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                         }
                     }
                 }

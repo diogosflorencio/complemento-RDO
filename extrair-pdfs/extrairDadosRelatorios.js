@@ -132,11 +132,15 @@ async function processarExtracaoDados() {
                             'Realizado': atividade.controleDeProducao?.realizado ?? '',
                             'Unidade': atividade.controleDeProducao?.unidade ?? '',
                             'Modelo do Relatório': relatorio.modeloDeRelatorioGlobal?.descricao || '',
+<<<<<<< HEAD
                             'Obra': obra.nome || '',
                             'Link (teste - adicionando link com hyperlinks usando o nome da obra)': { 
                                 v: `LINK DO ${obra.nome || ''}`, // texto que aparece na célula
                                 l: { Target: `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}` }},
                             'Link (teste - link direto, facilita na identificação do que já foi clicado)': `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}`
+=======
+                            'Obra': obra.nome || ''
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                         });
                     }
                 }
@@ -195,8 +199,13 @@ async function processarExtracaoDados() {
             const wsHH = XLSX.utils.aoa_to_sheet(dadosHHParaPlanilha);
             XLSX.utils.book_append_sheet(wb, wsHH, 'HH');
         }
+<<<<<<< HEAD
         XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_@diogosflorencio.xlsx');
         await atualizarStatus('Pronto! Tudo extraído.');
+=======
+        XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_diogosflorencio.xlsx');
+        await atualizarStatus('Extração completa gerada. Hmm, acho que é isso');
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     } catch (error) {
         await atualizarStatus(`Erro: ${error.message}`);
         console.error('Erro no processamento:', error);

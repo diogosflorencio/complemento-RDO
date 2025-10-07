@@ -91,6 +91,7 @@ async function criarCardFiltro() {
                                 <input type="date" id="pdf-data-fim" class="form-control" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                             </div>
                         </div>
+<<<<<<< HEAD
                         <div style="display: flex; gap: 10px;">
                             <div style="flex: 1;">
                                 <label for="pdf-ordem" style="display: block; margin-bottom: 4px; color: #444;">Ordem:</label>
@@ -107,6 +108,14 @@ async function criarCardFiltro() {
                                     <option value="rsp">RSPs</option>
                                 </select>
                             </div>
+=======
+                        <div>
+                            <label for="pdf-ordem" style="display: block; margin-bottom: 4px; color: #444;">Ordem:</label>
+                            <select id="pdf-ordem" class="form-control" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="desc">Do fim ao início</option>
+                                <option value="asc">Do início ao fim</option>
+                            </select>
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                         </div>
                         <div>
                             <label for="obras-excluidas" style="display: block; margin-bottom: 4px; color: #444;">Obras excluídas:</label>
@@ -120,9 +129,12 @@ async function criarCardFiltro() {
                             <input type="checkbox" id="aprovados-100" style="margin: 0;">
                             <label for="aprovados-100" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair apenas relatórios 100% aprovados</label>
                         </div>
+<<<<<<< HEAD
                         
 
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
                         <button class="${isDados ? 'btn-extrair-dados' : 'btn-extrair-pdf'}" style="width: 100%; padding: 8px; background: var(--theme-color); color: white; border: 2px solid black; border-radius: 8px; box-shadow: 2px 2px rgb(0, 0, 0); cursor: pointer; margin-top: 5px;">
                             ${isDados ? 'EXTRAIR DADOS' : 'EXTRAIR PDFs'}
                         </button>
@@ -134,6 +146,7 @@ async function criarCardFiltro() {
         // Adicionar listeners do modo
         container.querySelector('#modo-switch-pdf').onclick = () => renderizarConteudo('pdf');
         container.querySelector('#modo-switch-dados').onclick = () => renderizarConteudo('dados');
+<<<<<<< HEAD
         
         // Adicionar listener para o dropdown de tipo de extração
         const selectTipo = container.querySelector('#pdf-tipo');
@@ -150,6 +163,8 @@ async function criarCardFiltro() {
         
 
         
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
         if (isDados) {
             const btnDados = container.querySelector('.btn-extrair-dados');
             if (btnDados) {
@@ -295,8 +310,11 @@ async function criarCardFiltro() {
     .modo-switch.dados .modo-switch-slider {
       left: 48%;
     }
+<<<<<<< HEAD
     
 
+=======
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
     `;
     document.head.appendChild(style);
 

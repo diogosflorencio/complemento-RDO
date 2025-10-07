@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Versão [1.8 - Correções e Melhorias na Extração de Dados]
 
 ### Novidades e Correções ️
@@ -45,6 +46,11 @@ A versão 1.5 foca em aprimorar o sistema de revisão automática e corrigir bug
 ## Versão [1.4 - Revisão Geral de Relatórios e Melhorias no Servidor]
 
 ### Novidades e Correções ️
+=======
+## Versão [1.4 - Revisão Geral de Relatórios e Melhorias no Servidor]
+
+### Novidades e Correções 🛠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - **Revisão Geral de Relatórios**: Revisão completa do sistema de relatórios com melhorias na precisão e confiabilidade dos dados extraídos
 - **Melhorias no Servidor**: Otimizações no servidor para melhor performance e estabilidade
 - **Aprimoramento da Estabilidade**: Correções gerais que aumentam a robustez do sistema
@@ -54,7 +60,11 @@ A versão 1.4 traz uma revisão completa dos relatórios e melhorias significati
 
 ## Versão [1.3 - Correções Gerais]
 
+<<<<<<< HEAD
 ### Novidades e Correções ️
+=======
+### Novidades e Correções 🛠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - **Correções de Bugs Diversos**: Resolução de vários bugs identificados na versão anterior
 - **Melhorias na Estabilidade**: Ajustes que aumentam a estabilidade geral do sistema
 - **Aprimoramentos de Interface**: Melhorias na usabilidade e experiência do usuário
@@ -64,7 +74,11 @@ A versão 1.3 foca em correções gerais e melhorias de estabilidade, garantindo
 
 ## Versão [1.2 - Correções e Melhorias Gerais]
 
+<<<<<<< HEAD
 ### Novidades e Correções ️
+=======
+### Novidades e Correções 🛠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - **Lista de Colaboradores Não Utilizados**: Agora é possível visualizar e copiar facilmente uma lista de colaboradores presentes no arquivo de ponto (CSV) que não aparecem nos RDOs, facilitando o controle e conferência de faltantes.
 - **Ajuste na Formatação UTF-8 dos Nomes**: Melhorado o tratamento de nomes com caracteres especiais no arquivo CSV, utilizando uma alternativa ao localStorage para garantir a correta leitura e gravação dos dados, evitando problemas de encoding.
 - **Adição e Correção do Extrator Geral**: O extrator geral foi revisado e finalizado, permitindo a extração consolidada de dados de todas as obras e relatórios, com maior estabilidade e precisão.
@@ -73,12 +87,20 @@ A versão 1.3 foca em correções gerais e melhorias de estabilidade, garantindo
 
 ## Versão [1.1 - Extração de Horas Linha a Linha]
 
+<<<<<<< HEAD
 ### Novidades e Melhorias 
+=======
+### Novidades e Melhorias 🚀
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - **Extração de Horas Detalhada**: Agora é possível extrair as horas trabalhadas de cada colaborador, linha a linha, diretamente de todas as obras e dos relatórios delas em um período especifico.
 - **Maior Granularidade na Análise**: A nova funcionalidade permite uma análise mais precisa e detalhada das horas, facilitando a verificação e o faturamento.
 - **Otimização da Exportação**: O processo de exportação para XLSX foi aprimorado para incluir os dados de horas por linha, mantendo a clareza e organização da planilha.
 
+<<<<<<< HEAD
 ### Funcionalidades Adicionadas
+=======
+### Funcionalidades Adicionadas ✨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - **Compatibilidade Aprimorada**: Melhorias na compatibilidade com as versões mais recentes do sistema de RDO, garantindo uma extração de dados estável e confiável.
 
 ### Observação
@@ -86,19 +108,31 @@ A versão 1.1 foca em fornecer um nível de detalhe sem precedentes na extraçã
 
 ## Versão [1.0 - Compilador de Medição]
 
+<<<<<<< HEAD
 ### Novidades e Melhorias 
+=======
+### Novidades e Melhorias 🚀
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Lançamento oficial da versão 1.0, consolidando todas as funcionalidades essenciais para o fechamento de medição de forma rápida, precisa e intuitiva.
 - Refinamento dos fluxos de extração e compilação de dados, tornando o processo mais ágil e confiável.
 - Otimização do painel de controle e filtros, facilitando a seleção de obras, períodos e tipos de relatório.
 - Integração aprimorada com o sistema de exportação para XLSX e PDFs, garantindo maior compatibilidade e performance.
 - Interface redesenhada para melhor usabilidade, com feedbacks visuais claros e navegação simplificada.
 
+<<<<<<< HEAD
 ### Correções de Problemas ️
+=======
+### Correções de Problemas 🛠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ajustes em bugs reportados nas versões beta, incluindo falhas na filtragem de obras, duplicidade de relatórios e erros de interface.
 - Melhoria no tratamento de erros de API e mensagens ao usuário.
 - Correção de inconsistências na exportação de dados e geração de relatórios.
 
+<<<<<<< HEAD
 ### Funcionalidades Adicionadas
+=======
+### Funcionalidades Adicionadas ✨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Novos atalhos e cards para facilitar operações recorrentes.
 - Expansão das opções de personalização do tema e preferências do usuário.
 - Sistema de atualização automática de cards e relatórios, reduzindo etapas manuais.
@@ -109,33 +143,53 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 ## Versão [Beta 0.9] - Novo Extrator de Dados e Unificação de Relatórios
 
+<<<<<<< HEAD
 ### Extrator de Dados e Relatórios 
+=======
+### Extrator de Dados e Relatórios 📄
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Novo sistema de extração de dados dos relatórios, exportando atividades diretamente para **XLSX**
 - Extração detalhada de todas as atividades e horas dos relatórios, com filtragem por período, status e obras específicas
 - Interface de filtro totalmente redesenhada, com seleção de datas, ordem, tipos de relatório e exclusão de obras
 - Exportação de dados e PDFs agora integradas em um único painel flutuante, acessível em qualquer obra
 - Possibilidade de extrair apenas relatórios **100% aprovados**
 
+<<<<<<< HEAD
 ### Unificação e Otimização de PDFs 
+=======
+### Unificação e Otimização de PDFs 🔗
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Mesclagem automática de todos os PDFs dos relatórios de uma obra em um único arquivo, com nomeação inteligente (**RDO/RSP**)
 - Novo método de fetch paralelo para buscar relatórios, tornando o processo muito mais rápido e eficiente
 - Suporte a diferentes tipos de relatórios: **Diário de Obra, Semanal de Produção, Orçamentos**, entre outros
 - Download otimizado e status detalhado do progresso da extração
 
+<<<<<<< HEAD
 ### Interface e Usabilidade 
+=======
+### Interface e Usabilidade 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Card de filtro flutuante com modo duplo: exportação de dados (**XLSX**) ou **PDFs**
 - Explicação interativa sobre o funcionamento do extrator, acessível diretamente no painel
 - Inputs para exclusão de obras por sigla e extração de obras específicas por ID
 - Feedback visual de status e progresso durante todo o processo de extração
 
+<<<<<<< HEAD
 ### Melhorias Técnicas 
+=======
+### Melhorias Técnicas 🔧
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Refatoração completa dos scripts de extração, separando lógica de dados e interface
 - Uso de variáveis globais e armazenamento local para maior compatibilidade entre empresas
 - Gerenciamento eficiente de estados e listeners para ativação/desativação do extrator
 - Preparação para futura descontinuação do extrator antigo, com aviso integrado na interface
 - Removido o slide de imagens por razões de estar bugando alguns elementos, fazendo com que ficassem sobrepostos a outros
 
+<<<<<<< HEAD
 ### Correções de Bugs 
+=======
+### Correções de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ajustes na filtragem de obras e relatórios para evitar duplicidades e erros de seleção
 - Melhor tratamento de erros de API e feedback ao usuário
 - Correção de problemas de interface ao alternar entre modos de extração
@@ -150,39 +204,63 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.8] - Slider de Imagens das Obras
 
+<<<<<<< HEAD
 ## Slider de Imagens ️
+=======
+## Slider de Imagens 🖼️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Visualização dinâmica das últimas fotos das obras em andamento
 - Transição suave com efeito fade entre as imagens
 - Sistema inteligente de cache para otimização de carregamento
 - Preservação da imagem original da obra
 - Ativação/desativação da funcionalidade via popup
 
+<<<<<<< HEAD
 ## Integração com API 
+=======
+## Integração com API 🔄
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Sincronização automática com a API do Diário de Obra
 - Cache inteligente com validade de 30 minutos
 - Pré-carregamento de imagens para transição suave
 - Tratamento de erros e fallback para imagem padrão
 
+<<<<<<< HEAD
 ## Interface e Usabilidade 
+=======
+## Interface e Usabilidade 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Interação por hover para visualização das imagens
 - Delay inteligente para evitar ativações indesejadas
 - Transições suaves entre as imagens
 - Preservação da tag "Em andamento"
 - Interface responsiva e adaptativa
 
+<<<<<<< HEAD
 ## Melhorias Técnicas 
+=======
+## Melhorias Técnicas 🔧
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Sistema de cache otimizado para melhor performance
 - Gerenciamento eficiente de memória
 - Controle preciso de estados e transições
 - Verificações inteligentes de URL para otimização
 
+<<<<<<< HEAD
 ## Correções de Bugs 
+=======
+## Correções de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correção de sobreposição de imagens durante transições
 - Ajustes na preservação da imagem original
 - Melhorias na estabilidade do slider
 - Otimização do tratamento de erros da API
 
+<<<<<<< HEAD
 ## Personalização ️
+=======
+## Personalização ⚙️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Controle de ativação/desativação no popup
 - Estado persistente das preferências do usuário
 - Integração com o sistema de tema personalizado
@@ -199,37 +277,61 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.7] - Interatividade e Personalização
 
+<<<<<<< HEAD
 ## Novas Funcionalidades
+=======
+## Novas Funcionalidades ⭐
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Sistema de scroll suave estilo touch para melhor navegação
 - Teclas de atalho para navegação rápida no sistema
 - Sistema de extração e compilação de PDFs por obra
 - Interface aprimorada do popup com controles individuais
 
+<<<<<<< HEAD
 ## Personalização 
+=======
+## Personalização 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Seletor de cores personalizado para tema do aplicativo
 - Opções predefinidas de cores para rápida customização
 - Persistência das preferências de tema do usuário
 - Novo sistema de ativação/desativação de funcionalidades
 
+<<<<<<< HEAD
 ## Card de Horas e Autoformatação 
+=======
+## Card de Horas e Autoformatação 📊
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Aprimoramento na exibição de horas por função
 - Melhorias na formatação automática de textos
 - Campo dedicado para chave da API do Gemini
 - Salvamento automático das configurações
 
+<<<<<<< HEAD
 ## Melhorias Técnicas 
+=======
+## Melhorias Técnicas 🔧
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Reestruturação completa do código para melhor performance
 - Sistema de cache para otimização de recursos
 - Melhor gerenciamento de estado das funcionalidades
 - Novo sistema de feedback visual para ações
 
+<<<<<<< HEAD
 ## Correções de Bugs 
+=======
+## Correções de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correções no tema escuro (ainda em desenvolvimento)
 - Ajustes na consistência visual dos elementos
 - Melhorias na estabilidade geral
 - Otimização do uso de memória
 
+<<<<<<< HEAD
 ## Nova Interface de Controle ️
+=======
+## Nova Interface de Controle 🎛️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Popup redesenhado com nova organização
 - Lista detalhada de funcionalidades
 - Controles individuais para cada feature
@@ -245,17 +347,29 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.6] - Atualização de Cards e Melhorias
 
+<<<<<<< HEAD
 ## Card de Horas 
+=======
+## Card de Horas 🕒
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Atualização automática ao adicionar/remover colaboradores
 - Correção na cor tema do card
 - Salvamento automático após adição de horas no campo atividades
 
+<<<<<<< HEAD
 ## Interface e Usabilidade 
+=======
+## Interface e Usabilidade 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Botão de auto formatação restrito aos campos de comentário (estava antes, erroneamente, em todos os campos do tipo tbody tr)
 - Aprimoramento do tema escuro (em desenvolvimento. Favor não utilizar)
 - Para melhor uso da feature na versão 0.5, onde as imagens ficaram maiores, qualidade máxima nas evidências anexadas
 
+<<<<<<< HEAD
 ## Correções de Bugs 
+=======
+## Correções de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correção na cor tema do extrator de PDFs
 - Ajustes na atualização dinâmica do card de HH
 - Melhorias na consistência visual
@@ -270,26 +384,46 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.5] - Autoformatação e Estabilidade
 
+<<<<<<< HEAD
 ## Autoformatação Inteligente 
 - Novo sistema de auto formatação de textos com API individual por usuário
 - Possibilidade de restaurar texto anterior para maior consistência e segurança
 
 ## Interface e Usabilidade 
+=======
+## Autoformatação Inteligente 📝
+- Novo sistema de auto formatação de textos com API individual por usuário
+- Possibilidade de restaurar texto anterior para maior consistência e segurança
+
+## Interface e Usabilidade 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ajuste dinâmico do tamanho das evidências nos relatórios (imagens maiores)
 - Card de horas com wrap aprimorado para melhor visualização (mantendo estado durante o uso)
 - Cor padrão inicial do cabeçalho otimizada
 
+<<<<<<< HEAD
 ## Melhorias Técnicas 
+=======
+## Melhorias Técnicas 🔧
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correção no cálculo de horas considerando período de intervalo e suas variações individuais
 - Otimização do observer para prevenir problemas de reload do complemento
 - Aprimoramento no cálculo de horas extras (K1, K2, K3)
 
+<<<<<<< HEAD
 ## Correções de Bugs 
+=======
+## Correções de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correção no tratamento de intervalos vazios
 - Ajustes na lógica de categorização de horas extras
 - Estabilização do observer após reload da extensão
 
+<<<<<<< HEAD
 ## Problemas Conhecidos 
+=======
+## Problemas Conhecidos ⚠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Implementar a atualização das informações do card também para quando um colaborador for adicionado ou removido
 - Necessidade de implementação de salvamento automático após adição de horas no campo de atividade
 
@@ -303,6 +437,7 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.4] - Novas Funcionalidades e Melhorias
 
+<<<<<<< HEAD
 ## Personalização a gosto 
 - Escolha da cor do tema pelo usuário, permitindo personalizar a aparência da extensão e do site conforme preferências.
 
@@ -322,6 +457,27 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 - Ajustes no popup para maior estabilidade e consistência.
 
 ## Problemas Conhecidos 
+=======
+## Personalização a gosto 📄
+- Escolha da cor do tema pelo usuário, permitindo personalizar a aparência da extensão e do site conforme preferências.
+
+## Interface e Usabilidade 🎨
+- Tema escuro em reformulação para maior consistência visual.
+- Novos itens nos checkboxes do popup, oferecendo mais flexibilidade de configurações.
+
+## Melhorias no Popup 🔍
+- Lista de funções futuras e concluídas atualizada, com visão clara do progresso.
+
+## Melhorias Tecnicas 🔧
+- Filtro de tipo de relatório no Unificador de Relatórios corrigido para melhor precisão.
+- Melhorias no desempenho e otimização de recursos.
+
+## Correcoes de Bugs 🐛
+- Correção no comportamento do filtro de tipo de relatório.
+- Ajustes no popup para maior estabilidade e consistência.
+
+## Problemas Conhecidos ⚠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ausência de verificação pós adição ainda não resolvida (um controle de tempo será adicionado para reduzir erros).
 - Cores do tema escuro despadronizadas, sendo necessário retroceder em alguns pontos antes de avançar.
 
@@ -335,7 +491,11 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.3] - Novas Funcionalidades e Melhorias
 
+<<<<<<< HEAD
 ## Unificador de Relatórios
+=======
+## Unificador de Relatórios 📄
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Novo card flutuante para unificação de PDFs
 - Sistema de filtro por data (início e fim)
 - Filtro por tipo de relatório (RDO, RSP e Orçamentos)
@@ -345,13 +505,21 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 - Implementação de filtro por tipo de relatório, para melhor organização dos PDFs extraídos
 - Nomenclatura automática dos arquivos de acordo com nome da obra e seguindo necessidade de anexação ao SAP
 
+<<<<<<< HEAD
 ## Interface e Usabilidade
+=======
+## Interface e Usabilidade 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Aprimoramento do tema escuro
 - Expansão otimizada dos campos de comentário dos RSPs
 - Interface mais limpa e moderna
 - Cards recolhíveis com estado persistente
 
+<<<<<<< HEAD
 ## Melhorias no Popup
+=======
+## Melhorias no Popup 🔍
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Reorganização das funções futuras com separação clara entre:
   - Funcionalidades já implementadas
   - Recursos em desenvolvimento
@@ -360,7 +528,11 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 - Melhor visualização do progresso do desenvolvimento
 - Reorganização modular das funções no popup
 
+<<<<<<< HEAD
 ## Melhorias Técnicas
+=======
+## Melhorias Técnicas 🔧
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Implementação de observers específicos
 - Sistema de flags para controle de estados
 - Melhor gerenciamento de memória
@@ -368,7 +540,11 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 - Código mais modular e manutenível
 - Filtros otimizados na API
 
+<<<<<<< HEAD
 ## Correcoes de Bugs
+=======
+## Correcoes de Bugs 🐛
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ajustes no comportamento dos cards flutuantes
 - Melhor gestão de estados dos componentes
 - Tratamento de erros de autenticação
@@ -380,7 +556,11 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 - Adição indevida do campo "em andamento" foi retirada
 - Travamento do campo "atividades" após adição sanado
 
+<<<<<<< HEAD
 ## Problemas Conhecidos
+=======
+## Problemas Conhecidos ⚠️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Ausência de verificação pós adição
 
 ## Compatibilidade
@@ -393,23 +573,39 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.2] - Novas Funcionalidades e Melhorias
 
+<<<<<<< HEAD
 ## Interface Modular
+=======
+## Interface Modular 🎯
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Nova interface organizada em módulos distintos
 - Separação clara entre funções RDO e RSP
 - Design mais intuitivo e responsivo
 
+<<<<<<< HEAD
 ## Sistema de Horas Extras
+=======
+## Sistema de Horas Extras ⏱️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Implementação de lógicas K1 (após horário normal e outras frentes)
 - K2 (após 2h do K1 e fins de semana)
 - K3 (máximo 7h, após 22h)
 - Adição automática de horas no campo atividade via botão "adicionar" no card
 - K4 (periculosidade) e K2 (feriados) previstos para próxima atualização
 
+<<<<<<< HEAD
 ## Atalhos de Teclado
 - Implementação inicial de atalhos
 - Navegação mais rápida entre funcionalidades
 
 ## Personalização
+=======
+## Atalhos de Teclado ⌨️
+- Implementação inicial de atalhos
+- Navegação mais rápida entre funcionalidades
+
+## Personalização 🎨
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Correções no tema escuro
 - Preparação para sistema de temas personalizáveis
 - Sistema de variáveis globais para cores
@@ -438,7 +634,11 @@ A versão 1.0 marca o fim do ciclo beta, trazendo estabilidade, performance e um
 
 # Versão [Beta 0.1] - Funcionalidades Principais
 
+<<<<<<< HEAD
 ## 1. Análise de Horas Automatico
+=======
+## 1. Análise de Horas Automatico ⏱️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Realiza a soma automática de horas por função em RDOs de HH e identifica horas extras em fins de semana (K2).
 - No futuro, serão implementadas lógicas adicionais para a conversão de horas, utilizando parâmetros obtidos dos relatórios, de maneira semelhante ao que já ocorre com a classificação K2. A classificação K1 será aplicada às horas trabalhadas que excedem 8,8 horas normais (HN), limitadas a um máximo de 2 horas extras. Por exemplo, se o trabalho for iniciado às 06:30 e o funcionário continuar até além das 16:18, as horas entre 16:18 e 18:18 serão contabilizadas como K1, enquanto o restante será considerado K2. Além disso, a classificação K3 será aplicada às horas trabalhadas entre 22:00 e 05:00, considerando todas as horas nesse intervalo como K3, que representam horas extras noturnas. Neste contexto, as horas normais serão limitadas a 8,8 horas (HN) e as regras descritas anteriormente serão aplicadas, alterando-se apenas em casos de fins de semana e feriados (informação que tentarei obter através de uma biblioteca externa), onde todo o período de trabalho será classificado como K2, além de K3 para horas noturnas adicionais.
 - Exemplo de implementação: A função que converte uma string de tempo no formato "hh:mm" em um valor decimal pode ser representada assim:
@@ -452,7 +652,11 @@ function converterTempo(tempoStr) {
 
 Por exemplo, se a entrada for "08:48", a função retornará 8.8, facilitando a contabilização de horas.
 
+<<<<<<< HEAD
 ## 2. Interface Flutuante
+=======
+## 2. Interface Flutuante 🖥️
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Apresenta um card recolhível que mantém o estado mesmo após recarregamentos. (está com um bug)
 - Inclui um botão de cópia rápida para relatórios.
 - Exemplo: Um container pode ser criado com uma classe específica e posicionado fixamente no canto inferior da tela, permitindo que os usuários copiem rapidamente dados do relatório:
@@ -470,7 +674,11 @@ containerDados.style.cssText = `
 
 Isso garante que o acesso às funcionalidades seja sempre conveniente.
 
+<<<<<<< HEAD
 ## 3. Tema Escuro
+=======
+## 3. Tema Escuro 🌙
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
 - Permite a alteração dinâmica das cores da plataforma, proporcionando uma experiência visual mais agradável durante o uso noturno.
 - A personalização de elementos DOM específicos é feita através de uma função que altera as cores de cabeçalhos e outros elementos:
 
@@ -487,6 +695,7 @@ Por exemplo, ao ativar o tema escuro, os cabeçalhos se tornam cinza claro, redu
 
 ## Funções Futuras da Extensão
 
+<<<<<<< HEAD
 1. **Cor Principal**  
    Implementação de uma funcionalidade que permitirá trocar a cor principal dos cabeçalhos. A funcionalidade já existe, mas ainda não está conectada às funções do popup.
 
@@ -497,6 +706,18 @@ Por exemplo, ao ativar o tema escuro, os cabeçalhos se tornam cinza claro, redu
    Implementação de um sistema que avise se algum campo essencial estiver vazio. Essa função indicará de forma clara quando um campo que deve ser preenchido obrigatoriamente não estiver completo.
 
 4. **Teclas de Atalho**  
+=======
+1. **Cor Principal 🎨**  
+   Implementação de uma funcionalidade que permitirá trocar a cor principal dos cabeçalhos. A funcionalidade já existe, mas ainda não está conectada às funções do popup.
+
+2. **Auto formatação de Texto ✍️**  
+   Desenvolver uma função que possibilite a auto formatação das descrições. Essa funcionalidade tende a ser desafiadora e pode não ser totalmente viável ou funcional.
+
+3. **Validador de Campos ⚠️**  
+   Implementação de um sistema que avise se algum campo essencial estiver vazio. Essa função indicará de forma clara quando um campo que deve ser preenchido obrigatoriamente não estiver completo.
+
+4. **Teclas de Atalho ⌨️**  
+>>>>>>> f7e33eade8739748070ab676dedbe6b382c4ccae
    Introdução de atalhos de teclado, como Alt + H para acessar a página inicial, por exemplo. Isso permitirá que os usuários naveguem pelo site e adicionem relatórios ou itens nos relatórios de forma mais eficiente.
 
 ## Recursos Técnicos
