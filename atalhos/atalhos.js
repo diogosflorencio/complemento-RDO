@@ -1,4 +1,4 @@
-let keyboardShortcutsEnabled = true;
+let atalhosAtivados = true;
 
 // Função para inicializar atalhos apenas se o servidor estiver disponível
 async function initializeKeyboardShortcuts() {
@@ -9,8 +9,8 @@ async function initializeKeyboardShortcuts() {
     }
 
     chrome.storage.sync.get('keyboardShortcuts', function (data) {
-        keyboardShortcutsEnabled = data.keyboardShortcuts ?? true;
-        if (keyboardShortcutsEnabled) {
+        atalhosAtivados = data.keyboardShortcuts ?? true;
+        if (atalhosAtivados) {
             enableKeyboardShortcuts();
         }
     });
@@ -28,8 +28,8 @@ chrome.runtime.onMessage.addListener(async (message) => {
             return;
         }
 
-        keyboardShortcutsEnabled = message.keyboardShortcuts;
-        if (keyboardShortcutsEnabled) {
+        atalhosAtivados = message.keyboardShortcuts;
+        if (atalhosAtivados) {
             enableKeyboardShortcuts();
         } else {
             disableKeyboardShortcuts();
@@ -156,7 +156,7 @@ async function aprovarRelatorio() {
 }
 
 // Initial setup to ensure the correct state of keyboard shortcuts
-if (keyboardShortcutsEnabled) {
+if (atalhosAtivados) {
     enableKeyboardShortcuts();
 } else {
     disableKeyboardShortcuts();

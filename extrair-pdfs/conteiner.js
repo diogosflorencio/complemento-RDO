@@ -116,10 +116,15 @@ async function criarCardFiltro() {
                             <label for="obra-especifica" style="display: block; margin-bottom: 4px; color: #444;">Extrair obra específica:</label>
                             <input type="text" id="obra-especifica" class="form-control" placeholder="Ex: 664b1c7f7b8129706b075bba, 65f481f910388195c3094254" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
+
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                             <input type="checkbox" id="aprovados-100" style="margin: 0;">
-                            <label for="aprovados-100" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair apenas relatórios 100% aprovados</label>
+                            <label for="aprovados-100" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair aprovados</label>
+                            <input type="checkbox" id="sem-limite" style="margin: 0;">
+                            <label for="sem-limite" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extração ilimitada</label>
                         </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                         
 
 

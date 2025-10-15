@@ -21,7 +21,8 @@ async function atualizarStatus(mensagem, contador = null) {
         return new Promise(resolve => {
             const interval = setInterval(() => {
                 count--;
-                statusElement.innerHTML = `${mensagem} ${count} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
+                statusElement.innerHTML = `${mensagem} ${count} 
+                <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
                 if (count <= 0) {
                     clearInterval(interval);
                     resolve();
@@ -29,7 +30,8 @@ async function atualizarStatus(mensagem, contador = null) {
             }, 1000);
         });
     } else {
-        statusElement.innerHTML = `${mensagem}`;
+        statusElement.innerHTML = `${mensagem} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
+                
     }
 }
 
@@ -73,8 +75,10 @@ async function obterObrasFiltradas() {
 
 // Busca relatórios de uma obra no período
 async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
+    const semLimite = document.getElementById('sem-limite')?.checked;
+
     const params = {
-        limite: 100,
+        limite: semLimite ? 1000000 : 100,
         ordem: ordem,
         dataInicio: dataInicio,
         dataFim: dataFim
@@ -133,10 +137,7 @@ async function processarExtracaoDados() {
                             'Unidade': atividade.controleDeProducao?.unidade ?? '',
                             'Modelo do Relatório': relatorio.modeloDeRelatorioGlobal?.descricao || '',
                             'Obra': obra.nome || '',
-                            'Link (teste - adicionando link com hyperlinks usando o nome da obra)': { 
-                                v: `LINK DO ${obra.nome || ''}`, // texto que aparece na célula
-                                l: { Target: `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}` }},
-                            'Link (teste - link direto, facilita na identificação do que já foi clicado)': `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}`
+                            'Link': `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}`
                         });
                     }
                 }

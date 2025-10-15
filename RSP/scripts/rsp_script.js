@@ -2,8 +2,8 @@ let limitador = 0;
 
 // Função para obter nome da obra
 function obterNomeObra() {
-    const elemento = document.querySelector('td[data-v-9f2cdef4][colspan="3"]');
-    return elemento?.textContent?.trim() || '[local não identificado]';
+    const elemento = document.querySelector('td[data-v-9f2cdef4][colspan="3"]').textContent.slice(6);
+    return elemento; // descontinuei essa forma externa a proxima função de extrair o nome da obra pq n funciona nunca. agora funciona colocando internamente na função
 }
 
 // Função para formatar texto usando a API do Gemini
@@ -13,15 +13,15 @@ async function formatarRSPComIA(texto) {
         const apiKey = storageData.geminiApiKey;
         if (!apiKey) throw new Error('Chave da API Gemini não encontrada.');
 
-        const nomeObra = obterNomeObra();
-        
+        const nomeObra = document.querySelector('td[data-v-9f2cdef4][colspan="3"]').textContent.slice(6);
+        // texto antigo como prompt da formatação via llm:  text: `Organize e liste as informações do texto de forma clara e objetiva. Mescle repetições, separe atividades de ocorrências, inclua datas quando houver ocorrências. Inicie com "Realizado durante o período no ${nomeObra}" e finalize com "conforme relatórios em anexo." Não use asteriscos, negrito ou formatação especial.
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `Organize e liste as informações do texto de forma clara e objetiva. Mescle repetições, separe atividades de ocorrências, inclua datas quando houver ocorrências. Inicie com "Realizado durante o período no ${nomeObra}" e finalize com "conforme relatórios em anexo." Não use asteriscos, negrito ou formatação especial.
+                        text: `Organize e liste as informações do texto de forma clara e objetiva. Mescle repetições. Inicie com "Realizado durante o período no ${nomeObra}" e finalize com "Conforme relatórios anexos." Não use asteriscos, negrito ou formatação especial. No fim de cada linha das atapas do realizado, adicione ponto e virgula (;).
 
 TEXTO PARA ORGANIZAR:
 ${texto}`
@@ -34,7 +34,7 @@ ${texto}`
         const responseData = await response.json();
         return responseData.candidates[0].content.parts[0].text;
     } catch (error) {
-        console.error('Erro ao formatar com IA:', error);
+        console.error('(Contatar Diogo) Há algum erro. Ou você n tem a key a api ou deu algum erro do tipo:', error);
         return null;
     }
 }
@@ -110,13 +110,13 @@ async function coletarDadosRelatorios(dataInicio, dataFim) {
                         });
                     }
                     
-                    if (detalhesRelatorio.ocorrencias) {
-                        detalhesRelatorio.ocorrencias.forEach(ocorrencia => {
-                            if (ocorrencia.descricao?.trim()) {
-                                todasOcorrencias.push(`${relatorio.data}:\n${ocorrencia.descricao.trim()}`);
-                            }
-                        });
-                    }
+                    // if (detalhesRelatorio.ocorrencias) { // Paulo pediu pra não adicionar ocorrencias nos rsps
+                    //     detalhesRelatorio.ocorrencias.forEach(ocorrencia => {
+                    //         if (ocorrencia.descricao?.trim()) {
+                    //             todasOcorrencias.push(`${relatorio.data}:\n${ocorrencia.descricao.trim()}`);
+                    //         }
+                    //     });
+                    // }
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
             } catch (error) {
@@ -134,7 +134,7 @@ async function coletarDadosRelatorios(dataInicio, dataFim) {
     }
 }
 
-// Função SIMPLES para adicionar botão
+// add buuuutão
 function adicionarBotaoFormatacaoRSP() {
     const textareas = document.querySelectorAll('textarea[name="descrica"].form-control');
     
@@ -144,8 +144,26 @@ function adicionarBotaoFormatacaoRSP() {
         const botao = document.createElement('button');
         botao.type = 'button';
         botao.className = 'formatar-rsp btn btn-primary btn-sm';
-        botao.innerHTML = 'RSP';
-        botao.style.cssText = 'position: absolute; top: 5px; right: 5px; z-index: 999; padding: 2px 6px; font-size: 11px;';
+        botao.innerHTML = 'Adicionar comentário';
+        botao.style.cssText = `
+            position: absolute; 
+            top: 5px; 
+            right: 5px; 
+            z-index: 999; 
+            padding: 6px 12px; 
+            font-size: 11px; 
+            font-weight: 600;
+            background: var(--theme-color, #1d5b50); 
+            color: white; 
+            border: 2px solid black; 
+            border-radius: 6px; 
+            box-shadow: 2px 2px rgb(0, 0, 0); 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            font-family: Arial, sans-serif;
+        `;
+        
+     
         
         botao.onclick = async () => {
             try {
@@ -153,12 +171,14 @@ function adicionarBotaoFormatacaoRSP() {
                 const dataFim = document.querySelector('#editarRelatorioDataFim')?.value;
                 
                 if (!dataInicio || !dataFim) {
-                    alert('Preencha as datas de início e fim do relatório.');
+                    alert('Esse relatorio não tem data de inicio e fim');
                     return;
                 }
                 
                 botao.disabled = true;
-                botao.innerHTML = '...';
+                botao.innerHTML = 'Fazendo o fetch das infos';
+                botao.style.opacity = '0.7';
+                botao.style.cursor = 'not-allowed';
                 
                 const dados = await coletarDadosRelatorios(dataInicio, dataFim);
                 const todosOsDados = [...dados.comentarios, ...dados.ocorrencias];
@@ -168,10 +188,12 @@ function adicionarBotaoFormatacaoRSP() {
                 } else {
                     const textoCompleto = todosOsDados.join('\n\n');
                     const textoFormatado = await formatarRSPComIA(textoCompleto);
-                    textarea.value = textoFormatado || 'Erro ao formatar com IA.';
+                    textarea.value = textoFormatado || 'Deu algum erro. Provavelemento os comentarios dos RDOs no perido estão vazios.';
                 }
                 
-                botao.innerHTML = 'OK';
+                botao.innerHTML = 'pronto';
+                botao.style.opacity = '1';
+                botao.style.cursor = 'pointer';
                 setTimeout(() => {
                     botao.innerHTML = 'RSP';
                     botao.disabled = false;
@@ -181,6 +203,8 @@ function adicionarBotaoFormatacaoRSP() {
                 alert('Erro: ' + error.message);
                 botao.innerHTML = 'RSP';
                 botao.disabled = false;
+                botao.style.opacity = '1';
+                botao.style.cursor = 'pointer';
             }
         };
         

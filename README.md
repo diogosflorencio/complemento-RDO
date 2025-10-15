@@ -1,3 +1,20 @@
+## Versão [1.9 - Melhorias no Comentário Automático RSP e Exportação Ilimitada]
+
+### Novidades e Melhorias ️
+- **Correções no Comentário Automático RSP**: Melhorias significativas no sistema de geração automática de comentários para RSPs, com formatação mais precisa e pontuação adequada
+- **Melhoria na Extração de Links das Obras**: Aprimoramento na geração de links diretos nos arquivos Excel, facilitando a navegação e acesso aos relatórios originais
+- **Exportação Ilimitada de Dados**: Nova funcionalidade que permite extrair todos os relatórios sem limitações, oferecendo maior flexibilidade para análises completas
+- **Personalização do Botão RSP**: Botão "Adicionar comentário" com design integrado ao tema da extensão, incluindo bordas pretas, sombra e efeitos visuais
+- **Melhorias na Formatação**: Aprimoramento na formatação automática de textos com pontuação adequada (ponto e vírgula) no final de cada etapa realizada
+
+### Correções e Ajustes ️
+- **Correção na Identificação de Obra**: Melhoria na extração do nome da obra diretamente do DOM, eliminando problemas de identificação
+- **Mensagens de Erro Mais Claras**: Feedback mais específico para diferentes tipos de erro, facilitando a resolução de problemas
+- **Otimização do Processo**: Melhorias na performance e confiabilidade do sistema de extração de dados
+
+### Observação
+A versão 1.9 foca em melhorar significativamente a experiência do usuário na geração automática de comentários RSP e na exportação de dados, oferecendo maior flexibilidade e precisão no processo de medição.
+
 ## Versão [1.8 - Correções e Melhorias na Extração de Dados]
 
 ### Novidades e Correções ️
