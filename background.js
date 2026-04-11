@@ -24,9 +24,9 @@ chrome.tabs.onActivated.addListener(() => {
   checkServerStatus();
 });
 
-// Verifica status do servidor quando o usuário clica na extensão
-chrome.action.onClicked.addListener(() => {
-  console.log('Extensão clicada - verificando conectividade com servidor');
+// Abre o side panel e verifica servidor ao clicar no ícone
+chrome.action.onClicked.addListener((tab) => {
+  chrome.sidePanel.open({ windowId: tab.windowId });
   checkServerStatus();
 });
 
@@ -61,18 +61,12 @@ function disableServerFeatures() {
   // Marca que as funcionalidades dependentes do servidor estão indisponíveis
   chrome.storage.local.set({ 'server_unavailable': true });
 
-  // Remove popup para evitar uso de funcionalidades que dependem do servidor
-  chrome.action.setPopup({ popup: '' });
-
   console.log('Funcionalidades dependentes do servidor desabilitadas');
 }
 
 function enableServerFeatures() {
   // Marca que as funcionalidades dependentes do servidor estão disponíveis
   chrome.storage.local.set({ 'server_unavailable': false });
-
-  // Restaura popup
-  chrome.action.setPopup({ popup: 'popup/popup.html' });
 
   console.log('Funcionalidades dependentes do servidor habilitadas');
 }

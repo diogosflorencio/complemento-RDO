@@ -6,7 +6,7 @@ async function identificaRelatorioRDO_HH() {
     const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
     const datalhesRelatorio = document.querySelector(".card-header h4");
 
-    if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio) {
+    if (titulo && (titulo.textContent || '').toLowerCase().includes('rdo') && datalhesRelatorio) {
         // Verifica se o servidor está disponível para funcionalidades
         const available = await isServerAvailable();
         if (!available) {
@@ -372,14 +372,12 @@ async function criarContainerLinhaALinha() {
     if (existente) return existente;
     
     const container = document.createElement('div');
-    container.className = 'conteiner_hora_linhaalinha';
+    container.className = 'conteiner_hora_linhaalinha complemento-card-fixo-lg';
     container.style = `
         position: fixed;
         bottom: 20px;
         right: 20px;
         z-index: 99999;
-        width: 380px;
-        max-width: 95vw;
         max-height: 90vh;
         background: #fff;
         padding: 20px;
@@ -434,9 +432,12 @@ async function criarContainerLinhaALinha() {
     
     function applyExpandedState() {
         container.style.height = 'auto';
-        container.style.width = '380px';
+        container.style.width = '';
+        container.style.minWidth = '';
+        container.style.maxWidth = '';
         container.style.padding = '20px';
-        container.style.overflow = 'visible';
+        container.style.overflowX = 'hidden';
+        container.style.overflowY = 'auto';
         container.style.borderRadius = '8px';
         svgArrow.style.transform = 'rotate(0deg)';
         wrapperContainer.style.position = 'absolute';

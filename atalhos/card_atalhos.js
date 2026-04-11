@@ -13,6 +13,7 @@
     // Cria o elemento principal do painel de atalhos
     const shortcutPanel = document.createElement('div');
     shortcutPanel.id = 'shortcutPanel';
+    shortcutPanel.className = 'complemento-card-fixo-sm';
     shortcutPanel.innerHTML = `
                 <div class="cabecalho-atalhos">
             <h3>ATALHOS</h3>
@@ -67,7 +68,6 @@
             border: solid 2px black;
             box-shadow: 4px 4px rgb(0, 0, 0);
             z-index: 9999;
-            width: 300px;
             font-family: Arial, sans-serif;
             transition: height 0.3s ease;
             display: none;
@@ -96,6 +96,7 @@
         .shortcut-item {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             padding: 8px 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             color: black;

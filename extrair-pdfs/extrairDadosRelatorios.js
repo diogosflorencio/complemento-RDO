@@ -2,14 +2,39 @@
 // Módulo de extração de dados dos relatórios para XLSX
 // Não manipula container nem DOM além do necessário
 
-// Usar variáveis globais se já existirem, senão definir
-window.rdoEmpresa = window.rdoEmpresa || JSON.parse(localStorage.getItem('RDOEmpresa'));
+// Usar variáveis globais se já existirem; RDOEmpresa ausente/inválido não pode derrubar o script (senão processarExtracaoDados não registra no window).
+function lerRdoEmpresaDoStorage() {
+    try {
+        const raw = localStorage.getItem('RDOEmpresa');
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch {
+        return null;
+    }
+}
+window.rdoEmpresa = window.rdoEmpresa || lerRdoEmpresaDoStorage() || {};
 window.tokenApiExterna = window.tokenApiExterna || window.rdoEmpresa.tokenApiExterna;
 window.API_BASE_URL = window.API_BASE_URL || "https://apiexterna.diariodeobra.app/v1";
 window.headers = window.headers || {
     'token': window.tokenApiExterna,
     'Content-Type': 'application/json'
 };
+
+const DADOS_DELAY_ENTRE_REQS_MS = 500;
+// Nomes com prefixo DADOS_: extrairPDFsRelatorios.js já declara LIMITE_REQS_ANTES_PAUSA / PAUSA_MS no mesmo contexto global.
+const DADOS_LIMITE_REQS_ANTES_PAUSA = 100;
+let contadorRequisicoesAPI = 0;
+
+function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
+async function antesDeRequisicao() {
+    if (contadorRequisicoesAPI > 0 && contadorRequisicoesAPI % DADOS_LIMITE_REQS_ANTES_PAUSA === 0) {
+        await atualizarStatus('Mais de 100 requisições: aguardando 1 minuto (limite API 150/min)...', 60);
+    }
+    contadorRequisicoesAPI++;
+}
 
 // Utilitário para atualizar status na interface (opcional)
 async function atualizarStatus(mensagem, contador = null) {
@@ -37,9 +62,14 @@ async function atualizarStatus(mensagem, contador = null) {
 
 // Requisição genérica para a API
 async function fazerRequisicao(endpoint, params = {}) {
+    await antesDeRequisicao();
     const url = new URL(`${window.API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    const response = await fetch(url, { headers: window.headers });
+    let response = await fetch(url, { headers: window.headers });
+    if (response.status === 429) {
+        await atualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
+        response = await fetch(url, { headers: window.headers });
+    }
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
     return await response.json();
 }
@@ -49,10 +79,22 @@ async function obterDetalhesRelatorio(obraId, relatorioId) {
     return await fazerRequisicao(`obras/${obraId}/relatorios/${relatorioId}`);
 }
 
+function dadosTokensNomeSomenteObras() {
+    const el = document.getElementById('obras-somente-nome-contem');
+    if (!el || el.value.trim() === '') return [];
+    return el.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+}
+
+function dadosObraNomePassaFiltroSomente(nomeObraUpper, tokensSomente) {
+    if (!tokensSomente.length) return true;
+    return tokensSomente.some(t => nomeObraUpper.includes(t));
+}
+
 // Busca todas as obras filtrando por status e exclusão
 async function obterObrasFiltradas() {
     const obrasExcluidasInput = document.getElementById('obras-excluidas');
     const obraEspecificaInput = document.getElementById('obra-especifica');
+    const tokensSomenteNome = dadosTokensNomeSomenteObras();
     let siglasExcluidas = [];
     if (obrasExcluidasInput && obrasExcluidasInput.value.trim() !== '') {
         siglasExcluidas = obrasExcluidasInput.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -63,13 +105,17 @@ async function obterObrasFiltradas() {
     }
     const obras = await fazerRequisicao('obras');
     if (idsObrasEspecificas.length > 0) {
-        return obras.filter(o => idsObrasEspecificas.includes(o._id));
+        let sel = obras.filter(o => idsObrasEspecificas.includes(o._id));
+        if (tokensSomenteNome.length > 0) {
+            sel = sel.filter(o => dadosObraNomePassaFiltroSomente((o.nome || '').toUpperCase(), tokensSomenteNome));
+        }
+        return sel;
     }
     return obras.filter(obra => {
         const statusOk = obra.status && obra.status.descricao && obra.status.descricao.toLowerCase() === 'em andamento';
         const nomeObra = (obra.nome || '').toUpperCase();
         const excluida = siglasExcluidas.some(sigla => nomeObra.includes(sigla));
-        return statusOk && !excluida;
+        return statusOk && !excluida && dadosObraNomePassaFiltroSomente(nomeObra, tokensSomenteNome);
     });
 }
 
@@ -98,6 +144,7 @@ async function processarExtracaoDados() {
     const btnExtrair = document.querySelector('.btn-extrair-dados');
     try {
         if (btnExtrair) btnExtrair.disabled = true;
+        contadorRequisicoesAPI = 0;
         await atualizarStatus('Iniciando extração de dados...');
         const dataInicio = document.getElementById('pdf-data-inicio').value;
         const dataFim = document.getElementById('pdf-data-fim').value;
@@ -124,6 +171,7 @@ async function processarExtracaoDados() {
             }
             for (let i = 0; i < relatoriosNoPeriodo.length; i++) {
                 const relatorio = relatoriosNoPeriodo[i];
+                if (i > 0) await delay(DADOS_DELAY_ENTRE_REQS_MS);
                 await atualizarStatus(`Extraindo relatório ${i + 1}/${relatoriosNoPeriodo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
                 const detalhes = await obterDetalhesRelatorio(obra._id, relatorio._id);
                 // Atividades (aba Atividades)

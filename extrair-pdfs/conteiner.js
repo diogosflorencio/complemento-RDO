@@ -16,7 +16,7 @@ async function criarCardFiltro() {
     function renderizarConteudo(modo) {
         const isDados = modo === 'dados';
         container.innerHTML = `
-            <div class="container" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; min-width: 300px; width: fit-content; box-sizing: border-box; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; content-align: center; flex-direction: column; gap: 10px; font-size: 14px;">
+            <div class="container compilador-medicacao-card complemento-card-fixo" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; box-sizing: border-box; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; content-align: center; flex-direction: column; gap: 10px; font-size: 14px;">
                
                 <div id="overlay-desenvolvimento" style="display: none; flex-direction: column; align-items: center; bottom: 80px; justify-content: center; position: absolute; left: 0;  width: 100%; height: 295px; background: rgb(255, 255, 255); z-index: 10000;">
                     <span style="font-size: 1.3rem; font-weight: bold; color: #b00; margin-bottom: 18px;">EM DESENVOLVIMENTO</span>
@@ -58,7 +58,7 @@ async function criarCardFiltro() {
                 </div>
                 <div class="cabecalho" style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="margin: 15px 0px 5px; color: var(--theme-color) !important; font-size: 25px; font-weight: 600">Compilador de Medição
-                        <div id="wrap-explicacao" style="max-width: 300px; width: 100%; margin-top: 8px; background: #f7f7f7; border-radius: 6px; padding: 0; font-size: 0.95rem; color: #444; font-weight: 400; overflow: hidden; transition: max-height 0.4s ease;">
+                        <div id="wrap-explicacao" style="max-width: 100%; width: 100%; margin-top: 8px; background: #f7f7f7; border-radius: 6px; padding: 0; font-size: 0.95rem; color: #444; font-weight: 400; overflow: hidden; transition: max-height 0.4s ease;">
                             <div id="wrap-explicacao-header" style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px;">
                                 <span style="font-size: 1.1rem; font-weight: bold;">O que faz?</span>
                                 <span id="wrap-explicacao-toggle" style="display: flex; align-items: center; transition: transform 0.4s;">
@@ -69,8 +69,8 @@ async function criarCardFiltro() {
                             <div id="wrap-explicacao-content" style="padding: 0 12px 8px 24px; max-height: 180px; overflow-y: auto;">
                                 <ul style="margin: 8px 0 0 0; padding: 0; font-size: 0.90rem;">
                                     <li>Busca <b>todas as obras</b> e filtra apenas as que estão com status <b>em andamento</b></li>
-                                    <li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos (ou seja, tirando M3, só aprovados, etc).</li>
-                                    <li>Mescla todos os PDFs dos relatórios de cada obra em um único arquivo, renomeando conforme o tipo: <b>RDO</b> ou <b>RSP</b>.</li>
+                                    <li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos (excluir por sigla no nome, <b>somente</b> obras cujo nome contenha um trecho, só aprovados, etc).</li>
+                                    <li>Mescla os PDFs por <b>modelo de relatório</b> (lista vinda da API por obra); um arquivo por modelo e obra no período, ou só o modelo escolhido.</li>
                                     <li>Extrai de todos os relatórios as informações do campo <b>Atividades</b> e salva em formato <b>.XLSX</b>.</li>
                                     <li>(ainda desenvolvendo) Faz a extração exata (linha a linha) de todas as <b>horas</b> dos relatórios que têm "HH" no nome.</li>
                                 </ul>
@@ -100,17 +100,20 @@ async function criarCardFiltro() {
                                 </select>
                             </div>
                             <div style="flex: 1;">
-                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Tipo:</label>
+                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Modelo:</label>
                                 <select id="pdf-tipo" class="form-control" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-                                    <option value="tudo">Tudo</option>
-                                    <option value="rdo">RDOs</option>
-                                    <option value="rsp">RSPs</option>
+                                    <option value="tudo">Todos os modelos</option>
                                 </select>
+                                <span style="font-size: 0.72rem; color: #666;">Lista a partir de GET /obras (modelosDeRelatorios de cada obra visível ao utilizador).</span>
                             </div>
                         </div>
                         <div>
                             <label for="obras-excluidas" style="display: block; margin-bottom: 4px; color: #444;">Obras excluídas:</label>
                             <input type="text" id="obras-excluidas" class="form-control" placeholder="Ex: M3, TAC, REC" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div>
+                            <label for="obras-somente-nome-contem" style="display: block; margin-bottom: 4px; color: #444;">Somente obra que tem (no nome):</label>
+                            <input type="text" id="obras-somente-nome-contem" class="form-control" placeholder="Ex: HH, NORTE, sigla ou trecho; várias: vírgula (basta uma)" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
                         <div>
                             <label for="obra-especifica" style="display: block; margin-bottom: 4px; color: #444;">Extrair obra específica:</label>
@@ -143,14 +146,14 @@ async function criarCardFiltro() {
         // Adicionar listener para o dropdown de tipo de extração
         const selectTipo = container.querySelector('#pdf-tipo');
         if (selectTipo) {
-            // Restaurar seleção salva
-            const tipoSalvo = localStorage.getItem('tipoExtrairPDF') || 'tudo';
-            selectTipo.value = tipoSalvo;
-            
-            // Salvar seleção quando mudar
             selectTipo.addEventListener('change', (e) => {
                 localStorage.setItem('tipoExtrairPDF', e.target.value);
             });
+            if (typeof window.compiladorPopularSelectModelosRelatorio === 'function') {
+                void window.compiladorPopularSelectModelosRelatorio(container).catch((err) =>
+                    console.warn('Compilador: modelos no select', err)
+                );
+            }
         }
         
 
@@ -237,7 +240,9 @@ async function criarCardFiltro() {
         } else {
             container.style.height = '';
             container.style.overflow = '';
-            container.style.minWidth = '300px';
+            container.style.minWidth = '340px';
+            container.style.width = '340px';
+            container.style.maxWidth = '340px';
             container.querySelector('#overlay-desenvolvimento').style.display = 'none'; // flex pra mostrar quando n colapsado
             container.querySelector('.cabecalho').style.display = '';
             container.querySelector('.filtro-content').style.display = '';
@@ -300,7 +305,6 @@ async function criarCardFiltro() {
     .modo-switch.dados .modo-switch-slider {
       left: 48%;
     }
-    
 
     `;
     document.head.appendChild(style);

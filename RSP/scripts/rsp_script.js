@@ -15,7 +15,7 @@ async function formatarRSPComIA(texto) {
 
         const nomeObra = document.querySelector('td[data-v-9f2cdef4][colspan="3"]').textContent.slice(6);
         // texto antigo como prompt da formatação via llm:  text: `Organize e liste as informações do texto de forma clara e objetiva. Mescle repetições, separe atividades de ocorrências, inclua datas quando houver ocorrências. Inicie com "Realizado durante o período no ${nomeObra}" e finalize com "conforme relatórios em anexo." Não use asteriscos, negrito ou formatação especial.
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const init = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -28,11 +28,9 @@ ${texto}`
                     }]
                 }]
             })
-        });
-
-        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-        const responseData = await response.json();
-        return responseData.candidates[0].content.parts[0].text;
+        };
+        const { text } = await window.llmFetchGenerateContent(apiKey, init);
+        return text || null;
     } catch (error) {
         console.error('(Contatar Diogo) Há algum erro. Ou você n tem a key a api ou deu algum erro do tipo:', error);
         return null;
@@ -86,7 +84,7 @@ async function coletarDadosRelatorios(dataInicio, dataFim) {
         if (!response.ok) throw new Error(`Erro ao buscar relatórios: ${response.status}`);
         const relatorios = await response.json();
         
-        const relatoriosRDO = relatorios.filter(rel => rel.modeloDeRelatorioGlobal?.descricao === 'Relatório Diário de Obra (RDO)');
+        const relatoriosRDO = relatorios.filter(rel => (rel.modeloDeRelatorioGlobal?.descricao || '').toLowerCase().includes('rdo'));
         if (relatoriosRDO.length === 0) return { comentarios: [], ocorrencias: [] };
 
         const todosComentarios = [];
@@ -145,6 +143,7 @@ function adicionarBotaoFormatacaoRSP() {
         botao.type = 'button';
         botao.className = 'formatar-rsp btn btn-primary btn-sm';
         botao.innerHTML = 'Adicionar comentário';
+        botao.title = 'Essa função organiza os comentarios dos RDOs no período especificado e formata para o padrão de RSP do TAC. Ela não gera informações, apenas organiza e formata. Qualquer dúvida, me perguntar ou leia todo o codigo no github. (disclaimer necessário)';
         botao.style.cssText = `
             position: absolute; 
             top: 5px; 
@@ -153,7 +152,7 @@ function adicionarBotaoFormatacaoRSP() {
             padding: 6px 12px; 
             font-size: 11px; 
             font-weight: 600;
-            background: var(--theme-color, #1d5b50); 
+            background: var(--theme-color, #000000); 
             color: white; 
             border: 2px solid black; 
             border-radius: 6px; 
@@ -226,7 +225,7 @@ function ajustaAlturaTextarea() {
 
 function identificaRelatorioRSP() {
     const titulo = document.querySelector('td.rdo-title h5 b');
-    if (titulo?.textContent?.includes('Relatório Semanal de Produção (RSP)')) {
+    if (titulo?.textContent && titulo.textContent.toLowerCase().includes('rsp')) {
         setTimeout(ajustaAlturaTextarea, 1000);
         return true;
     }

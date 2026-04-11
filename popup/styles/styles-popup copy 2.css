@@ -1,6 +1,6 @@
 /* Variáveis globais de cores e estilos */
 :root {
-    --theme-color: #000000;      /* Cor principal do tema (padrão: preto) */
+    --theme-color: #1d5b50;      /* Cor principal do tema */
     --background-color: #1a1a1a;  /* Cor de fundo geral */
     --module-background: #2d2d2d; /* Cor de fundo dos módulos */
     --feature-background: #363636;/* Cor de fundo dos itens */
@@ -87,39 +87,12 @@ body {
     color: var(--muted-text-color);
 }
 
-.mensagem-desenvolvedor-collapse {
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--module-background);
-    overflow: hidden;
-}
-
-.mensagem-desenvolvedor-summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 12px 14px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-color);
-    border-left: 4px solid var(--theme-color);
-    user-select: none;
-}
-
-.mensagem-desenvolvedor-summary::-webkit-details-marker {
-    display: none;
-}
-
-.mensagem-desenvolvedor-collapse[open] .mensagem-desenvolvedor-summary {
-    border-bottom: 1px solid var(--border-color);
-}
-
 .mensagem-desenvolvedor {
-    background: color-mix(in srgb, var(--theme-color) 14%, transparent);
-    border: none;
-    border-radius: 0;
+    background: rgba(29, 91, 80, 0.2);
+    border: 1px solid rgba(29, 91, 80, 0.45);
+    border-radius: 8px;
     padding: 12px 14px;
-    margin: 0;
+    margin-bottom: 20px;
     font-size: 0.8rem;
     line-height: 1.45;
     color: var(--text-color);

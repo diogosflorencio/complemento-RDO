@@ -2711,7 +2711,7 @@ ul li[data-v-6c91c03b] {
 
 @media(max-width: 1280px) {
     .container-big .container[data-v-56107eaf] {
-        max-width:1100px
+        max-width:1100px 
     }
 }
 
@@ -8996,15 +8996,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 temaDark(false);
-const corPadrao = '#1d5b50';
-
-// Função para aplicar a cor padrão no cabeçalho - executa imediatamente
-function aplicarCorPadraoCabecalho() {
-    const headerRDOApp = document.querySelectorAll('header.header');
-    headerRDOApp.forEach(cabecalho => {
-        cabecalho.style.backgroundColor = corPadrao;
-    });
-}
+const corPadrao = '#000000';
 
 // Ouvinte para mudanças na cor do tema
 chrome.runtime.onMessage.addListener((mensagem) => {
@@ -9013,13 +9005,9 @@ chrome.runtime.onMessage.addListener((mensagem) => {
     }
 });
 
-// Carrega o tema salvo quando a página é carregada
-chrome.storage.sync.get('themeColor', (dados) => {
-    if (dados.themeColor) {
-        atualizarCorTema(dados.themeColor);
-    } else {
-        aplicarCorPadraoCabecalho(); // Aplica cor padrão se não houver cor salva
-    }
+// Carrega o tema salvo quando a página é carregada (sem valor guardado → preto)
+chrome.storage.sync.get('themeColor1', (dados) => {
+    atualizarCorTema(dados.themeColor1 || corPadrao);
 });
 
 // Atualiza a cor do tema em todos os elementos necessários
@@ -9031,8 +9019,5 @@ function atualizarCorTema(cor) {
         elemento.style.backgroundColor = cor;
     });
 }
-
-// Inicializa com a cor padrão
-aplicarCorPadraoCabecalho();
 
 

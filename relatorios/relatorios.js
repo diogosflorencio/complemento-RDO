@@ -16,7 +16,7 @@ async function identificaRelatorio() {
     const detalhesRelatorio = document.querySelector(".card-header h4");
     
 
-    if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && detalhesRelatorio) {
+    if (titulo && (titulo.textContent || '').toLowerCase().includes('rdo') && detalhesRelatorio) {
         const available = await isServerAvailable();
         if (!available) {
             console.log('Servidor indisponível - funcionalidades de relatório não executadas');
@@ -36,106 +36,64 @@ async function identificaRelatorio() {
     return false;
 }
 
-async function formatarTextoComIA(texto, tipo = 'comentario') {
-    let apiKey;
+/** Garante uma quebra de linha após cada `;` (lista de atividades no RDO). */
+function quebrarLinhasAtividadesPorPontoVirgula(texto) {
+    if (!texto || typeof texto !== 'string') return texto;
+    return texto.replace(/;(?!\s*\n)/g, ';\n').replace(/\n{3,}/g, '\n\n');
+}
+
+async function formatarTextoComIA(texto, tipoSecao = 'comentario') {
+    let apiKey = '';
     try {
         const data = await chrome.storage.sync.get('geminiApiKey');
-        apiKey = data.geminiApiKey;
+        apiKey = typeof data.geminiApiKey === 'string' ? data.geminiApiKey.trim() : '';
 
-        if (!apiKey) {
-            throw new Error('Key não encontrada.');
+        if (typeof window.llmFetchGenerateContent !== 'function') {
+            throw new Error(
+                'Módulo de formatação não carregou (llmFetchGenerateContent). Recarregue a página do Diário de Obra com a extensão ativa.'
+            );
         }
 
-        const GEMINI_MODEL = 'gemini-2.5-flash';
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+        if (!apiKey) {
+            throw new Error('KEY_SYNC_VAZIA');
+        }
 
-        let prompt;
-        
-        if (tipo === 'ocorrencia') {
-            prompt = `
-Você é um formatador especializado em Relatórios Diários de Obra (RDO) de pintura industrial, especificamente para a seção de OCORRÊNCIAS. Analise o texto e formate-o adequadamente mantendo TODAS as informações originais.
+        const contextoPrimeiraLinha =
+            tipoSecao === 'atividade'
+                ? 'Este trecho é do quadro de ATIVIDADES do dia.'
+                : 'Este trecho é de COMENTÁRIO ou de OCORRÊNCIA (não é o quadro de atividades do dia).';
+
+        const orientacaoAtividadesLista =
+            tipoSecao === 'atividade'
+                ? '\n- Nas listas de atividades terminadas em ponto e vírgula (;), use uma quebra de linha após cada ; (cada atividade numa linha). A última linha pode terminar em ponto (.) em vez de ;.\n'
+                : '';
+
+        const prompt = `
+Você é um formatador profissional de textos de Relatório Diário de Obra (RDO) de pintura industrial. ${contextoPrimeiraLinha} Mantenha TODAS as informações originais; melhore clareza, tom profissional e corrija gramática e ortografia sem alterar o sentido técnico.
 
 INSTRUÇÃO PRIORITÁRIA: Se houver texto entre duplos parênteses ((instrução)) no conteúdo, execute essa instrução específica e ignore todas as outras regras.
 
-CONTEXTO: Serviços de pintura industrial e manutenção. Corrija apenas termos mal escritos (ex: "trapiamento" → "trapeamento").
+CONTEXTO: Serviços de pintura industrial e manutenção. Corrija termos mal escritos (ex: "trapiamento" → "trapeamento").
 
-FORMATAÇÃO PARA OCORRÊNCIAS:
-- Mantenha o texto original das ocorrências, apenas ajustando a gramática
-- Corrija erros de digitação e ortografia
-- Mantenha a estrutura informativa da ocorrência
-- Preserve especificações técnicas completas
-- Preserve códigos e normas (ex: "SA1-SA2½" mantém exatamente assim)
-- Se a ocorrência for uma lista, mantenha a estrutura de lista
-- Se tiver uma lista de pessoas, coloque o nome delas embaixo de tudo separados por vírgula, assim: Diogo, Pedro e João.
-
-
-REGRAS IMPORTANTES:
-- PRESERVE todas as informações técnicas do texto original
-- NÃO simplifique ou reduza descrições técnicas
-- NÃO remova detalhes importantes das ocorrências
-- Mantenha especificações de materiais e processos completas
-- Corrija apenas erros gramaticais e ortográficos
-- Você não deve formatar, deve organizer e corrigir conforme as regras. não use * ou -. E você deve retornar apenas o conteudo conforme pedido, nada de "Aqui está o que você pediu..."!
-- Não esqueça do ponto final.
-
+ORIENTAÇÕES:
+- Mantenha o texto fiel ao original, com redação mais profissional e correta
+- Corrija erros de digitação, concordância e pontuação
+- Preserve especificações técnicas, códigos e normas (ex: "SA1-SA2½" exatamente assim)
+- Se houver lista de pessoas relevante, pode organizar os nomes separados por vírgula (ex.: Diogo, Pedro e João) quando couber no contexto
+- Não use * ou -. Não invente fatos. Retorne só o conteúdo pedido, sem prefácio do tipo "Aqui está…"
+- Não esqueça do ponto final quando fizer sentido${orientacaoAtividadesLista}
 
 EXEMPLO:
 Texto: "Foi identificado um problema na aplicação da tinta. Necessario fazer retrabalho."
-
 Resultado:
 "Foi identificado um problema na aplicação da tinta. Necessário fazer retrabalho."
 
 TEXTO PARA FORMATAR:
 ${texto}
 
-Formate preservando todas as informações técnicas originais, corrigindo apenas erros gramaticais e ortográficos.`;
-        } else {
-            prompt = `
-Você é um formatador especializado em Relatórios Diários de Obra (RDO) de pintura industrial. Analise o texto e formate-o adequadamente mantendo TODAS as informações originais.
+Formate de modo profissional, preservando o conteúdo técnico.`;
 
-INSTRUÇÃO PRIORITÁRIA: Se houver texto entre duplos parênteses ((instrução)) no conteúdo, execute essa instrução específica e ignore todas as outras regras.
-
-CONTEXTO: Serviços de pintura industrial e manutenção. Corrija apenas termos mal escritos (ex: "trapiamento" → "trapeamento").
-
-FORMATAÇÃO DE TÍTULO:
-- Se houver local/equipamento específico mencionado: "Realizado durante o dia na/no/em [local]:"
-- Se NÃO houver local específico (apenas "Realizado durante o dia", "manhã", "tarde", etc.): "Realizado durante o dia:"
-
-FORMATAÇÃO DAS ATIVIDADES:
-- Mantenha o texto original das atividades, apenas ajustando a gramática
-- Uma atividade por linha, terminando com ponto e vírgula
-- Última atividade termina com ponto final
-- Preserve especificações técnicas completas (ex: "Lavagem das estruturas" não vira apenas "Lavagem")
-- Preserve códigos e normas (ex: "SA1-SA2½" mantém exatamente assim)
-- Se tiver uma lista de pessoas, coloque o nome delas embaixo de tudo separados por vírgula, assim: Diogo, Pedro e João.
-
-REGRAS IMPORTANTES:
-- PRESERVE todas as informações técnicas do texto original
-- NÃO simplifique ou reduza descrições técnicas
-- NÃO remova detalhes importantes das atividades
-- Se não houver "Organização e limpeza" mencionado, adicione "Organização e limpeza da área." no final
-- Mantenha especificações de materiais e processos completas
-- Você não deve formatar, deve organizer e corrigir conforme as regras. não use * ou -. E você deve retornar apenas o conteudo conforme pedido, nada de "Aqui está o que você pediu..."!
-- Não esqueça do ponto final.
-
-EXEMPLO:
-Texto: "Período do dia: Lavagem das estruturas. Jateamento abrasivo SA-1-SA-2½. Aplicação de Acabamento."
-
-Resultado:
-"Realizado período de trabalho:
-
-Lavagem das estruturas;
-Jateamento abrasivo SA-1-SA-2½;
-Aplicação de acabamento;
-Organização e limpeza da área."
-
-TEXTO PARA FORMATAR:
-${texto}
-
-Formate preservando todas as informações técnicas originais.`;
-        }
-
-        const response = await fetch(endpoint, {
+        const init = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -147,13 +105,41 @@ Formate preservando todas as informações técnicas originais.`;
                     }]
                 }]
             })
-        });
-        const responseData = await response.json();
-        console.log('Resposta da API Gemini:', responseData);
-        return responseData.candidates[0].content.parts[0].text;
+        };
+        const { json: responseData, text: saidaDireta } = await window.llmFetchGenerateContent(apiKey, init);
+        console.log('Resposta da API (formatação):', responseData);
+        const saida =
+            typeof saidaDireta === 'string' && saidaDireta.trim()
+                ? saidaDireta.trim()
+                : null;
+        if (!saida) {
+            const detalhe =
+                (responseData && responseData.error && responseData.error.message) ||
+                (responseData && responseData.promptFeedback && JSON.stringify(responseData.promptFeedback)) ||
+                'A API respondeu sem texto utilizável (ex.: bloqueio de segurança ou resposta vazia).';
+            throw new Error(detalhe);
+        }
+        return tipoSecao === 'atividade' ? quebrarLinhasAtividadesPorPontoVirgula(saida) : saida;
     } catch (erro) {
-        console.error('Erro na formatação:', erro, { apiKey });
-        alert('Erro ao formatar texto. Para essa funcionalidade você precisa ter uma chave de API do Google Gemini. Verifique o campo "Gemini API Key" no menu de configurações da extensão (pop-up).');
+        const msg = erro && erro.message ? String(erro.message) : String(erro);
+        const moduloNaoCarregou = /llmFetchGenerateContent|Módulo de formatação não carregou/i.test(msg);
+        const chaveAusente =
+            msg === 'KEY_SYNC_VAZIA' || /key não encontrada|api key ausente/i.test(msg);
+        console.error('Erro na formatação:', erro, { chavePreenchida: Boolean(apiKey && String(apiKey).trim()) });
+
+        if (moduloNaoCarregou) {
+            alert(
+                'O script de formatação não carregou nesta página.\n\nRecarregue o Diário de Obra (F5). Se persistir, em chrome://extensions confira se o Complemento RDO está ativo e atualizado.'
+            );
+        } else if (chaveAusente) {
+            alert(
+                'Chave de API não encontrada ou vazia na extensão.\n\nAbra o pop-up do Complemento RDO, cole a chave no campo da API, altere o foco (Tab/clique fora) para gravar no Chrome, e tente de novo.'
+            );
+        } else {
+            alert(
+                `Erro ao formatar texto:\n\n${msg.slice(0, 500)}${msg.length > 500 ? '…' : ''}\n\nConfira quota/modelo da API e o consola (F12) para mais detalhe.`
+            );
+        }
         return texto;
     }
 }
@@ -210,13 +196,90 @@ async function atualizarOcorrencia(elementoOriginal, textoFormatado) {
     btnFechar.click();
 }
 
+async function atualizarAtividade(elementoOriginal, textoFormatado) {
+    const tr = elementoOriginal.closest('tr');
+    const btnEditar = tr.querySelector('[data-target^="#modalAtividades"]');
+    if (!btnEditar) {
+        throw new Error('Botão de edição de atividades não encontrado na linha.');
+    }
+    const alvoModal = btnEditar.getAttribute('data-target');
+    btnEditar.click();
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    const modal = document.querySelector(alvoModal);
+    if (!modal) {
+        throw new Error(`Modal de atividades não encontrado: ${alvoModal}`);
+    }
+    const form = modal.querySelector('form');
+    const textarea = form.querySelector('textarea[name="descrica"]');
+    if (!textarea) {
+        throw new Error('Campo de descrição (textarea) não encontrado no modal de atividades.');
+    }
+
+    textarea.value = textoFormatado;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+    const submitEvent = new Event('submit', {
+        bubbles: true,
+        cancelable: true
+    });
+    form.dispatchEvent(submitEvent);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const btnFechar = modal.querySelector('[data-dismiss="modal"]');
+    if (btnFechar) btnFechar.click();
+}
+
+/** Texto guardado antes de formatar, por linha da tabela (o <p> pode ser recriado pelo Vue após gravar). */
 const textosOriginais = new Map();
 
+function tituloBotaoFormatarPorTipo(tipoSecao) {
+    switch (tipoSecao) {
+        case 'atividade':
+            return 'Formatar atividades: redação profissional, corrige gramática e ortografia, mantém o técnico. Texto entre (( )) manda nas regras.';
+        case 'ocorrencia':
+            return 'Formatar ocorrência: redação profissional, corrige gramática e ortografia, mantém o técnico. Texto entre (( )) manda nas regras.';
+        default:
+            return 'Formatar comentário: redação profissional, corrige gramática e ortografia, mantém o técnico. Texto entre (( )) manda nas regras.';
+    }
+}
+
+/**
+ * Parágrafo visível com o texto do relatório (comentário / ocorrência / atividade).
+ * Em atividades há vários `p.white-space` (etapa, descrição, observação); o primeiro match
+ * de querySelector era o de etapa, muitas vezes vazio — a API recebia texto errado.
+ */
+function paragrafoTextoRelatorioNaLinha(linha) {
+    if (!linha) return null;
+    const principal = linha.querySelector('p.white-space:not(.sub-titulo-etapa):not(.observacao)');
+    if (principal) return principal;
+    const todos = linha.querySelectorAll('p.white-space');
+    if (!todos.length) return null;
+    let melhor = todos[0];
+    let max = (melhor.textContent || '').trim().length;
+    for (let i = 1; i < todos.length; i++) {
+        const len = (todos[i].textContent || '').trim().length;
+        if (len > max) {
+            melhor = todos[i];
+            max = len;
+        }
+    }
+    return melhor;
+}
+
 function adicionarBotoesFormatacao() {
-    const linhasTabela = document.querySelectorAll('#rdo-ocorrencias table.table-data.table-hover tbody tr, #rdo-comentario table.table-data.table-hover tbody tr');
+    const linhasTabela = document.querySelectorAll(
+        '#rdo-ocorrencias table.table-data.table-hover tbody tr, ' +
+            '#rdo-comentario table.table-data.table-hover tbody tr, ' +
+            '#rdo-atividades table.table-data.table-hover tbody tr, ' +
+            '#rdo-atividade table.table-data.table-hover tbody tr'
+    );
 
     linhasTabela.forEach(linha => {
         if (linha.querySelector('.formatar')) return;
+        if (!paragrafoTextoRelatorioNaLinha(linha)) return;
 
         const containerBotoes = document.createElement('div');
         containerBotoes.style.cssText = `
@@ -229,9 +292,11 @@ function adicionarBotoesFormatacao() {
         `;
 
 
+        const tipoLinha = verificarTipoSecao(linha);
+
         const botaoFormatar = document.createElement('a');
         botaoFormatar.href = '#';
-        botaoFormatar.title = 'Auto formatação (nos comentários, faz formatação automática dos textos para o padrão de RDO do TAC. Nas ocorrências, corrige apenas erros de gramática e ortografia. Se usado (("Qualquer pedido")), faz o que foi ordenado entre parênteses duplo)';
+        botaoFormatar.title = tituloBotaoFormatarPorTipo(tipoLinha);
         botaoFormatar.className = 'formatar';
 
         const iconeFormatar = document.createElement('i');
@@ -266,8 +331,13 @@ function adicionarBotoesFormatacao() {
             botaoFormatar.classList.add('loading');
             iconeFormatar.textContent = 'sync';
 
-            const conteudoOriginal = linha.querySelector('p.white-space');
-            textosOriginais.set(conteudoOriginal, conteudoOriginal.textContent);
+            const conteudoOriginal = paragrafoTextoRelatorioNaLinha(linha);
+            if (!conteudoOriginal) {
+                botaoFormatar.classList.remove('loading');
+                iconeFormatar.textContent = 'autorenew';
+                return;
+            }
+            textosOriginais.set(linha, conteudoOriginal.textContent);
 
             const tipoSecao = verificarTipoSecao(linha);
             const textoFormatado = await formatarTextoComIA(conteudoOriginal.textContent, tipoSecao);
@@ -275,6 +345,8 @@ function adicionarBotoesFormatacao() {
             if (textoFormatado && textoFormatado !== conteudoOriginal.textContent) {
                 if (tipoSecao === 'ocorrencia') {
                     await atualizarOcorrencia(conteudoOriginal, textoFormatado);
+                } else if (tipoSecao === 'atividade') {
+                    await atualizarAtividade(conteudoOriginal, textoFormatado);
                 } else {
                     await atualizarComentario(conteudoOriginal, textoFormatado);
                 }
@@ -291,18 +363,20 @@ function adicionarBotoesFormatacao() {
             botaoRestaurar.classList.add('loading');
             iconeRestaurar.textContent = 'sync';
 
-            const conteudoOriginal = linha.querySelector('p.white-space');
-            const textoOriginal = textosOriginais.get(conteudoOriginal);
+            const conteudoOriginal = paragrafoTextoRelatorioNaLinha(linha);
+            const textoOriginal = textosOriginais.get(linha);
 
-            if (textoOriginal) {
+            if (textoOriginal && conteudoOriginal) {
                 const tipoSecao = verificarTipoSecao(linha);
                 if (tipoSecao === 'ocorrencia') {
                     await atualizarOcorrencia(conteudoOriginal, textoOriginal);
+                } else if (tipoSecao === 'atividade') {
+                    await atualizarAtividade(conteudoOriginal, textoOriginal);
                 } else {
                     await atualizarComentario(conteudoOriginal, textoOriginal);
                 }
                 botaoRestaurar.style.display = 'none';
-                textosOriginais.delete(conteudoOriginal);
+                textosOriginais.delete(linha);
             }
 
             botaoRestaurar.classList.remove('loading');
@@ -533,7 +607,7 @@ function adicionarBotoesEquipamentos() {
 //         function isRelatorioHH() {
 //             const titulo = document.querySelector('td.rdo-title h5 b');
 //             const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
-//             return titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && nomeObra.includes('HH');
+//             return titulo && (titulo.textContent || '').toLowerCase().includes('rdo') && nomeObra.includes('HH');
 
 //         }
 
@@ -859,7 +933,7 @@ function adicionarBotaoRevisaoGeral() {
         function isRelatorioHH() {
             const titulo = document.querySelector('td.rdo-title h5 b');
             const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
-            return titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && nomeObra.includes('HH');
+            return titulo && (titulo.textContent || '').toLowerCase().includes('rdo') && nomeObra.includes('HH');
         }
 
         async function adicionarEquipamentosEspecificos(isHH) {
@@ -920,7 +994,7 @@ function adicionarBotaoRevisaoGeral() {
                     originalLog.apply(console, args);
                     
                     // Verifica se é a mensagem de resposta da API Gemini
-                    if (args[0] && args[0].includes && args[0].includes('Resposta da API Gemini:')) {
+                    if (args[0] && args[0].includes && args[0].includes('Resposta da API (formatação):')) {
                         console.log = originalLog; // Restaura console.log original
                         clearTimeout(timeout);
                         resolve(true);
@@ -1220,27 +1294,26 @@ function adicionarBotaoRevisaoGeral() {
 }
 
 function verificarTipoSecao(linha) {
-    // Procura por botões de edição na linha
-    const btnComentarios = linha.querySelector('[data-target="#modalComentariosForm"]');
     const btnOcorrencias = linha.querySelector('[data-target="#modalOcorrenciaForm"]');
-    
-    // Se encontrar botão de ocorrências, é uma ocorrência
     if (btnOcorrencias) {
         return 'ocorrencia';
     }
-    
-    // Se encontrar botão de comentários, é um comentário
+
+    const btnAtividades = linha.querySelector('[data-target^="#modalAtividades"]');
+    if (btnAtividades) {
+        return 'atividade';
+    }
+
+    const btnComentarios = linha.querySelector('[data-target="#modalComentariosForm"]');
     if (btnComentarios) {
         return 'comentario';
     }
-    
-    // Verifica se há outros indicadores na linha
+
     const textoLinha = linha.textContent.toLowerCase();
     if (textoLinha.includes('ocorrência') || textoLinha.includes('ocorrencia')) {
         return 'ocorrencia';
     }
-    
-    // Por padrão, assume que é comentário
+
     return 'comentario';
 }
 
@@ -1255,13 +1328,17 @@ function personalizarTamanhoEvidencias() {
             imagem.style.width = '222px';
             imagem.style.height = '148px';
 
-            // Pega a URL atual da imagem de fundo
             const backgroundImage = imagem.style.backgroundImage;
-            if (backgroundImage) {
-                // Remove /miniatura da URL
+            if (backgroundImage && backgroundImage.includes('/miniatura/')) {
                 const urlAltaQualidade = backgroundImage.replace('/miniatura/', '/');
-                // Define a nova URL da imagem em alta qualidade
-                imagem.style.backgroundImage = urlAltaQualidade;
+                const match = urlAltaQualidade.match(/url\(['"]?([^'"]+)['"]?\)/);
+                const src = match ? match[1] : null;
+                if (src) {
+                    const img = new Image();
+                    img.onload = () => { imagem.style.backgroundImage = urlAltaQualidade; };
+                    img.onerror = () => { /* mantém miniatura */ };
+                    img.src = src;
+                }
             }
         });
 

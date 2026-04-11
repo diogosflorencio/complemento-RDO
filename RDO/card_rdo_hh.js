@@ -10,7 +10,7 @@ async function identificaRelatorioRDO() {
     const nomeObra = document.querySelector('tr td[colspan="3"]')?.textContent || '';
     const datalhesRelatorio = document.querySelector(".card-header h4"); // Essa tag só aparce quando o RDO está no modo de edição serve pra apenas mostrar o card no momento certo
 
-    if (titulo && titulo.textContent.includes('Relatório Diário de Obra (RDO)') && datalhesRelatorio && nomeObra.includes('HH')) { // condicionais pra fazer o dito a cima // 
+    if (titulo && (titulo.textContent || '').toLowerCase().includes('rdo') && datalhesRelatorio && nomeObra.includes('HH')) { // condicionais pra fazer o dito a cima // 
         return true;
     } else {
         return false; // else quase que desnecessario
@@ -270,9 +270,9 @@ function exibirDadosFuncionarios() {
     }, 1000);
 }
 // muda cor quando o card surge
-chrome.storage.sync.get('themeColor', (data) => {
-    if (data.themeColor) {
-        document.documentElement.style.setProperty('--theme-color', data.themeColor);
+chrome.storage.sync.get('themeColor1', (data) => {
+    if (data.themeColor1) {
+        document.documentElement.style.setProperty('--theme-color', data.themeColor1);
     }
 });
 
@@ -418,7 +418,7 @@ function criarContainer() {
         const container = document.createElement('div');
         container.classList = "conteiner_hora";
         container.innerHTML = `
-        <div class="container" style="position: fixed; bottom: 20px; left: 20px; z-index: 99999; width: 300px; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; transition: height 0.3s;">
+        <div class="container complemento-card-fixo-sm" style="position: fixed; bottom: 20px; left: 20px; z-index: 99999; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; transition: height 0.3s;">
     <div class="wrapper-container" style="position: absolute; z-index: 99999; top: 3px; left: 15px; width: 25px; margin: 0px; padding: 0px; color: var(--theme-color); cursor: pointer;">
         <svg class="down" viewBox="0 0 24 24" style="transition: transform 0.3s; transform: rotate(180deg);">
             <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" fill="var(--theme-color)"></path>
@@ -461,9 +461,12 @@ function criarContainer() {
 
         function applyExpandedState() {
             containerElement.style.height = 'auto';
-            containerElement.style.width = '300px';
+            containerElement.style.width = '';
+            containerElement.style.minWidth = '';
+            containerElement.style.maxWidth = '';
             containerElement.style.padding = '20px';
-            containerElement.style.overflow = 'visible';
+            containerElement.style.overflowX = 'hidden';
+            containerElement.style.overflowY = 'visible';
             containerElement.style.borderRadius = '8px';
             svgArrow.style.transform = 'rotate(0deg)';
             wrapperContainer.style.position = 'absolute';

@@ -1,7 +1,7 @@
 // Aguarda o carregamento completo do DOM
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Popup carregado");
-    const defaultColor = '#1d5b50';  // Cor padrão do tema
+    const defaultColor = '#000000';  // Cor padrão do tema (preto)
 
     // Aplica cor padrão imediatamente
     document.documentElement.style.setProperty('--theme-color', defaultColor);
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'darkTheme',
         'cardRDOHH',
         'PDFExtractor',
-        'themeColor',
+        'themeColor1',
         'geminiApiKey',
         'keyboardShortcuts',
         'autoFormat',
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setupDarkTheme(data.darkTheme ?? false);
         setupHoursCard(data.cardRDOHH ?? true);
         setupPDFExtractor(data.PDFExtractor ?? false);
-        setupThemeColor(data.themeColor ?? defaultColor);
+        setupThemeColor(data.themeColor1 ?? defaultColor);
         setupGeminiKey(data.geminiApiKey ?? '');
         setupKeyboardShortcuts(data.keyboardShortcuts ?? true);
         setupAutoFormat(data.autoFormat ?? true);
@@ -70,10 +70,13 @@ function setupGeminiKey(initialKey) {
         visibilityIcon.textContent = isVisible ? 'Mostrar' : 'Esconder';
     });
     
-    geminiKeyInput.addEventListener('change', function() {
+    function persistirGeminiKey() {
         const apiKey = geminiKeyInput.value;
         chrome.storage.sync.set({ geminiApiKey: apiKey });
-    });
+    }
+
+    geminiKeyInput.addEventListener('change', persistirGeminiKey);
+    geminiKeyInput.addEventListener('input', persistirGeminiKey);
 }
 
 // Configuração do tema escuro
@@ -159,28 +162,33 @@ function setupThemeColor(initialColor) {
     
     document.querySelectorAll('.color-option').forEach(option => {
         option.addEventListener('click', () => {
-            const color = option.style.background;
+            const color = option.dataset.themeColor || option.style.backgroundColor || option.style.background;
             saveThemeColor(color);
         });
     });
 
     const customColorPicker = document.querySelector('.custom-color');
-    customColorPicker.addEventListener('change', (e) => {
-        saveThemeColor(e.target.value);
-    });
+    if (customColorPicker) {
+        customColorPicker.addEventListener('change', (e) => {
+            saveThemeColor(e.target.value);
+        });
+    }
 }
 
 function saveThemeColor(color) {
-    chrome.storage.sync.set({ themeColor: color }, () => {
-        applyThemeColor(color);
-        notifyContentScript({ themeColor: color });
+    const hex = rgbToHex(color).toLowerCase();
+    if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) return;
+    chrome.storage.sync.set({ themeColor1: hex }, () => {
+        applyThemeColor(hex);
+        notifyContentScript({ themeColor: hex });
     });
 }
 
 // Função auxiliar para converter RGB para Hexadecimal (peguei do stackoverflow)
 function rgbToHex(rgb) {
+    if (rgb == null || rgb === '') return '';
     // Handle rgb(r, g, b) format
-    const matches = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    const matches = String(rgb).match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
     if (matches) {
         const [_, r, g, b] = matches;
         return '#' + [r, g, b].map(x => {
@@ -192,20 +200,25 @@ function rgbToHex(rgb) {
 }
 
 function applyThemeColor(color) {
-    const hexColor = rgbToHex(color);
-    
-    // Update CSS variable in popup
+    let hexColor = rgbToHex(color).toLowerCase();
+    if (!hexColor || !/^#[0-9a-f]{6}$/i.test(hexColor)) {
+        hexColor = '#000000';
+    }
+
     document.documentElement.style.setProperty('--theme-color', hexColor);
-    
-    // Update active state of color options
+
     document.querySelectorAll('.color-option').forEach(option => {
         option.classList.remove('active');
-        if (option.style.background === color) {
+        const raw = option.dataset.themeColor || option.style.backgroundColor || option.style.background || '';
+        if (rgbToHex(raw).toLowerCase() === hexColor) {
             option.classList.add('active');
         }
     });
-    
-    document.querySelector('.custom-color').value = hexColor;
+
+    const customColorPicker = document.querySelector('.custom-color');
+    if (customColorPicker && /^#[0-9a-f]{6}$/i.test(hexColor)) {
+        customColorPicker.value = hexColor;
+    }
 }
 
 // Função utilitária para notificar content script
@@ -250,7 +263,7 @@ const defaultSettings = {
     darkTheme: false,
     cardRDOHH: true,
     PDFExtractor: false,
-    themeColor: '#1d5b50',
+    themeColor1: '#000000',
     geminiApiKey: '',
     keyboardShortcuts: true,
     autoFormat: true,
@@ -263,7 +276,7 @@ const configIds = [
     'darkTheme',
     'cardRDOHH',
     'PDFExtractor',
-    'themeColor',
+    'themeColor1',
     'geminiApiKey',
     'keyboardShortcuts',
     'autoFormat',

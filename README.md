@@ -1,3 +1,44 @@
+## Mensagem do desenvolvedor
+
+Criar esta extensão trouxe muito aprendizado e benefícios. Foi minha primeira vez criando um complemento para navegadores e, por isso, aprendi bastante. Nos benefícios: esta aplicação me permitiu trabalhar de forma mais automatizada, com menos erros, em vez de calcular sempre na mão, os cálculos ficaram na própria extensão; toda a matemática e as regras de negócio que eu precisava aplicar, apliquei uma vez no código, o que tornou errar quase impossível. Também foi positivo ver que foi útil para muita gente em vários casos de uso, por exemplo na compilação de informações ou de PDFs.
+
+Com isso, uma coisa precisa ser dita: esta extensão não inventa informação; ela transforma dados reais em informação organizada e precisa. Ela transforma relatórios de ponto em horas revisadas por pessoa; texto incorreto do encarregado em texto corrigido; dados avulsos em planilhas prontas para medição; PDFs soltos em compilações prontas para arquivo ou envio em medição.
+
+Afirmações levianas sobre o meu trabalho não serão aceitas. Todo o código (com versionamento) está disponível desde sempre no GitHub: https://github.com/diogosflorencio/complemento-rdo
+
+Espero continuar melhorando esta ferramenta para que continue sendo útil para mim e para outras pessoas. Espero que o Diário de Obra (site no qual esta extensão se baseia) corrija os problemas que tem enfrentado com a própria API.
+
+Att.,  
+Diogo, sempre à disposição.
+
+---
+
+## Versão [2.1], correções e ajustes
+
+Versão focada em **correção** de bugs e em pequenos ajustes de fluxo.
+
+- **Extração de dados (Compilador)**: o script deixava de registrar a função no `window` por erro de sintaxe (`const` duplicados entre `extrairPDFsRelatorios.js` e `extrairDadosRelatorios.js`) e por falha ao ler `RDOEmpresa` ausente no `localStorage` em outros scripts da mesma página.
+- **RDO / RSP**: identificação por presença de `rdo` ou `rsp` no nome/descrição (título da página ou modelo), em vez de depender do texto completo oficial.
+- **Compilador de Medição**: campo opcional **“Somente obra que tem (no nome)”** (complementar às obras excluídas).
+- **Unificador (por obra)**: lista de **modelo de relatório** preenchida com `GET /obras/{obraId}` (`modelosDeRelatorios`); filtro por `_id` do modelo; IDs do formulário com prefixo `unificador-` para não conflitar com o Compilador.
+
+---
+
+## Versão [2.0]
+
+### Melhorias
+- **Interface em side panel**: Popup da extensão passou a abrir no painel lateral do Chrome.
+- **Unificador e Compilador de PDF**: Timeout de 5 min por requisição; até 3 tentativas por relatório; validação de cabeçalho PDF (ignora resposta que não for PDF); throttle e pausa de 1 min a cada 100 requisições (limite da API 150/min).
+- **Relatórios não baixados**: Se houver falha (timeout, erro ou não-PDF), é exibida mensagem e gerado download de um HTML com os links dos relatórios que não foram baixados (Unificador e Compilador).
+- **extrairDadosRelatorios**: Throttle e pausa a cada 100 requisições; tratamento de 429 (aguarda 1 min e tenta de novo).
+- **Unificador (card colapsado)**: Ao colapsar, o aviso é ocultado e é exibido o título "Unificador de PDF".
+
+### Correções
+- **Unificador**: Erro ao colapsar (elemento `.unificador-aviso` inexistente), uso de `.unificador-aviso-collapse` e checagens de null; estilos de colapso aplicados no elemento correto (`.container`).
+- **Unificador**: Erro "No PDF header found", validação do buffer antes de parsear; requisições que não retornam PDF são ignoradas ou tentadas de novo.
+
+---
+
 ## Versão [1.9 - Melhorias no Comentário Automático RSP e Exportação Ilimitada]
 
 ### Novidades e Melhorias ️
