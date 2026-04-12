@@ -1,5 +1,5 @@
 {
-    "status": "ok",
-    "version": "2.2",
-    "server": "sync-server-v2.0"
+    "status": "success",
+    "message": "aware",
+    "server": "sync-server-v1.0"
 }
