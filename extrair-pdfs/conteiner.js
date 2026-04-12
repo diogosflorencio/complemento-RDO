@@ -1,3 +1,23 @@
+/** GET /obras (modelos) vem de extrairPDFsRelatorios.js; token pode ficar disponível depois do login. */
+function agendarPopularSelectModelosCompilador(container) {
+    let tentativas = 0;
+    const max = 40;
+    const id = setInterval(() => {
+        tentativas++;
+        if (typeof window.compiladorPopularSelectModelosRelatorio === 'function') {
+            clearInterval(id);
+            void window.compiladorPopularSelectModelosRelatorio(container).catch((err) =>
+                console.warn('Compilador: modelos no select', err)
+            );
+            return;
+        }
+        if (tentativas >= max) {
+            clearInterval(id);
+            console.warn('Compilador: compiladorPopularSelectModelosRelatorio não ficou disponível a tempo.');
+        }
+    }, 100);
+}
+
 async function criarCardFiltro() {
       // Verifica se o servidor está disponível para funcionalidades
       const available = await isServerAvailable();
@@ -59,6 +79,8 @@ async function criarCardFiltro() {
                 <div class="cabecalho" style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="margin: 15px 0px 5px; color: var(--theme-color) !important; font-size: 25px; font-weight: 600">Compilador de Medição
                         <div id="wrap-explicacao" style="max-width: 100%; width: 100%; margin-top: 8px; background: #f7f7f7; border-radius: 6px; padding: 0; font-size: 0.95rem; color: #444; font-weight: 400; overflow: hidden; transition: max-height 0.4s ease;">
+                        
+                         
                             <div id="wrap-explicacao-header" style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px;">
                                 <span style="font-size: 1.1rem; font-weight: bold;">O que faz?</span>
                                 <span id="wrap-explicacao-toggle" style="display: flex; align-items: center; transition: transform 0.4s;">
@@ -77,6 +99,7 @@ async function criarCardFiltro() {
                                 <span style="font-size: 0.85rem; color: #888;">Funciona automaticamente com a API de qualquer empresa/contrato, desde que tenha o token de integração gerado.</span>
                             </div>
                         </div>
+                        ${isDados ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">Como há diversos usuarios com diferentes casos de uso, essa funcionalidade (extração de dados), extrairá todos os campos existentes no modelo de relatório e período escolhido.</p>' : ''}
                     </div>
                 </div>
                 <div class="filtro-content" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
@@ -100,11 +123,10 @@ async function criarCardFiltro() {
                                 </select>
                             </div>
                             <div style="flex: 1;">
-                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Modelo:</label>
+                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Modelo (get /obras)</label>
                                 <select id="pdf-tipo" class="form-control" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                                     <option value="tudo">Todos os modelos</option>
                                 </select>
-                                <span style="font-size: 0.72rem; color: #666;">Lista a partir de GET /obras (modelosDeRelatorios de cada obra visível ao utilizador).</span>
                             </div>
                         </div>
                         <div>
@@ -149,11 +171,7 @@ async function criarCardFiltro() {
             selectTipo.addEventListener('change', (e) => {
                 localStorage.setItem('tipoExtrairPDF', e.target.value);
             });
-            if (typeof window.compiladorPopularSelectModelosRelatorio === 'function') {
-                void window.compiladorPopularSelectModelosRelatorio(container).catch((err) =>
-                    console.warn('Compilador: modelos no select', err)
-                );
-            }
+            agendarPopularSelectModelosCompilador(container);
         }
         
 

@@ -9,15 +9,16 @@ function rdoEmpresaDoStorage() {
         return null;
     }
 }
-const rdoEmpresa = rdoEmpresaDoStorage() || {};
-const tokenApiExterna = rdoEmpresa.tokenApiExterna;
+const API_BASE_URL = 'https://apiexterna.diariodeobra.app/v1';
 
-const API_BASE_URL = "https://apiexterna.diariodeobra.app/v1";
-
-const headers = {
-    'token': tokenApiExterna,
-    'Content-Type': 'application/json'
-};
+/** Token lido no momento do fetch — o script pode carregar antes do login e o token só existir depois. */
+function compiladorHeadersApiAtual() {
+    const r = rdoEmpresaDoStorage() || {};
+    return {
+        token: r.tokenApiExterna || '',
+        'Content-Type': 'application/json'
+    };
+}
 
 // at the beginning of the file, i have to do that para que eu consiga usar a variavel em outros arquivos
 let PDFExtractorAtivo = true;
@@ -127,10 +128,11 @@ async function fazerRequisicao(endpoint, params = {}) {
     await antesDeRequisicao();
     const url = new URL(`${API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    const headers = compiladorHeadersApiAtual();
     let response = await fetch(url, { headers });
     if (response.status === 429) {
         await atualizarStatus('Limite da API (150req/min)! \nAguardando 1 minuto...', 60);
-        response = await fetch(url, { headers });
+        response = await fetch(url, { headers: compiladorHeadersApiAtual() });
     }
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
     return await response.json();
@@ -289,6 +291,30 @@ async function compiladorPopularSelectModelosRelatorio(container) {
 }
 
 window.compiladorPopularSelectModelosRelatorio = compiladorPopularSelectModelosRelatorio;
+
+/** Login no mesmo separador não dispara `storage`; ao voltar o foco ou após token novo, tenta de novo. */
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    const wrap = document.querySelector('.container_pdf_filtro');
+    if (!wrap || typeof window.compiladorPopularSelectModelosRelatorio !== 'function') return;
+    const r = rdoEmpresaDoStorage() || {};
+    if (!r.tokenApiExterna) return;
+    compiladorModelosCache = null;
+    void window.compiladorPopularSelectModelosRelatorio(wrap).catch(() => {});
+});
+
+let __compiladorTokenAnterior = (rdoEmpresaDoStorage() || {}).tokenApiExterna || '';
+setInterval(() => {
+    const t = (rdoEmpresaDoStorage() || {}).tokenApiExterna || '';
+    if (t === __compiladorTokenAnterior) return;
+    __compiladorTokenAnterior = t;
+    if (!t) return;
+    compiladorModelosCache = null;
+    const wrap = document.querySelector('.container_pdf_filtro');
+    if (wrap && typeof window.compiladorPopularSelectModelosRelatorio === 'function') {
+        void window.compiladorPopularSelectModelosRelatorio(wrap).catch(() => {});
+    }
+}, 1500);
 
 async function obterDetalhesRelatorio(obraId, relatorioId) {
     return await fazerRequisicao(`obras/${obraId}/relatorios/${relatorioId}`);

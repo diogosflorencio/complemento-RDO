@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         'keyboardShortcuts',
         'autoFormat',
         'touchScroll',  // Adicionado
-        'obrasSlider'   // Adicionado
+        'obrasSlider',   // Adicionado
+        'dashboardInicio'
     ], function (data) {
         // Inicializa cada funcionalidade com valores padrão caso não existam
         setupDarkTheme(data.darkTheme ?? false);
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setupAutoFormat(data.autoFormat ?? true);
         setupTouchScroll(data.touchScroll ?? false); // Adicionado
         setupObrasSlider(data.obrasSlider ?? true);  // Adicionado
+        setupDashboardInicio(data.dashboardInicio !== false);
     });
 
     // // Configuração do Disclaimer
@@ -243,6 +245,21 @@ function setupTouchScroll(initialState) {
     });
 }
 
+// Card dashboard na tela inicial (lista de obras)
+function setupDashboardInicio(initialState) {
+    const el = document.getElementById('dashboardInicio');
+    if (!el) return;
+
+    el.checked = initialState;
+
+    el.addEventListener('change', function () {
+        const on = el.checked;
+        chrome.storage.sync.set({ dashboardInicio: on }, () => {
+            notifyContentScript({ dashboardInicio: on });
+        });
+    });
+}
+
 // Configuração do slider de imagens
 function setupObrasSlider(initialState) {
     const obrasSliderCheckbox = document.getElementById('obrasSlider');
@@ -269,6 +286,7 @@ const defaultSettings = {
     autoFormat: true,
     touchScroll: false,
     obrasSlider: true,
+    dashboardInicio: true,
 };
 
 // Lista de IDs dos elementos de configuração
@@ -282,6 +300,7 @@ const configIds = [
     'autoFormat',
     'touchScroll',
     'obrasSlider',
+    'dashboardInicio',
 ];
 
 function atualizarVersaoDoManifest() {
