@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDO</title>
+    <link rel="shortcut icon" href="../imagens/icon48.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles-popup.css">
+    <script src="script/popup.js" defer></script>
+    <script src="script/pdfLib.js" defer></script>
+    <script src="script/extrairPDFs.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Textura de fundo decorativa -->
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Header principal -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="header-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.9"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.9"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="app-title">Complemento RDO</h1>
+                <span class="app-subtitle">Diário de Obra</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="version-tag">v<span class="version-number">00</span></span>
+        </div>
+    </header>
+
+    <!-- Aviso da API (colapsável) -->
+    <div class="aviso-api" id="avisoApi">
+        <div class="aviso-header" onclick="toggleAviso()" role="button" tabindex="0" aria-expanded="true" aria-controls="avisoBody">
+            <div class="aviso-title">
+                <span class="aviso-dot" aria-hidden="true"></span>
+                <strong>API instável</strong>
+            </div>
+            <button class="aviso-toggle" aria-label="Recolher aviso">▾</button>
+        </div>
+        <div class="aviso-body" id="avisoBody">
+            <p>Muito código foi alterado para driblar a instabilidade. A API está com timeout grande nas requisições HTTP e os binários dos PDFs frequentemente vêm sem imagens.</p>
+        </div>
+    </div>
+
+    <!-- Módulos -->
+    <main class="module-grid">
+
+        <!-- Geral -->
+        <section class="module half" style="--delay: 0.05s">
+            <div class="module-header">
+                <span class="module-label">01</span>
+                <span>Geral</span>
+            </div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Extração de PDFs</span>
+                    <label class="switch">
+                        <input type="checkbox" id="PDFExtractor" checked aria-label="Extração de PDFs">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Teclas de atalho</span>
+                    <label class="switch">
+                        <input type="checkbox" id="keyboardShortcuts" aria-label="Teclas de atalho">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Scroll touch</span>
+                    <label class="switch">
+                        <input type="checkbox" id="touchScroll" aria-label="Scroll estilo touch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Slider de imagens</span>
+                    <label class="switch">
+                        <input type="checkbox" id="obrasSlider" checked aria-label="Slider de imagens das obras">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section class="module half" style="--delay: 0.1s">
+            <div class="module-header">
+                <span class="module-label">02</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="module-content">
+                <div class="empty-state">
+                    <span>Em breve</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funções RDO -->
+        <section class="module half" style="--delay: 0.15s">
+            <div class="module-header">
+                <span class="module-label">03</span>
+                <span>Funções RDO</span>
+            </div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Card Horas/Função</span>
+                    <label class="switch">
+                        <input type="checkbox" id="hoursCard" checked aria-label="Card Horas/Função">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Formatação auto</span>
+                    <label class="switch">
+                        <input type="checkbox" id="AutoFormat1" aria-label="Formatação automática">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Validação de campos</span>
+                    <label class="switch">
+                        <input type="checkbox" id="AutoFormat2" disabled aria-label="Validação de campos">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funções RSP -->
+        <section class="module half" style="--delay: 0.2s">
+            <div class="module-header">
+                <span class="module-label">04</span>
+                <span>Funções RSP</span>
+            </div>
+            <div class="module-content">
+                <div class="feature-item" title="Em desenvolvimento. Função sempre ativa.">
+                    <span>Expansão comentário</span>
+                    <label class="switch" title="Em desenvolvimento. Função sempre ativa.">
+                        <input type="checkbox" id="textareaExpand" checked aria-label="Expansão do comentário">
+                        <span class="slider andamento"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Visualização .xlsx</span>
+                    <label class="switch">
+                        <input type="checkbox" id="xlsxView" disabled aria-label="Visualização de .xlsx">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personalização / Aparência -->
+        <section class="module full" style="--delay: 0.25s" id="secaoPersonalizacao">
+            <div class="module-header">
+                <span class="module-label">05</span>
+                <span>Aparência</span>
+            </div>
+            <div class="module-content">
+
+                <!-- Tema escuro -->
+                <div class="feature-item">
+                    <span>Tema Escuro <em class="tag-wip">ajustes pendentes</em></span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkTheme" title="Tema Escuro" aria-label="Tema Escuro">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Skins de aparência do popup -->
+                <div class="skins-section">
+                    <p class="skins-label">Skin do painel</p>
+                    <div class="skins-grid" id="skinsGrid">
+                        <button class="skin-btn active" data-skin="default" title="Floresta (padrão)" aria-label="Skin Floresta">
+                            <span class="skin-preview" style="--s1:#1d5b50;--s2:#0f1117"></span>
+                            <span>Floresta</span>
+                        </button>
+                        <button class="skin-btn" data-skin="ocean" title="Oceano" aria-label="Skin Oceano">
+                            <span class="skin-preview" style="--s1:#1a6fa0;--s2:#0a1525"></span>
+                            <span>Oceano</span>
+                        </button>
+                        <button class="skin-btn" data-skin="ember" title="Brasa" aria-label="Skin Brasa">
+                            <span class="skin-preview" style="--s1:#b84a2a;--s2:#160b08"></span>
+                            <span>Brasa</span>
+                        </button>
+                        <button class="skin-btn" data-skin="violet" title="Violeta" aria-label="Skin Violeta">
+                            <span class="skin-preview" style="--s1:#7c3aed;--s2:#0d0a1a"></span>
+                            <span>Violeta</span>
+                        </button>
+                        <button class="skin-btn" data-skin="slate" title="Granito" aria-label="Skin Granito">
+                            <span class="skin-preview" style="--s1:#4a5568;--s2:#111418"></span>
+                            <span>Granito</span>
+                        </button>
+                        <button class="skin-btn" data-skin="light" title="Claro" aria-label="Skin Claro">
+                            <span class="skin-preview" style="--s1:#1d5b50;--s2:#f0f2f5"></span>
+                            <span>Claro</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cor do tema (mantido para o JS existente) -->
+                <div class="color-row">
+                    <p class="skins-label">Cor de acento</p>
+                    <div class="color-picker">
+                        <div class="color-option active" style="background: #1d5b50" title="Verde Floresta"></div>
+                        <div class="color-option" style="background: #2c3e50" title="Azul Ardósia"></div>
+                        <div class="color-option" style="background: #8e44ad" title="Roxo"></div>
+                        <div class="color-option" style="background: #c0392b" title="Vermelho"></div>
+                        <input type="color" class="custom-color" value="#1d5b50" aria-label="Escolha de cor personalizada">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Gemini API Key -->
+        <section class="module full" style="--delay: 0.3s">
+            <div class="module-header">
+                <span class="module-label">06</span>
+                <span>Gemini API Key</span>
+            </div>
+            <div class="module-content">
+                <div class="form-group">
+                    <label for="geminiKey" class="form-label">Chave de API</label>
+                    <div class="input-group">
+                        <input
+                            type="password"
+                            id="geminiKey"
+                            class="form-control"
+                            placeholder="AIza••••••••••••••••••••••"
+                            aria-label="Campo para chave da API"
+                        >
+                        <button class="btn-toggle-key" type="button" id="toggleKey" aria-label="Mostrar/ocultar chave">
+                            <svg id="iconShow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="iconHide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <small class="form-text">Necessário para formatação automática de comentários</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- Changelog / Status -->
+        <section class="module full changelog-module" style="--delay: 0.35s">
+            <div class="module-header">
+                <span class="module-label">07</span>
+                <span>Status das Funções</span>
+            </div>
+            <div class="module-content">
+                <ul class="lista-funcoes-futuras">
+                    <li class="feito">Sistema de atalhos de teclado para navegação e ações rápidas<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Expansão automática da área de comentários no RSP<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Card de visualização de horas por função no RDO<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Adição detalhada de horas (HN, K1, K2 e K3) separadas por função no card<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Adição automática das horas do card no campo de atividades<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Personalização de tema de acordo com escolha do usuário<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="em-andamento">Tema dark completo em todo diariodeobra<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li class="feito">Sistema inteligente de formatação automática para comentários nos RDOs<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="em-andamento">Validação em tempo real dos campos essenciais com feedback visual<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li class="em-andamento">Integração com calendário para identificação automática de feriados<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li class="feito">Sistema de compilação de PDFs por obra com filtros personalizáveis<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Scroll estilo touch com inércia e movimentação suave<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Slider automático de imagens nas obras em andamento<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li>Sistema de versionamento com histórico de alterações<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li>Dashboard para monitoramento de equipamentos, produção e horas em HH<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li>Análise de métricas de produtividade e uso de equipamentos<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li>Container para visualização de orçamento e arquivo xlsx<div class="separador"></div><input type="checkbox" disabled></li>
+                    <li class="feito">Extrator geral de medição: unificação de PDFs e extração de dados do campo de atividades<div class="separador"></div><input type="checkbox" checked disabled></li>
+                    <li class="feito">Script para gerenciar todas as funcionalidades e revisar o relatório automaticamente<div class="separador"></div><input type="checkbox" checked disabled></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="app-footer">
+        <p>Desenvolvido por <a href="#" target="_self" class="dev-link">Diogo</a></p>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <p>Complemento RDO</p>
+    </footer>
+
+    <script>
+    // ─── Skins do popup (salvas em localStorage) ──────────────────────────────
+
+    const SKINS = {
+        default: {
+            '--background-color': '#0f1117',
+            '--module-background': '#161b22',
+            '--feature-background': '#1c2330',
+            '--border-color': '#2d3748',
+            '--text-color': '#e8eaf0',
+            '--muted-text-color': '#6b7280',
+            '--surface-hover': '#212a37',
+        },
+        ocean: {
+            '--background-color': '#0a1525',
+            '--module-background': '#0f1e33',
+            '--feature-background': '#142540',
+            '--border-color': '#1e3a5f',
+            '--text-color': '#dbeafe',
+            '--muted-text-color': '#5b8ab5',
+            '--surface-hover': '#1a2e4a',
+        },
+        ember: {
+            '--background-color': '#160b08',
+            '--module-background': '#1f1008',
+            '--feature-background': '#2a150a',
+            '--border-color': '#4a2010',
+            '--text-color': '#fde8d8',
+            '--muted-text-color': '#a06040',
+            '--surface-hover': '#321808',
+        },
+        violet: {
+            '--background-color': '#0d0a1a',
+            '--module-background': '#130e25',
+            '--feature-background': '#1a1230',
+            '--border-color': '#2d1f55',
+            '--text-color': '#ede9fe',
+            '--muted-text-color': '#7c6aaa',
+            '--surface-hover': '#201535',
+        },
+        slate: {
+            '--background-color': '#111418',
+            '--module-background': '#181e26',
+            '--feature-background': '#1f2833',
+            '--border-color': '#2e3a4a',
+            '--text-color': '#d1d8e4',
+            '--muted-text-color': '#5a6878',
+            '--surface-hover': '#252f3d',
+        },
+        light: {
+            '--background-color': '#f0f2f5',
+            '--module-background': '#ffffff',
+            '--feature-background': '#f5f7fa',
+            '--border-color': '#d8dde6',
+            '--text-color': '#1a2035',
+            '--muted-text-color': '#6b7280',
+            '--surface-hover': '#eaedf2',
+        },
+    };
+
+    const SKIN_ACCENTS = {
+        default: '#1d5b50',
+        ocean:   '#1a6fa0',
+        ember:   '#b84a2a',
+        violet:  '#7c3aed',
+        slate:   '#4a5568',
+        light:   '#1d5b50',
+    };
+
+    function applySkin(name) {
+        const skin = SKINS[name] || SKINS.default;
+        const root = document.documentElement;
+        Object.entries(skin).forEach(([k, v]) => root.style.setProperty(k, v));
+        // Mantém compatibilidade com a cor do tema existente no popup.js
+        // (só altera se não houver cor customizada salva)
+        const savedAccent = localStorage.getItem('rdo_custom_accent');
+        if (!savedAccent) {
+            root.style.setProperty('--theme-color', SKIN_ACCENTS[name] || '#1d5b50');
+        }
+        // Atualiza botões
+        document.querySelectorAll('.skin-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.skin === name);
+        });
+        localStorage.setItem('rdo_skin', name);
+    }
+
+    function initSkins() {
+        const saved = localStorage.getItem('rdo_skin') || 'default';
+        applySkin(saved);
+        document.querySelectorAll('.skin-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applySkin(btn.dataset.skin);
+            });
+        });
+    }
+
+    // ─── Toggle aviso API ────────────────────────────────────────────────────
+    function toggleAviso() {
+        const body = document.getElementById('avisoBody');
+        const btn = document.querySelector('.aviso-toggle');
+        const header = document.querySelector('.aviso-header');
+        const expanded = body.style.display !== 'none' && body.style.display !== '';
+        if (expanded || body.style.display === '') {
+            body.style.display = 'none';
+            btn.textContent = '▸';
+            header.setAttribute('aria-expanded', 'false');
+        } else {
+            body.style.display = '';
+            btn.textContent = '▾';
+            header.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    // ─── Toggle key icon ─────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        initSkins();
+
+        const toggleBtn = document.getElementById('toggleKey');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const input = document.getElementById('geminiKey');
+                const show = document.getElementById('iconShow');
+                const hide = document.getElementById('iconHide');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    show.style.display = 'none';
+                    hide.style.display = '';
+                } else {
+                    input.type = 'password';
+                    show.style.display = '';
+                    hide.style.display = 'none';
+                }
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

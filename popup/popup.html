@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <!-- Configurações básicas do documento -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDO</title>
+    <!-- Recursos externos -->
+    <link rel="shortcut icon" href="../imagens/icon48.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles/styles-popup.css">
+    <script src="script/popup.js" defer></script>
+    <script src="script/pdfLib.js" defer></script>
+    <script src="script/extrairPDFs.js" defer></script>
+</head>
+
+<body>
+    <!-- Banner de versão beta -->
+    <div class="beta-banner">
+        <div class="banner-content">
+            <h2 class="titulo">Complemento RDO</h2>
+            <!-- <span class="message">🚧 Em desenvolvimento - Algumas funções podem estar instáveis 🚧</span> -->
+        </div>
+        <span class="version-tag">2.1</span>
+    </div>
+
+    <!-- Aviso sobre instabilidade da API -->
+    <div class="aviso-api">
+        <strong>Aviso: API do Diário de Obra está completamente instável.</strong>
+        <p>Muito código foi alterado para tentar driblar a instabilidade do sistema. A API está com timeout muito grande nas requisições HTTP (o que faz ela dar erro). Além disso, os binários dos PDFs dos relatórios estão vindo, muitas vezes, sem as imagens.</p>
+    </div>
+
+    <details class="mensagem-desenvolvedor-collapse">
+        <summary class="mensagem-desenvolvedor">Mensagem do desenvolvedor</summary>
+        <div class="mensagem-desenvolvedor">
+            <p>Criar esta extensão trouxe muito aprendizado e benefícios. Foi minha primeira vez criando um complemento para navegadores e, por isso, aprendi bastante. Nos benefícios: esta aplicação me permitiu trabalhar de forma mais automatizada, com menos erros (em vez de calcular sempre na mão, os cálculos ficaram na própria extensão; toda a matemática e as regras de negócio que eu precisava aplicar, apliquei uma vez no código, o que tornou errar quase impossível). Também foi positivo ver que foi útil para muita gente em vários casos de uso, por exemplo na compilação de informações ou de PDFs.</p>
+            <p>Com isso, uma coisa precisa ser dita: esta extensão não inventa informação; ela transforma dados reais em informação organizada e precisa. Ela transforma relatórios de ponto em horas revisadas por pessoa; texto incorreto do encarregado em texto corrigido; dados avulsos em planilhas prontas para medição; PDFs soltos em compilações prontas para arquivo ou envio em medição.</p>
+            <p>Afirmações levianas sobre o meu trabalho não serão aceitas. Todo o código (com versionamento) está disponível desde sempre no GitHub: <a href="https://github.com/diogosflorencio/complemento-rdo" target="_blank" rel="noopener noreferrer">github.com/diogosflorencio/complemento-rdo</a></p>
+            <p>Espero continuar melhorando esta ferramenta para que continue sendo útil para mim e para outras pessoas. Espero que o Diário de Obra (site no qual esta extensão se baseia) corrija os problemas que tem enfrentado com a própria API.</p>
+            <p class="assinatura-desenvolvedor">Att.,<br>Diogo, sempre à disposição.</p>
+        </div>
+    </details>
+
+    <!-- Grid principal de módulos -->
+    <div class="module-grid">
+        <!-- Módulos de funcionalidades -->
+        <!-- modulo das funções gerais do complemento -->
+        <div class="module half">
+            <div class="module-header">Geral</div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Extração de</br>PDFs</span>
+                    <label class="switch">
+                        <input type="checkbox" id="PDFExtractor" checked aria-label="Extração de PDFs">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Teclas de </br> atalho</span>
+                    <label class="switch">
+                        <input type="checkbox" id="keyboardShortcuts" aria-label="Teclas de atalho">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Scroll estilo</br>touch</span>
+                    <label class="switch">
+                        <input type="checkbox" id="touchScroll" aria-label="Scroll estilo touch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item">
+                    <span>Slider de</br>imagens</span>
+                    <label class="switch">
+                        <input type="checkbox" id="obrasSlider" checked aria-label="Slider de imagens das obras">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="module half">
+            <div class="module-header">Dashboard</div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Card na tela</br>inicial (lista)</span>
+                    <label class="switch" title="Painel colapsável em #/app/obras com resumo de relatórios não aprovados e tutorial.">
+                        <input type="checkbox" id="dashboardInicio" checked aria-label="Dashboard na tela inicial">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="module half">
+            <div class="module-header">Funções RDO</div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Card Horas/</br>Função</span>
+                    <label class="switch">
+                        <input type="checkbox" id="hoursCard" checked aria-label="Card Horas/Função">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Formatação</br> automática</span>
+                    <label class="switch">
+                        <input type="checkbox" id="AutoFormat1" aria-label="Formatação automática">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Validação de</br> campos</span>
+                    <label class="switch">
+                        <input type="checkbox" id="AutoFormat2" disabled aria-label="Validação de campos">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="module half">
+            <div class="module-header">Funções RSP</div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Expansão do</br> comentário</span>
+                    <label class="switch" title="Em desenvolvimento. Função sempre ativa. ">
+                        <input type="checkbox" id="textareaExpand" checked aria-label="Expansão do comentário">
+                        <span class="slider andamento"></span>
+                    </label>
+                </div>
+                <div class="feature-item" title="Em desenvolvimento.">
+                    <span>Visualização</br> de .xlsx</span>
+                    <label class="switch">
+                        <input type="checkbox" id="xlsxView" disabled aria-label="Visualização de .xlsx">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="module full">
+            <div class="module-header">Personalização</div>
+            <div class="module-content">
+                <div class="feature-item">
+                    <span>Tema Escuro (Faltam ajustes)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkTheme" title="Tema Escuro" aria-label="Tema Escuro">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="color-picker">
+                    <p>Tema:</p>
+                    <div class="color-option active" data-theme-color="#000000" style="background: #000000" title="Preto (padrão)"></div>
+                    <div class="color-option" data-theme-color="#1d5b50" style="background: #1d5b50" title="Verde"></div>
+                    <div class="color-option" data-theme-color="#2c3e50" style="background: #2c3e50" title="Azul ardósia"></div>
+                    <div class="color-option" data-theme-color="#8e44ad" style="background: #8e44ad" title="Roxo"></div>
+                    <div class="color-option" data-theme-color="#c0392b" style="background: #c0392b" title="Vermelho"></div>
+                    <p>Escolha:</p>
+                    <input type="color" class="custom-color" value="#000000" aria-label="Escolha de cor personalizada">    
+                </div>
+            </div>
+        </div>
+        <div class="module full">
+            <div class="module-header">
+                Gemini API Key
+            </div>
+            <div class="module-content">
+                <div class="form-group">
+                    <label for="geminiKey">Campo para chave da API</label>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="geminiKey" 
+                            class="form-control" 
+                            placeholder="Insira sua chave API do Gemini"
+                            aria-label="Campo para chave da API"
+                        >
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="toggleKey">
+                                <i class="material-icons">Mostrar</i>
+                            </button>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">
+                        (Necessário para funcionalidade de formatação automática)
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        
+
+        <div class="module full">
+            <div class="module-header">Funções em desenvolvimento, futuras e concluídas</div>
+            <div class="module-content">
+                <ul class="lista-funcoes-futuras">
+
+                    <li class="feito">Sistema de atalhos de teclado para navegação e ações rápidas<div
+                            class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+
+                    <li title="" class="feito">Expansão automática da área de comentários no RSP<div class="separador">
+                        </div>
+                        <input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="feito">Card de visualização de horas por função no RDO<div class="separador"></div><input
+                            type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="feito">Adição detalhada de horas (HN, K1, K2 e K3) separadas por função no card<div
+                            class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+                    
+                    <li class="feito">Adição automática das horas do card no campo de atividades<div
+                        class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+                   
+                    <li class="feito">Personalização de tema de acordo com escolha do usuario pra todo diario de obra<div
+                            class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="em-andamento">Tema dark. Aplicação de tema escuro em todo diariodeobra<div
+                            class="separador"></div><input type="checkbox" disabled>
+                    </li>
+
+                    <li class="feito">Sistema inteligente de formatação automática para comentários nos RDOs<div class="separador">
+                        </div><input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="em-andamento">Validação em tempo real dos campos essenciais com feedback visual<div class="separador"></div>
+                        <input type="checkbox" disabled>
+                    </li>
+
+                    <li class="em-andamento">Integração com calendário para identificação automática de feriados<div class="separador"></div>
+                        <input type="checkbox" disabled>
+                    </li>
+
+                    <li class="feito">Sistema de compilação de PDFs por obra com filtros personalizáveis<div
+                            class="separador"></div>
+                        <input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="feito">Scroll estilo touch com inércia e movimentação suave<div class="separador"></div>
+                        <input type="checkbox" checked disabled>
+                    </li>
+
+                    <li class="feito">Slider automático de imagens nas obras em andamento<div class="separador"></div><input
+                            type="checkbox" checked disabled>
+                    </li>
+
+                    <li>Sistema de versionamento com histórico de alterações (via API ou uso do complemento)<div
+                            class="separador"></div><input type="checkbox" disabled>
+                    </li>
+
+                    <li>Dashboard na página inicial para monitoramento de equipamentos, produção e horas em HH<div
+                            class="separador"></div><input type="checkbox" disabled>
+                    </li>
+
+                    <li>Análise de métricas de produtividade e uso de equipamentos<div class="separador"></div><input
+                            type="checkbox" disabled>
+                    </li>
+
+                    <li>Container para visualização de orçamento, rastreio e arquivo xlsx no geral direto do App<div
+                            class="separador"></div><input type="checkbox" disabled>
+                    </li>
+
+                    <li class="feito">Extrator geral de medição: unificação de PDFs e extração de dados do campo de atividades<div class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+                    <li class="feito">Script para gerenciar todas as funcionalides criadas e revisar o relatorio inteiramente por si mesmo.<div class="separador"></div><input type="checkbox" checked disabled>
+                    </li>
+  
+
+                </ul>
+                <!-- <div class="disclaimer">
+                    
+                    <div class="disclaimer-header">
+                        <h3>Disclaimer de Responsabilidade</h3>
+                        <button class="collapse-button-eye" onclick="toggleDisclaimer()" aria-label="Expandir/Recolher">
+                            <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="disclaimer-content" class="disclaimer-content" style="display: none;">
+                        <div class="disclaimer-purpose">
+                            <p>Esta extensão foi desenvolvida por mim, utilizando recursos próprios, incluindo tempo pessoal (fora do trabalho), conhecimento técnico, infraestrutura e investimento financeiro.</p>
+                            <br>
+                            <p>É uma ferramenta para otimizar tarefas específicas. Seu compartilhamento é realizado de forma voluntária, sem garantias ou compromissos de manutenção, não tendo como objetivo ser uma solução corporativa ou de uso geral.</p>
+                        </div>
+
+                        <div class="disclaimer-important">
+                            <h4>IMPORTANTE</h4>
+                            <ul class="disclaimer-list">
+                                <li>A extensão passa por atualizações conforme necessidades e função do criador </li>
+                                <li>Funcionalidades podem ser alteradas ou descontinuadas</li>
+                                <li>Não há garantia de precisão dos dados ou resultados gerados (sei até onde posso considerar as informações geradas pelos scripts criados, mas sem garantia a outros )</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <!-- Rodapé -->
+    <footer class="module full">
+        <p class="footer-text">
+            Desenvolvido por
+            <a href="#" target="_self" class="dev-link" >Diogo</a>.
+        </p>
+    </footer>
+</body>
+</html>
