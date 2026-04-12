@@ -11,7 +11,7 @@ function rdoEmpresaDoStorage() {
 }
 const API_BASE_URL = 'https://apiexterna.diariodeobra.app/v1';
 
-/** Token lido no momento do fetch — o script pode carregar antes do login e o token só existir depois. */
+/** Token lido no momento do fetch, o script pode carregar antes do login e o token só existir depois. */
 function compiladorHeadersApiAtual() {
     const r = rdoEmpresaDoStorage() || {};
     return {

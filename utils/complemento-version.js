@@ -1,5 +1,5 @@
 /**
- * Versão instalada (hardcode) e URL da loja — alinhar com manifest.json ao publicar.
+ * Versão instalada (hardcode) e URL da loja, alinhar com manifest.json ao publicar.
  * O background grava em chrome.storage.local a versão informada pelo JSON de status (GitHub raw).
  */
 (function complementoRdoVersionModule() {
@@ -121,7 +121,7 @@
               ? 'Versão publicada (status): ' + remote
               : ok
                 ? 'Extensão instalada: v' + COMPLEMENTO_RDO_VERSION
-                : 'Sem resposta válida do endpoint de status — funções que dependem do servidor ficam desligadas.';
+                : 'Sem resposta válida do endpoint de status, funções que dependem do servidor ficam desligadas.';
         }
         const show = ok && serverSaysUpdate(remote);
         if (ban && link) {

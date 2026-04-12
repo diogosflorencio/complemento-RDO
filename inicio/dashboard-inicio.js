@@ -96,7 +96,7 @@
     //  API HELPERS 
     async function apiGet(path) {
         const token = obterTokenApi();
-        if (!token) throw new Error('Token ausente — faça login no Diário de Obra.');
+        if (!token) throw new Error('Token ausente, faça login no Diário de Obra.');
         const res = await fetch(`${API_BASE}${path}`, {
             headers: { token, 'Content-Type': 'application/json' }
         });
@@ -152,7 +152,7 @@
 
     async function agregarNaoAprovados(d1, d2, onProg) {
         const token = obterTokenApi();
-        if (!token) throw new Error('Token ausente — faça login no Diário de Obra.');
+        if (!token) throw new Error('Token ausente, faça login no Diário de Obra.');
         const res = await fetch(`${API_BASE}/obras`, {
             headers: { token, 'Content-Type': 'application/json' }
         });
@@ -950,7 +950,7 @@
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.3</div><div class="rdo-vdesc">Correções gerais de bugs e melhorias de estabilidade</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.2</div><div class="rdo-vdesc">Lista de colaboradores não utilizados, correção encoding UTF-8, extrator geral</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.1</div><div class="rdo-vdesc">Extração de horas linha a linha, exportação granular para XLSX por colaborador</div></div></div>
-            <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.0</div><div class="rdo-vdesc">Versão estável — compilador de medição, filtros, XLSX, PDFs, atalhos e temas</div></div></div>
+            <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.0</div><div class="rdo-vdesc">Versão estável, compilador de medição, filtros, XLSX, PDFs, atalhos e temas</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 0.9 beta</div><div class="rdo-vdesc">Fetch paralelo, painel unificado, filtros avançados, exportação consolidada</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 0.8 beta</div><div class="rdo-vdesc">Slider de imagens das obras, cache 30 min, pré-carregamento</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 0.1 beta</div><div class="rdo-vdesc">Card de horas por função, card flutuante colapsável, tema escuro inicial</div></div></div>
@@ -1028,7 +1028,7 @@
                 const s = wrap.querySelector('#' + id);
                 if (s) popularSelect(s, sorted);
             });
-        } catch (e) { /* silencia — token pode não estar configurado */ }
+        } catch (e) { /* silencia, token pode não estar configurado */ }
     }
 
     function atualizarPainelServidorVersao(wrap) {
@@ -1087,7 +1087,7 @@
                             ? `Esta extensão instalada: v${vLocal}` +
                               (remote ? ` · versão no status: ${remote}` : '') +
                               (backend ? ` · backend: ${backend}` : '')
-                            : `Extensão v${vLocal} — aguardando endpoint de status (JSON raw no GitHub).`;
+                            : `Extensão v${vLocal}, aguardando endpoint de status (JSON raw no GitHub).`;
                     }
                     const showUp = ok && remote && remote !== String(vLocal).trim();
                     if (ban && link) {

@@ -249,7 +249,7 @@ function tituloBotaoFormatarPorTipo(tipoSecao) {
 /**
  * Parágrafo visível com o texto do relatório (comentário / ocorrência / atividade).
  * Em atividades há vários `p.white-space` (etapa, descrição, observação); o primeiro match
- * de querySelector era o de etapa, muitas vezes vazio — a API recebia texto errado.
+ * de querySelector era o de etapa, muitas vezes vazio, a API recebia texto errado.
  */
 function paragrafoTextoRelatorioNaLinha(linha) {
     if (!linha) return null;
