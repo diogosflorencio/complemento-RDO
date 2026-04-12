@@ -8,12 +8,12 @@
    },
    "content_scripts": [ {
       "css": [  ],
-      "js": [ "utils/server-check.js", "inicio/dashboard-inicio.js", "extrair-pdfs/complemento-card-layout.js", "tema-dark/tema/tema.js", "tema-dark/tema_dark.js", "RDO/card_rdo_hh.js", "RDO/card_rdo_hh_linha_a_linha.js", "RSP/scripts/rsp_script.js", "atalhos/atalhos.js", "atalhos/card_atalhos.js", "extrair-pdfs/lib-extrator.js", "extrair-pdfs/sheetjs.js", "extrair-pdfs/conteiner.js", "extrair-pdfs/extrairPDFs.js", "extrair-pdfs/extrairPDFsRelatorios.js", "extrair-pdfs/extrairDadosRelatorios.js", "relatorios/relatorios.js", "relatorios/scroll.js" ],
+      "js": [ "utils/server-check.js", "utils/complemento-version.js", "inicio/dashboard-inicio.js", "extrair-pdfs/complemento-card-layout.js", "tema-dark/tema/tema.js", "tema-dark/tema_dark.js", "RDO/card_rdo_hh.js", "RDO/card_rdo_hh_linha_a_linha.js", "RSP/scripts/rsp_script.js", "atalhos/atalhos.js", "atalhos/card_atalhos.js", "extrair-pdfs/lib-extrator.js", "extrair-pdfs/sheetjs.js", "extrair-pdfs/conteiner.js", "extrair-pdfs/extrairPDFs.js", "extrair-pdfs/extrairPDFsRelatorios.js", "extrair-pdfs/extrairDadosRelatorios.js", "relatorios/relatorios.js", "relatorios/scroll.js" ],
       "matches": [ "*://web.diariodeobra.app/*" ],
       "run_at": "document_idle"
    } ],
    "description": "Uma extensão para melhorar a usabilidade do app de RDO.",
-   "host_permissions": [ "*://web.diariodeobra.app/*", "https://apiexterna.diariodeobra.app/*", "https://unpleasant-ingaborg-diogosflorencio-baf2a414.koyeb.app/*", "https://generativelanguage.googleapis.com/*" ],
+   "host_permissions": [ "*://web.diariodeobra.app/*", "https://apiexterna.diariodeobra.app/*", "https://raw.githubusercontent.com/*", "https://generativelanguage.googleapis.com/*" ],
    "icons": {
       "48": "imagens/icon48.png"
    },

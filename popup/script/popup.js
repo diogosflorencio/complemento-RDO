@@ -304,6 +304,10 @@ const configIds = [
 ];
 
 function atualizarVersaoDoManifest() {
+    if (typeof window.complementoRdoRefreshPopupServerUi === 'function') {
+        window.complementoRdoRefreshPopupServerUi();
+        return;
+    }
     fetch(chrome.runtime.getURL('manifest.json'))
         .then(resposta => resposta.json())
         .then(manifest => {

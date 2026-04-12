@@ -116,4 +116,5 @@
     // Adiciona os elementos ao DOM
     document.head.appendChild(style);
     document.body.appendChild(shortcutPanel);
+    if (typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(shortcutPanel);
 })();

@@ -439,6 +439,8 @@ function criarContainer() {
         </div>`;
 
         document.body.appendChild(container);
+        const _crvHh = container.querySelector('.container');
+        if (_crvHh && typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(_crvHh);
 
         let isCollapsed = localStorage.getItem('rdoWrapperState') === 'collapsed';
         const wrapperContainer = container.querySelector('.wrapper-container');

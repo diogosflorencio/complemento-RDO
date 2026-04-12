@@ -155,6 +155,8 @@ async function unificador_criarCardFiltro() {
     `;
 
     document.body.appendChild(container);
+    const _crvUnif = container.querySelector('.container');
+    if (_crvUnif && typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(_crvUnif);
 
     void unificador_preencherSelectModelosRelatorio(container).catch((err) => console.warn('Unificador: modelos', err));
 

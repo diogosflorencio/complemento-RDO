@@ -242,6 +242,8 @@ async function criarCardFiltro() {
 
     renderizarConteudo('pdf');
     document.body.appendChild(container);
+    const _crvBox = container.querySelector('.container');
+    if (_crvBox && typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(_crvBox);
 
     // Função para aplicar o estado de colapso
     function aplicarEstadoColapso(colapsado) {

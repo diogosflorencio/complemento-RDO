@@ -76,7 +76,7 @@
         if (d.includes('andamento')) return '#22c55e';
         if (d.includes('conclu'))    return '#3b82f6';
         if (d.includes('parali'))    return '#f59e0b';
-        return '#555';
+        return '#9ca3af';
     }
 
     function statusBg(desc) {
@@ -208,7 +208,7 @@
 
 #${CONTAINER_ID} .rdo-overlay{
     position:fixed;inset:0;z-index:2147482900;
-    background:#0a0a0a;font-family:'Inter',sans-serif;font-size:13px;color:#f0f0f0;
+    background:#0a0a0a;font-family:'Inter',sans-serif;font-size:13px;color:#ffffff;
     display:flex;flex-direction:column;
 }
 #${CONTAINER_ID} .rdo-layout{display:flex;height:100%;overflow:hidden;}
@@ -219,25 +219,32 @@
     display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;
 }
 #${CONTAINER_ID} .rdo-sb-head{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.07);}
-#${CONTAINER_ID} .rdo-sb-wordmark{font-size:13px;font-weight:600;color:#f0f0f0;letter-spacing:.01em;}
-#${CONTAINER_ID} .rdo-sb-wordmark span{color:#555;font-weight:400;}
-#${CONTAINER_ID} .rdo-sb-ver{font-size:11px;color:#333;margin-top:3px;}
+#${CONTAINER_ID} .rdo-sb-wordmark{font-size:13px;font-weight:600;color:#ffffff;letter-spacing:.01em;}
+#${CONTAINER_ID} .rdo-sb-wordmark span{color:#d0d0d0;font-weight:400;}
+#${CONTAINER_ID} .rdo-sb-ver{font-size:11px;color:#a8a8a8;margin-top:3px;}
 #${CONTAINER_ID} .rdo-sb-sec{
     font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
-    color:#333;padding:16px 16px 6px;
+    color:#a8a8a8;padding:16px 16px 6px;
 }
 #${CONTAINER_ID} .rdo-ni{
     display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;
-    color:#555;font-size:12.5px;font-weight:400;transition:color .12s,background .12s;
+    color:#d0d0d0;font-size:12.5px;font-weight:400;transition:color .12s,background .12s;
     border-left:2px solid transparent;user-select:none;
 }
-#${CONTAINER_ID} .rdo-ni:hover{color:#f0f0f0;background:#1a1a1a;}
-#${CONTAINER_ID} .rdo-ni.on{color:#f0f0f0;background:#1a1a1a;border-left-color:#f0f0f0;}
+#${CONTAINER_ID} .rdo-ni:hover{color:#ffffff;background:#1a1a1a;}
+#${CONTAINER_ID} .rdo-ni.on{color:#ffffff;background:#1a1a1a;border-left-color:#ffffff;}
 #${CONTAINER_ID} .rdo-ni svg{width:13px;height:13px;flex-shrink:0;}
 #${CONTAINER_ID} .rdo-sb-foot{
     margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,0.07);
-    display:flex;align-items:center;gap:7px;font-size:11px;color:#333;
+    display:flex;flex-direction:column;gap:8px;font-size:11px;color:#d0d0d0;
 }
+#${CONTAINER_ID} .rdo-sb-foot-srv{display:flex;align-items:flex-start;gap:8px;}
+#${CONTAINER_ID} .rdo-sb-srv-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;background:#717171;}
+#${CONTAINER_ID} .rdo-sb-srv-dot.ok{background:#22c55e;}
+#${CONTAINER_ID} .rdo-sb-srv-dot.bad{background:#ef4444;}
+#${CONTAINER_ID} .rdo-sb-srv-line1{font-weight:600;color:#ffffff;line-height:1.35;}
+#${CONTAINER_ID} .rdo-sb-foot-sub{font-size:10px;color:#c6c6c6;margin-top:2px;line-height:1.35;}
+#${CONTAINER_ID} .rdo-sb-foot-app{font-size:10px;color:#b8b8b8;}
 #${CONTAINER_ID} .rdo-status-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;flex-shrink:0;}
 
 #${CONTAINER_ID} .rdo-main{flex:1;overflow-y:auto;background:#0a0a0a;}
@@ -246,21 +253,21 @@
     padding:0 24px;height:48px;background:#111111;
     border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:10;
 }
-#${CONTAINER_ID} .rdo-tb-title{font-size:13px;font-weight:600;color:#f0f0f0;}
-#${CONTAINER_ID} .rdo-tb-crumb{font-size:11px;color:#333;}
+#${CONTAINER_ID} .rdo-tb-title{font-size:13px;font-weight:600;color:#ffffff;}
+#${CONTAINER_ID} .rdo-tb-crumb{font-size:11px;color:#a8a8a8;}
 #${CONTAINER_ID} .rdo-tb-close{
     width:28px;height:28px;border-radius:6px;background:transparent;
     border:1px solid rgba(255,255,255,0.1);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;color:#555;transition:color .12s,background .12s;
+    display:flex;align-items:center;justify-content:center;color:#d0d0d0;transition:color .12s,background .12s;
 }
-#${CONTAINER_ID} .rdo-tb-close:hover{color:#f0f0f0;background:#1a1a1a;}
+#${CONTAINER_ID} .rdo-tb-close:hover{color:#ffffff;background:#1a1a1a;}
 #${CONTAINER_ID} .rdo-tb-close svg{width:12px;height:12px;}
 
 #${CONTAINER_ID} .rdo-pg{padding:28px 24px;display:none;}
 #${CONTAINER_ID} .rdo-pg.on{display:block;}
 
-#${CONTAINER_ID} .rdo-ph{font-size:20px;font-weight:600;color:#f0f0f0;margin-bottom:4px;letter-spacing:-.01em;}
-#${CONTAINER_ID} .rdo-ps{font-size:12px;color:#555;margin-bottom:24px;}
+#${CONTAINER_ID} .rdo-ph{font-size:20px;font-weight:600;color:#ffffff;margin-bottom:4px;letter-spacing:-.01em;}
+#${CONTAINER_ID} .rdo-ps{font-size:12px;color:#d0d0d0;margin-bottom:24px;}
 
 /* GRIDS */
 #${CONTAINER_ID} .rdo-sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
@@ -274,13 +281,13 @@
     background:#111111;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px 16px;
     box-shadow:0px 1px 5px -4px rgba(0,0,0,0.9),0px 0px 0px 1px rgba(255,255,255,0.04),0px 4px 8px rgba(0,0,0,0.4);
 }
-#${CONTAINER_ID} .rdo-sc-lbl{font-size:10px;font-weight:500;color:#333;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
-#${CONTAINER_ID} .rdo-sc-val{font-size:22px;font-weight:600;color:#f0f0f0;line-height:1;letter-spacing:-.02em;}
+#${CONTAINER_ID} .rdo-sc-lbl{font-size:10px;font-weight:500;color:#a8a8a8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+#${CONTAINER_ID} .rdo-sc-val{font-size:22px;font-weight:600;color:#ffffff;line-height:1;letter-spacing:-.02em;}
 #${CONTAINER_ID} .rdo-sc-val.r{color:#ff4444;}
 #${CONTAINER_ID} .rdo-sc-val.g{color:#22c55e;}
 #${CONTAINER_ID} .rdo-sc-val.b{color:#3b82f6;}
 #${CONTAINER_ID} .rdo-sc-val.y{color:#f59e0b;}
-#${CONTAINER_ID} .rdo-sc-meta{font-size:10px;color:#333;margin-top:4px;}
+#${CONTAINER_ID} .rdo-sc-meta{font-size:10px;color:#a8a8a8;margin-top:4px;}
 
 /* CARD */
 #${CONTAINER_ID} .rdo-card{
@@ -289,17 +296,17 @@
     margin-bottom:8px;
 }
 #${CONTAINER_ID} .rdo-card:last-child{margin-bottom:0;}
-#${CONTAINER_ID} .rdo-card-tit{font-size:13px;font-weight:600;color:#f0f0f0;margin-bottom:2px;}
-#${CONTAINER_ID} .rdo-card-sub{font-size:11px;color:#333;margin-bottom:14px;}
+#${CONTAINER_ID} .rdo-card-tit{font-size:13px;font-weight:600;color:#ffffff;margin-bottom:2px;}
+#${CONTAINER_ID} .rdo-card-sub{font-size:11px;color:#a8a8a8;margin-bottom:14px;}
 
 /* FORM ROW */
 #${CONTAINER_ID} .rdo-frow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px;}
 #${CONTAINER_ID} .rdo-fg{display:flex;flex-direction:column;gap:4px;}
-#${CONTAINER_ID} .rdo-fg label{font-size:10px;font-weight:500;color:#333;letter-spacing:.04em;text-transform:uppercase;}
+#${CONTAINER_ID} .rdo-fg label{font-size:10px;font-weight:500;color:#a8a8a8;letter-spacing:.04em;text-transform:uppercase;}
 #${CONTAINER_ID} .rdo-fg input[type=date],
 #${CONTAINER_ID} .rdo-fg select{
     padding:6px 9px;border:1px solid rgba(255,255,255,0.12);border-radius:6px;
-    background:#1a1a1a;color:#f0f0f0;font-size:11px;font-family:'Inter',sans-serif;
+    background:#1a1a1a;color:#ffffff;font-size:11px;font-family:'Inter',sans-serif;
     outline:none;color-scheme:dark;cursor:pointer;
 }
 #${CONTAINER_ID} .rdo-fg select{min-width:180px;}
@@ -314,14 +321,14 @@
 }
 #${CONTAINER_ID} .rdo-btn:hover{opacity:.85;}
 #${CONTAINER_ID} .rdo-btn:disabled{opacity:.35;cursor:default;}
-#${CONTAINER_ID} .rdo-btn.sec{background:#1a1a1a;color:#f0f0f0;border:1px solid rgba(255,255,255,0.1);}
+#${CONTAINER_ID} .rdo-btn.sec{background:#1a1a1a;color:#ffffff;border:1px solid rgba(255,255,255,0.1);}
 #${CONTAINER_ID} .rdo-btn.sec:hover:not(:disabled){background:#222;}
 
 /* PROGRESS */
-#${CONTAINER_ID} .rdo-smsg{font-size:10px;color:#555;min-height:13px;margin-bottom:6px;}
+#${CONTAINER_ID} .rdo-smsg{font-size:10px;color:#d0d0d0;min-height:13px;margin-bottom:6px;}
 #${CONTAINER_ID} .rdo-smsg.err{color:#ff6666;}
 #${CONTAINER_ID} .rdo-pbar-wrap{margin-bottom:8px;display:none;}
-#${CONTAINER_ID} .rdo-pbar-txt{font-size:10px;color:#333;margin-bottom:3px;}
+#${CONTAINER_ID} .rdo-pbar-txt{font-size:10px;color:#a8a8a8;margin-bottom:3px;}
 #${CONTAINER_ID} .rdo-pbar{height:1.5px;background:#222;border-radius:2px;overflow:hidden;}
 #${CONTAINER_ID} .rdo-pfill{height:100%;border-radius:2px;background:#f0f0f0;width:0%;transition:width .3s;}
 
@@ -335,9 +342,9 @@
     padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);
 }
 #${CONTAINER_ID} .rdo-row-item:last-child{border-bottom:none;}
-#${CONTAINER_ID} .rdo-ri-name{font-size:12px;color:#f0f0f0;}
-#${CONTAINER_ID} .rdo-ri-sub{font-size:10px;color:#555;margin-top:1px;}
-#${CONTAINER_ID} .rdo-ri-val{font-size:12px;font-weight:600;color:#f0f0f0;}
+#${CONTAINER_ID} .rdo-ri-name{font-size:12px;color:#ffffff;}
+#${CONTAINER_ID} .rdo-ri-sub{font-size:10px;color:#d0d0d0;margin-top:1px;}
+#${CONTAINER_ID} .rdo-ri-val{font-size:12px;font-weight:600;color:#ffffff;}
 
 /* TAGS */
 #${CONTAINER_ID} .rdo-tag{font-size:9px;font-weight:500;padding:2px 7px;border-radius:9999px;letter-spacing:.02em;}
@@ -345,18 +352,18 @@
 #${CONTAINER_ID} .rdo-tag.lo{background:rgba(245,158,11,0.1);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
 #${CONTAINER_ID} .rdo-tag.ok{background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
 #${CONTAINER_ID} .rdo-tag.info{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);}
-#${CONTAINER_ID} .rdo-tag.neu{background:rgba(255,255,255,0.05);color:#777;border:1px solid rgba(255,255,255,0.1);}
+#${CONTAINER_ID} .rdo-tag.neu{background:rgba(255,255,255,0.05);color:#c0c0c0;border:1px solid rgba(255,255,255,0.1);}
 
 /* EMPTY */
 #${CONTAINER_ID} .rdo-empty{
-    padding:28px 16px;text-align:center;font-size:11px;color:#333;
+    padding:28px 16px;text-align:center;font-size:11px;color:#a8a8a8;
     border:1px dashed rgba(255,255,255,0.07);border-radius:7px;
 }
 
 /* BAR CHART */
 #${CONTAINER_ID} .rdo-bar-item{margin-bottom:10px;}
-#${CONTAINER_ID} .rdo-bar-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;color:#555;}
-#${CONTAINER_ID} .rdo-bar-head span:last-child{font-weight:500;color:#f0f0f0;}
+#${CONTAINER_ID} .rdo-bar-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;color:#d0d0d0;}
+#${CONTAINER_ID} .rdo-bar-head span:last-child{font-weight:500;color:#ffffff;}
 #${CONTAINER_ID} .rdo-bar-track{height:2px;background:#222;border-radius:2px;overflow:hidden;}
 #${CONTAINER_ID} .rdo-bar-fill{height:100%;border-radius:2px;background:#f0f0f0;transition:width .6s cubic-bezier(.4,0,.2,1);}
 #${CONTAINER_ID} .rdo-bar-fill.g{background:#22c55e;}
@@ -370,18 +377,18 @@
     background:#111111;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px 16px;
     box-shadow:0px 1px 5px -4px rgba(0,0,0,0.9),0px 0px 0px 1px rgba(255,255,255,0.04),0px 4px 8px rgba(0,0,0,0.4);
 }
-#${CONTAINER_ID} .rdo-obra-name{font-size:12px;font-weight:600;color:#f0f0f0;margin-bottom:7px;line-height:1.4;}
+#${CONTAINER_ID} .rdo-obra-name{font-size:12px;font-weight:600;color:#ffffff;margin-bottom:7px;line-height:1.4;}
 #${CONTAINER_ID} .rdo-obra-stat{
     display:inline-flex;align-items:center;font-size:9px;font-weight:500;
     padding:2px 8px;border-radius:9999px;margin-bottom:9px;
 }
-#${CONTAINER_ID} .rdo-obra-meta{font-size:10px;color:#555;display:flex;gap:10px;flex-wrap:wrap;}
+#${CONTAINER_ID} .rdo-obra-meta{font-size:10px;color:#d0d0d0;display:flex;gap:10px;flex-wrap:wrap;}
 
 /* TASK PROGRESS */
 #${CONTAINER_ID} .rdo-etapa{margin-bottom:16px;}
 #${CONTAINER_ID} .rdo-etapa-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-#${CONTAINER_ID} .rdo-etapa-name{font-size:12px;font-weight:600;color:#f0f0f0;flex:1;}
-#${CONTAINER_ID} .rdo-etapa-pct{font-size:11px;font-weight:600;color:#f0f0f0;margin-left:10px;}
+#${CONTAINER_ID} .rdo-etapa-name{font-size:12px;font-weight:600;color:#ffffff;flex:1;}
+#${CONTAINER_ID} .rdo-etapa-pct{font-size:11px;font-weight:600;color:#ffffff;margin-left:10px;}
 #${CONTAINER_ID} .rdo-etapa-bar{height:3px;background:#1e1e1e;border-radius:2px;overflow:hidden;margin-bottom:8px;}
 #${CONTAINER_ID} .rdo-etapa-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.4,0,.2,1);}
 #${CONTAINER_ID} .rdo-task{
@@ -389,9 +396,9 @@
     border-bottom:1px solid rgba(255,255,255,0.04);gap:6px;
 }
 #${CONTAINER_ID} .rdo-task:last-child{border-bottom:none;}
-#${CONTAINER_ID} .rdo-task-item{font-size:9.5px;color:#333;min-width:28px;}
-#${CONTAINER_ID} .rdo-task-name{font-size:11px;color:#777;flex:1;}
-#${CONTAINER_ID} .rdo-task-pct{font-size:10px;font-weight:600;color:#444;min-width:32px;text-align:right;}
+#${CONTAINER_ID} .rdo-task-item{font-size:9.5px;color:#a8a8a8;min-width:28px;}
+#${CONTAINER_ID} .rdo-task-name{font-size:11px;color:#c4c4c4;flex:1;}
+#${CONTAINER_ID} .rdo-task-pct{font-size:10px;font-weight:600;color:#b0b0b0;min-width:32px;text-align:right;}
 #${CONTAINER_ID} .rdo-task-pct.done{color:#22c55e;}
 #${CONTAINER_ID} .rdo-task-pct.part{color:#f59e0b;}
 
@@ -401,14 +408,14 @@
 #${CONTAINER_ID} .rdo-worker-av{
     width:30px;height:30px;border-radius:50%;background:#1a1a1a;
     border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;
-    justify-content:center;font-size:10px;font-weight:600;color:#555;flex-shrink:0;
+    justify-content:center;font-size:10px;font-weight:600;color:#d0d0d0;flex-shrink:0;
 }
 #${CONTAINER_ID} .rdo-worker-info{flex:1;min-width:0;}
-#${CONTAINER_ID} .rdo-worker-name{font-size:12px;color:#f0f0f0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#${CONTAINER_ID} .rdo-worker-role{font-size:10px;color:#555;}
+#${CONTAINER_ID} .rdo-worker-name{font-size:12px;color:#ffffff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#${CONTAINER_ID} .rdo-worker-role{font-size:10px;color:#d0d0d0;}
 #${CONTAINER_ID} .rdo-worker-stats{text-align:right;flex-shrink:0;}
 #${CONTAINER_ID} .rdo-worker-pres{font-size:12px;font-weight:600;color:#22c55e;}
-#${CONTAINER_ID} .rdo-worker-hrs{font-size:10px;color:#555;}
+#${CONTAINER_ID} .rdo-worker-hrs{font-size:10px;color:#d0d0d0;}
 
 /* CLIMATE */
 #${CONTAINER_ID} .rdo-clima-sumario{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
@@ -416,26 +423,26 @@
     background:#1a1a1a;border:1px solid rgba(255,255,255,0.05);
     border-radius:6px;padding:12px;text-align:center;
 }
-#${CONTAINER_ID} .rdo-clima-period{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#333;margin-bottom:8px;}
-#${CONTAINER_ID} .rdo-clima-big{font-size:18px;font-weight:600;color:#f0f0f0;line-height:1;margin-bottom:3px;}
-#${CONTAINER_ID} .rdo-clima-sub{font-size:10px;color:#555;}
+#${CONTAINER_ID} .rdo-clima-period{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#a8a8a8;margin-bottom:8px;}
+#${CONTAINER_ID} .rdo-clima-big{font-size:18px;font-weight:600;color:#ffffff;line-height:1;margin-bottom:3px;}
+#${CONTAINER_ID} .rdo-clima-sub{font-size:10px;color:#d0d0d0;}
 
 /* MATERIAL TABLE */
 #${CONTAINER_ID} .rdo-mat-head{
     display:flex;justify-content:space-between;padding:5px 0;
     border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:4px;
 }
-#${CONTAINER_ID} .rdo-mat-head span{font-size:10px;font-weight:500;color:#333;text-transform:uppercase;letter-spacing:.05em;}
+#${CONTAINER_ID} .rdo-mat-head span{font-size:10px;font-weight:500;color:#a8a8a8;text-transform:uppercase;letter-spacing:.05em;}
 #${CONTAINER_ID} .rdo-mat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 #${CONTAINER_ID} .rdo-mat-row:last-child{border-bottom:none;}
-#${CONTAINER_ID} .rdo-mat-desc{font-size:12px;color:#f0f0f0;}
-#${CONTAINER_ID} .rdo-mat-qty{font-size:12px;font-weight:600;color:#f0f0f0;}
+#${CONTAINER_ID} .rdo-mat-desc{font-size:12px;color:#ffffff;}
+#${CONTAINER_ID} .rdo-mat-qty{font-size:12px;font-weight:600;color:#ffffff;}
 
 /* RANKING NUM */
 #${CONTAINER_ID} .rdo-rank-num{
     width:18px;height:18px;border-radius:4px;background:#1a1a1a;
     display:flex;align-items:center;justify-content:center;
-    font-size:9px;font-weight:600;color:#444;flex-shrink:0;
+    font-size:9px;font-weight:600;color:#b0b0b0;flex-shrink:0;
 }
 
 /* FUNCIONALIDADES (existente) */
@@ -444,8 +451,8 @@
     padding:13px 14px;background:#111111;border:1px solid rgba(255,255,255,0.07);border-radius:8px;
     box-shadow:0px 1px 5px -4px rgba(0,0,0,0.9),0px 0px 0px 1px rgba(255,255,255,0.04),0px 4px 8px rgba(0,0,0,0.4);
 }
-#${CONTAINER_ID} .rdo-fi-name{font-size:12px;font-weight:600;color:#f0f0f0;margin-bottom:4px;}
-#${CONTAINER_ID} .rdo-fi-desc{font-size:11px;color:#555;line-height:1.5;}
+#${CONTAINER_ID} .rdo-fi-name{font-size:12px;font-weight:600;color:#ffffff;margin-bottom:4px;}
+#${CONTAINER_ID} .rdo-fi-desc{font-size:11px;color:#d0d0d0;line-height:1.5;}
 
 /* TUTORIAL (existente) */
 #${CONTAINER_ID} .rdo-tut-list{display:flex;flex-direction:column;gap:6px;}
@@ -454,32 +461,56 @@
     border:1px solid rgba(255,255,255,0.07);border-radius:8px;
     box-shadow:0px 1px 5px -4px rgba(0,0,0,0.9),0px 0px 0px 1px rgba(255,255,255,0.04),0px 4px 8px rgba(0,0,0,0.4);
 }
-#${CONTAINER_ID} .rdo-ts-n{font-size:11px;font-weight:600;color:#333;width:18px;flex-shrink:0;padding-top:1px;}
-#${CONTAINER_ID} .rdo-ts-title{font-size:12px;font-weight:600;color:#f0f0f0;margin-bottom:4px;}
-#${CONTAINER_ID} .rdo-ts-desc{font-size:11px;color:#555;line-height:1.5;}
+#${CONTAINER_ID} .rdo-ts-n{font-size:11px;font-weight:600;color:#a8a8a8;width:18px;flex-shrink:0;padding-top:1px;}
+#${CONTAINER_ID} .rdo-ts-title{font-size:12px;font-weight:600;color:#ffffff;margin-bottom:4px;}
+#${CONTAINER_ID} .rdo-ts-desc{font-size:11px;color:#d0d0d0;line-height:1.5;}
 #${CONTAINER_ID} .rdo-ts-code{
     display:inline-block;font-family:'Roboto Mono',monospace;font-size:10px;
     background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);
-    padding:2px 7px;border-radius:4px;margin-top:5px;color:#555;
+    padding:2px 7px;border-radius:4px;margin-top:5px;color:#d0d0d0;
 }
+
+/* AVISO DEV + SERVIDOR (dashboard) */
+#${CONTAINER_ID} .rdo-dev-nota{
+    font-size:11px;line-height:1.55;color:#e2e2e2;
+    background:#151515;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 14px;margin-bottom:14px;
+}
+#${CONTAINER_ID} .rdo-srv-box{
+    font-size:11px;line-height:1.5;color:#e2e2e2;
+    background:#151515;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 14px;margin-bottom:16px;
+}
+#${CONTAINER_ID} .rdo-srv-row{display:flex;align-items:flex-start;gap:10px;}
+#${CONTAINER_ID} .rdo-dash-srv-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;background:#717171;}
+#${CONTAINER_ID} .rdo-dash-srv-dot.ok{background:#22c55e;}
+#${CONTAINER_ID} .rdo-dash-srv-dot.bad{background:#ef4444;}
+#${CONTAINER_ID} .rdo-srv-lines{flex:1;min-width:0;}
+#${CONTAINER_ID} .rdo-srv-strong{font-weight:600;color:#ffffff;margin-bottom:4px;}
+#${CONTAINER_ID} .rdo-srv-detail{font-size:10px;color:#c8c8c8;}
+#${CONTAINER_ID} .rdo-update-banner{display:none;margin-top:10px;}
+#${CONTAINER_ID} .rdo-update-banner.on{display:block;}
+#${CONTAINER_ID} .rdo-update-banner a{color:#93c5fd;font-weight:600;text-decoration:underline;cursor:pointer;}
 
 /* VERSÕES (existente) */
 #${CONTAINER_ID} .rdo-ver-list{display:flex;flex-direction:column;}
 #${CONTAINER_ID} .rdo-vi{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
 #${CONTAINER_ID} .rdo-vi:last-child{border-bottom:none;}
 #${CONTAINER_ID} .rdo-vdot{width:6px;height:6px;border-radius:50%;background:#222;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;margin-top:4px;}
-#${CONTAINER_ID} .rdo-vdot.cur{background:#f0f0f0;border-color:#f0f0f0;}
-#${CONTAINER_ID} .rdo-vtit{font-size:12px;font-weight:600;color:#f0f0f0;display:flex;align-items:center;gap:7px;margin-bottom:2px;}
-#${CONTAINER_ID} .rdo-vpill{font-size:9px;font-weight:500;padding:1px 7px;border-radius:9999px;background:rgba(255,255,255,0.06);color:#555;border:1px solid rgba(255,255,255,0.1);}
-#${CONTAINER_ID} .rdo-vdesc{font-size:11px;color:#333;line-height:1.5;}
+#${CONTAINER_ID} .rdo-vdot.cur{background:#ffffff;border-color:#ffffff;}
+#${CONTAINER_ID} .rdo-vtit{font-size:12px;font-weight:600;color:#ffffff;display:flex;align-items:center;gap:7px;margin-bottom:2px;}
+#${CONTAINER_ID} .rdo-vpill{font-size:9px;font-weight:500;padding:1px 7px;border-radius:9999px;background:rgba(255,255,255,0.06);color:#d0d0d0;border:1px solid rgba(255,255,255,0.1);}
+#${CONTAINER_ID} .rdo-vdesc{font-size:11px;color:#a8a8a8;line-height:1.5;}
 `;
 
     function montarHtml() {
         const { inicio, fim } = datasPadraoMes();
+        const vLocal = (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) ? window.COMPLEMENTO_RDO_VERSION : '2.1';
+        const loja = (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_STORE_URL)
+            ? window.COMPLEMENTO_RDO_STORE_URL
+            : 'https://chromewebstore.google.com/detail/complemento-rdo/ifcagjkbngilbhannhibomnniipoannd';
         return `<style>${CSS}</style>
 
 <div class="rdo-fab" id="rdo-fab" title="Abrir painel">
-  <svg viewBox="0 0 24 24" fill="none" stroke="#f0f0f0" stroke-width="1.8" stroke-linecap="round">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round">
     <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
     <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
   </svg>
@@ -491,7 +522,7 @@
     <nav class="rdo-sb">
       <div class="rdo-sb-head">
         <div class="rdo-sb-wordmark">Complemento <span>RDO</span></div>
-        <div class="rdo-sb-ver">versão 2.1</div>
+        <div class="rdo-sb-ver">versão ${vLocal}</div>
       </div>
 
       <div class="rdo-sb-sec">Painel</div>
@@ -549,8 +580,14 @@
       </div>
 
       <div class="rdo-sb-foot">
-        <div class="rdo-status-dot"></div>
-        ativo · diariodeobra.app
+        <div class="rdo-sb-foot-srv">
+          <div class="rdo-sb-srv-dot" id="rdo-sb-srv-dot"></div>
+          <div>
+            <div class="rdo-sb-srv-line1" id="rdo-sb-srv-line1">Verificando servidor…</div>
+            <div class="rdo-sb-foot-sub" id="rdo-sb-foot-sub"></div>
+          </div>
+        </div>
+        <div class="rdo-sb-foot-app">Extensão v${vLocal} · diariodeobra.app</div>
       </div>
     </nav>
 
@@ -569,6 +606,11 @@
       <div class="rdo-pg on" id="rdo-pg-dash">
         <div class="rdo-ph">Dashboard</div>
         <div class="rdo-ps">Resumo de obras ativas e relatórios do período</div>
+        <div class="rdo-dev-nota" id="rdo-dev-nota">
+          Ainda estou desenvolvendo: por enquanto há só o básico aqui. A ideia é cruzar o máximo de dados possível,
+          gerar o máximo de informação útil e permitir extrair tudo direto desta página, sem depender de fluxos manuais repetitivos.
+        </div>
+        
         <div class="rdo-sgrid">
           <div class="rdo-sc"><div class="rdo-sc-lbl">Obras ativas</div><div class="rdo-sc-val" id="rdo-s1">--</div><div class="rdo-sc-meta">em andamento</div></div>
           <div class="rdo-sc"><div class="rdo-sc-lbl">Não aprovados</div><div class="rdo-sc-val r" id="rdo-s2">--</div><div class="rdo-sc-meta">no período</div></div>
@@ -987,6 +1029,90 @@
                 if (s) popularSelect(s, sorted);
             });
         } catch (e) { /* silencia — token pode não estar configurado */ }
+    }
+
+    function atualizarPainelServidorVersao(wrap) {
+        if (!wrap || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) return;
+        const loja =
+            (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_STORE_URL) ||
+            'https://chromewebstore.google.com/detail/complemento-rdo/ifcagjkbngilbhannhibomnniipoannd';
+        const vLocal =
+            (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) || '2.1';
+
+        const apply = () => {
+            chrome.storage.local.get(
+                ['server_unavailable', 'server_remote_complemento_version', 'server_remote_backend'],
+                (r) => {
+                    if (chrome.runtime.lastError) return;
+                    const ok = !r.server_unavailable;
+                    const remote = String(r.server_remote_complemento_version || '').trim();
+                    const backend = String(r.server_remote_backend || '').trim();
+
+                    const sbDot = wrap.querySelector('#rdo-sb-srv-dot');
+                    const sbLine = wrap.querySelector('#rdo-sb-srv-line1');
+                    const sbSub = wrap.querySelector('#rdo-sb-foot-sub');
+                    if (sbDot) {
+                        sbDot.classList.toggle('ok', ok);
+                        sbDot.classList.toggle('bad', !ok);
+                    }
+                    if (sbLine) {
+                        sbLine.textContent = ok
+                            ? 'Sincronização: servidor OK'
+                            : 'Sincronização: sem resposta válida';
+                    }
+                    if (sbSub) {
+                        sbSub.textContent = ok
+                            ? (backend
+                                ? `Publicado v${remote || '—'} · ${backend}`
+                                : (remote ? `Versão no status: ${remote}` : 'Resposta ok (sem version no JSON)'))
+                            : 'isServerAvailable() fica falso; funções dependentes não executam.';
+                    }
+
+                    const dd = wrap.querySelector('#rdo-dash-srv-dot');
+                    const dmeta = wrap.querySelector('#rdo-dash-srv-meta');
+                    const dtitle = wrap.querySelector('#rdo-dash-srv-title');
+                    const ban = wrap.querySelector('#rdo-update-banner');
+                    const link = wrap.querySelector('#rdo-update-link');
+                    if (dd) {
+                        dd.classList.toggle('ok', ok);
+                        dd.classList.toggle('bad', !ok);
+                    }
+                    if (dtitle) {
+                        dtitle.textContent = ok
+                            ? 'Servidor de sincronização: OK'
+                            : 'Servidor de sincronização: indisponível ou inválido';
+                    }
+                    if (dmeta) {
+                        dmeta.textContent = ok
+                            ? `Esta extensão instalada: v${vLocal}` +
+                              (remote ? ` · versão no status: ${remote}` : '') +
+                              (backend ? ` · backend: ${backend}` : '')
+                            : `Extensão v${vLocal} — aguardando endpoint de status (JSON raw no GitHub).`;
+                    }
+                    const showUp = ok && remote && remote !== String(vLocal).trim();
+                    if (ban && link) {
+                        if (showUp) {
+                            ban.classList.add('on');
+                            link.href = loja;
+                            link.textContent = `A versão ${remote} está disponível. Atualize!`;
+                        } else {
+                            ban.classList.remove('on');
+                            link.textContent = '';
+                        }
+                    }
+                }
+            );
+        };
+        apply();
+        if (!wrap.dataset.complementoSrvUiBound) {
+            wrap.dataset.complementoSrvUiBound = '1';
+            chrome.storage.onChanged.addListener((ch, area) => {
+                if (area !== 'local') return;
+                if (!ch.server_unavailable && !ch.server_remote_complemento_version && !ch.server_remote_backend) return;
+                if (!document.getElementById(CONTAINER_ID)) return;
+                apply();
+            });
+        }
     }
 
     //  EVENTOS 
@@ -1477,20 +1603,20 @@
                     const pctP = Math.round(turnos[t].prat / tot * 100);
                     const pctI = 100 - pctP;
                     return `<div style="margin-bottom:14px;">
-                        <div style="font-size:11px;font-weight:500;color:#555;margin-bottom:6px;">${nomesTurno[t]}</div>
+                        <div style="font-size:11px;font-weight:500;color:#d0d0d0;margin-bottom:6px;">${nomesTurno[t]}</div>
                         <div style="display:flex;gap:6px;align-items:center;font-size:10px;">
                             <span style="color:#22c55e;min-width:28px;">${pctP}%</span>
                             <div style="flex:1;height:3px;background:#222;border-radius:2px;overflow:hidden;">
                                 <div style="height:100%;width:${pctP}%;background:#22c55e;border-radius:2px;"></div>
                             </div>
-                            <span style="color:#555;">Praticável · ${turnos[t].prat}d</span>
+                            <span style="color:#d0d0d0;">Praticável · ${turnos[t].prat}d</span>
                         </div>
                         <div style="display:flex;gap:6px;align-items:center;font-size:10px;margin-top:4px;">
                             <span style="color:#ff4444;min-width:28px;">${pctI}%</span>
                             <div style="flex:1;height:3px;background:#222;border-radius:2px;overflow:hidden;">
                                 <div style="height:100%;width:${pctI}%;background:#ff4444;border-radius:2px;"></div>
                             </div>
-                            <span style="color:#555;">Impraticável · ${turnos[t].imprat}d</span>
+                            <span style="color:#d0d0d0;">Impraticável · ${turnos[t].imprat}d</span>
                         </div>
                     </div>`;
                 }).join('') || '<div class="rdo-empty">Nenhum dado de turno</div>';
@@ -1649,6 +1775,8 @@
                 pw.style.display = 'none';
             }
         });
+
+        atualizarPainelServidorVersao(wrap);
     }
 
     //  MOUNT / UNMOUNT 

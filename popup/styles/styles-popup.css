@@ -65,6 +65,43 @@ body {
     width: 45px;
 }
 
+.popup-meta-srv {
+    margin: -8px 0 16px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--module-background);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.popup-server-pill {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.popup-server-pill.ok {
+    color: #86efac;
+}
+
+.popup-server-pill.bad {
+    color: #fca5a5;
+}
+
+.popup-server-sub {
+    color: var(--muted-text-color);
+    font-size: 0.78rem;
+}
+
+.popup-update-banner {
+    margin-top: 8px;
+}
+
+.popup-update-banner a {
+    color: #93c5fd;
+    font-weight: 600;
+}
+
 .aviso-api {
     background: rgba(180, 80, 40, 0.25);
     border: 1px solid rgba(220, 120, 80, 0.6);

@@ -411,6 +411,7 @@ async function criarContainerLinhaALinha() {
     `;
     
     document.body.appendChild(container);
+    if (typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(container);
 
     // Colapso/expansão
     const wrapperContainer = container.querySelector('.wrapper-container-linhaalinha');

@@ -2,7 +2,7 @@
 // Este sistema verifica a conectividade com o servidor para garantir que as funcionalidades
 // que dependem de sincronização de dados funcionem corretamente. Se o servidor estiver
 // indisponível, as funcionalidades são desabilitadas para evitar inconsistências.
-const SERVER_STATUS_URL = 'https://unpleasant-ingaborg-diogosflorencio-baf2a414.koyeb.app/api/aware'; // Endpoint para verificar status do servidor
+const SERVER_STATUS_URL = 'https://raw.githubusercontent.com/diogosflorencio/complemento-RDO/refs/heads/master/server/data.json'; // Endpoint para verificar status do servidor
 
 console.log('Background script carregado - sistema de sincronização ativo');
 
@@ -40,14 +40,17 @@ async function checkServerStatus() {
 
     console.log('Resposta do servidor:', data);
 
-    // Verifica se o servidor está respondendo corretamente
-    if (data.message !== 'aware') {
-      // Servidor não está respondendo como esperado - desabilita funcionalidades
+    const ok = data && String(data.status || '').toLowerCase() === 'ok';
+
+    if (!ok) {
       disableServerFeatures();
       console.log('Servidor não está respondendo corretamente - funcionalidades desabilitadas');
     } else {
-      // Servidor está funcionando - habilita funcionalidades
-      enableServerFeatures();
+      chrome.storage.local.set({
+        server_unavailable: false,
+        server_remote_complemento_version: data.version != null ? String(data.version) : '',
+        server_remote_backend: data.server != null ? String(data.server) : '',
+      });
       console.log('Servidor funcionando normalmente - funcionalidades habilitadas');
     }
   } catch (error) {
@@ -59,16 +62,13 @@ async function checkServerStatus() {
 
 function disableServerFeatures() {
   // Marca que as funcionalidades dependentes do servidor estão indisponíveis
-  chrome.storage.local.set({ 'server_unavailable': true });
+  chrome.storage.local.set({
+    server_unavailable: true,
+    server_remote_complemento_version: '',
+    server_remote_backend: '',
+  });
 
   console.log('Funcionalidades dependentes do servidor desabilitadas');
-}
-
-function enableServerFeatures() {
-  // Marca que as funcionalidades dependentes do servidor estão disponíveis
-  chrome.storage.local.set({ 'server_unavailable': false });
-
-  console.log('Funcionalidades dependentes do servidor habilitadas');
 }
 
 // Verificação inicial imediata
