@@ -503,7 +503,7 @@
 
     function montarHtml() {
         const { inicio, fim } = datasPadraoMes();
-        const vLocal = (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) ? window.COMPLEMENTO_RDO_VERSION : '2.1';
+        const vLocal = (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) ? window.COMPLEMENTO_RDO_VERSION : '2.2';
         const loja = (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_STORE_URL)
             ? window.COMPLEMENTO_RDO_STORE_URL
             : 'https://chromewebstore.google.com/detail/complemento-rdo/ifcagjkbngilbhannhibomnniipoannd';
@@ -938,7 +938,8 @@
         <div class="rdo-ps">Histórico completo de atualizações</div>
         <div class="rdo-card">
           <div class="rdo-ver-list">
-       
+            reflexões sobre versões futuras: no futuro, irei organizar o projeto, existe partes que não foram uteis ou até hoje não funcionam, por exemplo, função do mexer nas paginas clicando e arastando o mouse, como no celular, ou a função de tema escuro. Irei focar mais nos atalhos no futuro, inclusive em cada botão haverá o atalho que permite clicar nele. tipo nos botões de salvar, haverá o atalho alt + s. Estou pensando em passar todo projeto pra reactjs e typescript, com isso evitaria muitos erros e melhoraria a usabilidade e a possibilidade de adicionar novas funcionalidades usando biblotecas externas. alem disso, com react o codigo no lado do cliente ficaria mais seguro sem ter o source map. 
+            <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 2.2</div><div class="rdo-vdesc">Correções de bugs</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 2.1</div><div class="rdo-vdesc">Dashboard tela cheia, sidebar com abas, FAB com posição fixa, progresso por obra em tempo real. Dashboards de análise: Obras, Produção, Mão de Obra, Ocorrências, Clima, Equipamentos e Materiais. Filtros por obra e período em todos. Cache de obras.</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 2.0</div><div class="rdo-vdesc">Side panel, MutationObserver, guard de chrome API, timeout e retry no compilador</div></div></div>
             <div class="rdo-vi"><div class="rdo-vdot"></div><div><div class="rdo-vtit">v 1.9</div><div class="rdo-vdesc">Comentário RSP aprimorado, links diretos no Excel, exportação ilimitada</div></div></div>
@@ -1037,7 +1038,7 @@
             (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_STORE_URL) ||
             'https://chromewebstore.google.com/detail/complemento-rdo/ifcagjkbngilbhannhibomnniipoannd';
         const vLocal =
-            (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) || '2.1';
+            (typeof window !== 'undefined' && window.COMPLEMENTO_RDO_VERSION) || '2.2';
 
         const apply = () => {
             chrome.storage.local.get(
@@ -1063,7 +1064,7 @@
                     if (sbSub) {
                         sbSub.textContent = ok
                             ? (backend
-                                ? `Publicado v${remote || '—'} · ${backend}`
+                                ? `Publicado v${remote || '-'} · ${backend}`
                                 : (remote ? `Versão no status: ${remote}` : 'Resposta ok (sem version no JSON)'))
                             : 'isServerAvailable() fica falso; funções dependentes não executam.';
                     }

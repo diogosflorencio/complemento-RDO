@@ -1,38 +1,31 @@
-/** GET /obras (modelos) vem de extrairPDFsRelatorios.js; token pode ficar disponível depois do login. */
 function agendarPopularSelectModelosCompilador(container) {
     let tentativas = 0;
-    const max = 40;
-    const id = setInterval(() => {
+    const maxTentativas = 80;
+    const milissegundosEntreTentativas = 50;
+    const identificadorIntervalo = setInterval(() => {
         tentativas++;
         if (typeof window.compiladorPopularSelectModelosRelatorio === 'function') {
-            clearInterval(id);
-            void window.compiladorPopularSelectModelosRelatorio(container).catch((err) =>
-                console.warn('Compilador: modelos no select', err)
-            );
+            clearInterval(identificadorIntervalo);
+            void window.compiladorPopularSelectModelosRelatorio(container).catch(() => {});
             return;
         }
-        if (tentativas >= max) {
-            clearInterval(id);
-            console.warn('Compilador: compiladorPopularSelectModelosRelatorio não ficou disponível a tempo.');
+        if (tentativas >= maxTentativas) {
+            clearInterval(identificadorIntervalo);
         }
-    }, 100);
+    }, milissegundosEntreTentativas);
 }
 
 async function criarCardFiltro() {
-      // Verifica se o servidor está disponível para funcionalidades
-      const available = await isServerAvailable();
-      if (!available) {
-          console.log('Servidor indisponível - processamento de relatórios não executado');
-          return;
-      }
+    const available = await isServerAvailable();
+    if (!available) {
+        return;
+    }
 
     if (document.querySelector('.container_pdf_filtro')) return;
     if (!PDFExtractorAtivo) return null;
-    console.log('Criando card filtro');
     const container = document.createElement('div');
     container.classList = "container_pdf_filtro";
 
-    // Função para renderizar o conteúdo do container conforme o modo
     function renderizarConteudo(modo) {
         const isDados = modo === 'dados';
         container.innerHTML = `
@@ -123,7 +116,7 @@ async function criarCardFiltro() {
                                 </select>
                             </div>
                             <div style="flex: 1;">
-                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Modelo (get /obras)</label>
+                                <label for="pdf-tipo" style="display: block; margin-bottom: 4px; color: #444;">Modelo de relatório</label>
                                 <select id="pdf-tipo" class="form-control" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                                     <option value="tudo">Todos os modelos</option>
                                 </select>
@@ -161,15 +154,12 @@ async function criarCardFiltro() {
                 </div>
             </div>
         `;
-        // Adicionar listeners do modo
         container.querySelector('#modo-switch-pdf').onclick = () => renderizarConteudo('pdf');
         container.querySelector('#modo-switch-dados').onclick = () => renderizarConteudo('dados');
-        
-        // Adicionar listener para o dropdown de tipo de extração
         const selectTipo = container.querySelector('#pdf-tipo');
         if (selectTipo) {
-            selectTipo.addEventListener('change', (e) => {
-                localStorage.setItem('tipoExtrairPDF', e.target.value);
+            selectTipo.addEventListener('change', (evento) => {
+                localStorage.setItem('tipoExtrairPDF', evento.target.value);
             });
             agendarPopularSelectModelosCompilador(container);
         }
@@ -190,7 +180,6 @@ async function criarCardFiltro() {
         } else {
             container.querySelector('.btn-extrair-pdf').addEventListener('click', processarRelatorios);
         }
-        // Reatribuir o colapso do wrap explicação
         const header = container.querySelector('#wrap-explicacao-header');
         const content = container.querySelector('#wrap-explicacao-content');
         const wrap = container.querySelector('#wrap-explicacao');
@@ -209,12 +198,10 @@ async function criarCardFiltro() {
                     toggleSvg.style.transform = 'rotate(0deg)';
                 }
             };
-            // Inicialmente colapsado
             content.style.display = 'none';
             wrap.style.maxHeight = '50px';
             toggleSvg.style.transform = 'rotate(0deg)';
         }
-        // Reaplicar listener do wrap geral e estado de colapso
         let colapsado = localStorage.getItem('pdf_card_colapsado') === 'true';
         aplicarEstadoColapso(colapsado);
         container.querySelector('.wrapper-container').addEventListener('click', function (e) {
@@ -223,7 +210,6 @@ async function criarCardFiltro() {
             localStorage.setItem('pdf_card_colapsado', colapsado);
             aplicarEstadoColapso(colapsado);
         });
-        // Lógica do overlay de desenvolvimento
         const overlay = container.querySelector('#overlay-desenvolvimento');
         const inputSenha = container.querySelector('#senha-desenvolvimento');
 
@@ -231,7 +217,6 @@ async function criarCardFiltro() {
             function entrar() {
                 if (inputSenha.value === 'hermione') {
                     overlay.style.display = 'none';
-                    // overlay.style.display = 'none';
                 }
             };
             inputSenha.addEventListener('keydown', function (e) {
@@ -245,7 +230,6 @@ async function criarCardFiltro() {
     const _crvBox = container.querySelector('.container');
     if (_crvBox && typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(_crvBox);
 
-    // Função para aplicar o estado de colapso
     function aplicarEstadoColapso(colapsado) {
         if (colapsado) {
             container.style.height = '45px';
@@ -272,7 +256,6 @@ async function criarCardFiltro() {
         }
     }
 
-    // Adicionar CSS para o switch
     const style = document.createElement('style');
     style.innerHTML = `
     .modo-switch-wrap {

@@ -87,7 +87,7 @@ async function executeIfServerAvailable(callback) {
 
       const hasNext = i < MODEL_IDS.length - 1;
       if (hasNext && shouldTryNextModel(res.status, json)) {
-        console.warn('[Complemento RDO]', modelId, '— limite ou indisponível; tentando o próximo.');
+        console.warn('[Complemento RDO]', modelId, '- limite ou indisponível; tentando o próximo.');
         continue;
       }
       throw lastError;

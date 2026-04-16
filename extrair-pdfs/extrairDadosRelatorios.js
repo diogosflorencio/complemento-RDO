@@ -21,7 +21,6 @@ window.headers = window.headers || {
 };
 
 const DADOS_DELAY_ENTRE_REQS_MS = 500;
-// Nomes com prefixo DADOS_: extrairPDFsRelatorios.js já declara LIMITE_REQS_ANTES_PAUSA / PAUSA_MS no mesmo contexto global.
 const DADOS_LIMITE_REQS_ANTES_PAUSA = 100;
 let contadorRequisicoesAPI = 0;
 
@@ -29,25 +28,26 @@ function delay(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 
-async function antesDeRequisicao() {
+/** Não usar nome global `antesDeRequisicao`  o Compilador (extrairPDFsRelatorios) declara o seu. */
+async function dadosAntesDeRequisicao() {
     if (contadorRequisicoesAPI > 0 && contadorRequisicoesAPI % DADOS_LIMITE_REQS_ANTES_PAUSA === 0) {
-        await atualizarStatus('Mais de 100 requisições: aguardando 1 minuto (limite API 150/min)...', 60);
+        await dadosAtualizarStatus('Mais de 100 requisições: aguardando 1 minuto (limite API 150/min)...', 60);
     }
     contadorRequisicoesAPI++;
 }
 
-// Utilitário para atualizar status na interface (opcional)
-async function atualizarStatus(mensagem, contador = null) {
+/** Status só do modo Dados  não sobrescrever `atualizarStatus` do Compilador. */
+async function dadosAtualizarStatus(mensagem, contador = null) {
     const statusElement = document.getElementById('status-extracao');
     if (!statusElement) return;
-    if (contador) {
+    const comContagem = typeof contador === 'number' && contador > 0;
+    if (comContagem) {
         let count = contador;
         statusElement.innerHTML = `${mensagem} ${count}`;
         return new Promise(resolve => {
             const interval = setInterval(() => {
                 count--;
-                statusElement.innerHTML = `${mensagem} ${count} 
-                <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
+                statusElement.innerHTML = `${mensagem} ${count}`;
                 if (count <= 0) {
                     clearInterval(interval);
                     resolve();
@@ -55,28 +55,25 @@ async function atualizarStatus(mensagem, contador = null) {
             }, 1000);
         });
     } else {
-        statusElement.innerHTML = `${mensagem} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
-                
+        statusElement.innerHTML = `${mensagem}`;
     }
 }
 
-// Requisição genérica para a API
-async function fazerRequisicao(endpoint, params = {}) {
-    await antesDeRequisicao();
+async function dadosFazerRequisicao(endpoint, params = {}) {
+    await dadosAntesDeRequisicao();
     const url = new URL(`${window.API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
     let response = await fetch(url, { headers: window.headers });
     if (response.status === 429) {
-        await atualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
+        await dadosAtualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
         response = await fetch(url, { headers: window.headers });
     }
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
     return await response.json();
 }
 
-// Busca detalhes de um relatório
-async function obterDetalhesRelatorio(obraId, relatorioId) {
-    return await fazerRequisicao(`obras/${obraId}/relatorios/${relatorioId}`);
+async function dadosObterDetalhesRelatorio(obraId, relatorioId) {
+    return await dadosFazerRequisicao(`obras/${obraId}/relatorios/${relatorioId}`);
 }
 
 function dadosTokensNomeSomenteObras() {
@@ -103,7 +100,7 @@ async function obterObrasFiltradas() {
     if (obraEspecificaInput && obraEspecificaInput.value.trim() !== '') {
         idsObrasEspecificas = obraEspecificaInput.value.split(',').map(s => s.trim()).filter(Boolean);
     }
-    const obras = await fazerRequisicao('obras');
+    const obras = await dadosFazerRequisicao('obras');
     if (idsObrasEspecificas.length > 0) {
         let sel = obras.filter(o => idsObrasEspecificas.includes(o._id));
         if (tokensSomenteNome.length > 0) {
@@ -129,7 +126,7 @@ async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
         dataInicio: dataInicio,
         dataFim: dataFim
     };
-    return await fazerRequisicao(`obras/${obraId}/relatorios`, params);
+    return await dadosFazerRequisicao(`obras/${obraId}/relatorios`, params);
 }
 
 // Função principal: extrai dados dos relatórios e exporta XLSX
@@ -145,7 +142,7 @@ async function processarExtracaoDados() {
     try {
         if (btnExtrair) btnExtrair.disabled = true;
         contadorRequisicoesAPI = 0;
-        await atualizarStatus('Iniciando extração de dados...');
+        await dadosAtualizarStatus('Iniciando extração de dados...');
         const dataInicio = document.getElementById('pdf-data-inicio').value;
         const dataFim = document.getElementById('pdf-data-fim').value;
         const ordem = document.getElementById('pdf-ordem').value;
@@ -156,7 +153,7 @@ async function processarExtracaoDados() {
         let atividadesExtraidas = [];
         let maoDeObraHH = [];
         for (let obra of obras) {
-            await atualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`, 0);
+            await dadosAtualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`);
             const relatorios = await obterRelatoriosObra(obra._id, dataInicio, dataFim, ordem);
             let relatoriosNoPeriodo = relatorios.filter(relatorio => {
                 if (!relatorio.data) return false;
@@ -172,8 +169,8 @@ async function processarExtracaoDados() {
             for (let i = 0; i < relatoriosNoPeriodo.length; i++) {
                 const relatorio = relatoriosNoPeriodo[i];
                 if (i > 0) await delay(DADOS_DELAY_ENTRE_REQS_MS);
-                await atualizarStatus(`Extraindo relatório ${i + 1}/${relatoriosNoPeriodo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
-                const detalhes = await obterDetalhesRelatorio(obra._id, relatorio._id);
+                await dadosAtualizarStatus(`Extraindo relatório ${i + 1}/${relatoriosNoPeriodo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
+                const detalhes = await dadosObterDetalhesRelatorio(obra._id, relatorio._id);
                 // Atividades (aba Atividades)
                 if (Array.isArray(detalhes.atividades)) {
                     for (let atividade of detalhes.atividades) {
@@ -206,10 +203,10 @@ async function processarExtracaoDados() {
             }
         }
         if (atividadesExtraidas.length === 0 && maoDeObraHH.length === 0) {
-            await atualizarStatus('Nenhuma atividade ou mão de obra encontrada para exportar.');
+            await dadosAtualizarStatus('Nenhuma atividade ou mão de obra encontrada para exportar.');
             return;
         }
-        await atualizarStatus('Compilando dados e gerando o arquivo .xlsx');
+        await dadosAtualizarStatus('Compilando dados e gerando o arquivo .xlsx');
         const ws = XLSX.utils.json_to_sheet(atividadesExtraidas);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
@@ -245,9 +242,9 @@ async function processarExtracaoDados() {
             XLSX.utils.book_append_sheet(wb, wsHH, 'HH');
         }
         XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_@diogosflorencio.xlsx');
-        await atualizarStatus('Pronto! Tudo extraído.');
+        await dadosAtualizarStatus('Pronto! Tudo extraído.');
     } catch (error) {
-        await atualizarStatus(`Erro: ${error.message}`);
+        await dadosAtualizarStatus(`Erro: ${error.message}`);
         console.error('Erro no processamento:', error);
     } finally {
         if (btnExtrair) btnExtrair.disabled = false;

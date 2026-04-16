@@ -1,4 +1,8 @@
-const PDFLib = window.PDFLib; // cria o objeto PDFLib
+const PDFLib = window.PDFLib;
+
+
+
+const unificador_svgCarregando = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="20" height="20"><path fill="#000000" stroke="#000000" stroke-width="12" transform-origin="center" d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="0.5" values="0;120" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></path></svg>';
 
 function rdoEmpresaDoStorage() {
     try {
@@ -11,7 +15,6 @@ function rdoEmpresaDoStorage() {
 }
 const API_BASE_URL = 'https://apiexterna.diariodeobra.app/v1';
 
-/** Token lido no momento do fetch, o script pode carregar antes do login e o token só existir depois. */
 function compiladorHeadersApiAtual() {
     const r = rdoEmpresaDoStorage() || {};
     return {
@@ -20,11 +23,9 @@ function compiladorHeadersApiAtual() {
     };
 }
 
-// at the beginning of the file, i have to do that para que eu consiga usar a variavel em outros arquivos
 let PDFExtractorAtivo = true;
 let cardFiltroCreated = false;
 
-// fazendo o carregamento inicial do estado
 chrome.storage.sync.get('PDFExtractor', function (data) {
     PDFExtractorAtivo = data.PDFExtractor ?? true;
     if (!PDFExtractorAtivo) {
@@ -36,7 +37,6 @@ chrome.storage.sync.get('PDFExtractor', function (data) {
     }
 });
 
-// manipula a mensagem do chrome
 chrome.runtime.onMessage.addListener((mensagem, sender, sendResponse) => {
     if ('PDFExtractor' in mensagem) {
         PDFExtractorAtivo = mensagem.PDFExtractor;
@@ -55,13 +55,16 @@ chrome.runtime.onMessage.addListener((mensagem, sender, sendResponse) => {
     }
 });
 
-// ===== LIMITE 150 REQUISIÇÕES/MINUTO =====
-const DELAY_ENTRE_REQS_MS = 500;
+const DELAY_ENTRE_REQS_MS = 600;
 const LIMITE_REQS_ANTES_PAUSA = 100;
 const PAUSA_MS = 60000;
-const FETCH_TIMEOUT_MS = 300000; // 5 min
-const MAX_TENTATIVAS_PDF = 5;
+const FETCH_TIMEOUT_MS = 300000;
+const MAX_TENTATIVAS_PDF = 6;
 let contadorRequisicoes = 0;
+
+function compiladorLog(...args) {
+    console.log('[Complemento RDO][Compilador PDF]', ...args);
+}
 
 function delay(ms) {
     return new Promise(r => setTimeout(r, ms));
@@ -73,10 +76,19 @@ function ehPdfValido(buffer) {
     return arr[0] === 0x25 && arr[1] === 0x50 && arr[2] === 0x44 && arr[3] === 0x46 && arr[4] === 0x2D;
 }
 
-function fetchComTimeout(url, msTimeout) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), msTimeout);
-    return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
+function fetchComTimeout(urlPdf, milissegundosTimeout) {
+    const controladorAborto = new AbortController();
+    const identificadorTimeout = setTimeout(() => controladorAborto.abort(), milissegundosTimeout);
+    return fetch(urlPdf, {
+        signal: controladorAborto.signal,
+        credentials: 'omit',
+        mode: 'cors',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer-when-downgrade',
+        headers: {
+            Accept: 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
+        },
+    }).finally(() => clearTimeout(identificadorTimeout));
 }
 
 async function antesDeRequisicao() {
@@ -85,8 +97,6 @@ async function antesDeRequisicao() {
     }
     contadorRequisicoes++;
 }
-
-// ===== FUNÇÕES UTILITÁRIAS =====
 
 function toggleCard(e) {
     const container = e.currentTarget.closest('.container');
@@ -103,25 +113,33 @@ function toggleCard(e) {
     localStorage.setItem('pdfFilterState', content.style.display);
 }
 
-async function atualizarStatus(mensagem, contador = null) {
-    const statusElement = document.getElementById('status-extracao');
-    if (!statusElement) return;
-    if (contador) {
-        let count = contador;
-        statusElement.innerHTML = `${mensagem} ${count}`;
-        return new Promise(resolve => {
-            const interval = setInterval(() => {
-                count--;
-                statusElement.innerHTML = `${mensagem} ${count} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
-                if (count <= 0) {
-                    clearInterval(interval);
+function compilador_montarHtmlStatus(mensagemHtml) {
+    return `<div class="complemento-rdo-status-linha" style="font-size:14px;color:#666;line-height:1.45;width:100%;box-sizing:border-box">${mensagemHtml}</div>`;
+}
+
+async function atualizarStatus(mensagem, modoOuContagem = null) {
+    const elementoStatus = document.getElementById('status-extracao');
+    if (!elementoStatus) return;
+
+    const texto =
+        typeof mensagem === 'string' ? mensagem : mensagem == null ? '' : String(mensagem);
+
+    if (typeof modoOuContagem === 'number' && modoOuContagem > 0) {
+        let segundosRestantes = modoOuContagem;
+        elementoStatus.innerHTML = compilador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
+        return new Promise((resolve) => {
+            const intervalo = setInterval(() => {
+                segundosRestantes--;
+                elementoStatus.innerHTML = compilador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
+                if (segundosRestantes <= 0) {
+                    clearInterval(intervalo);
                     resolve();
                 }
             }, 1000);
         });
-    } else {
-        statusElement.innerHTML = `${mensagem} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
     }
+
+    elementoStatus.innerHTML = compilador_montarHtmlStatus(texto);
 }
 
 async function fazerRequisicao(endpoint, params = {}) {
@@ -131,14 +149,16 @@ async function fazerRequisicao(endpoint, params = {}) {
     const headers = compiladorHeadersApiAtual();
     let response = await fetch(url, { headers });
     if (response.status === 429) {
+        compiladorLog('429 no endpoint', endpoint, ', aguardando 1 min');
         await atualizarStatus('Limite da API (150req/min)! \nAguardando 1 minuto...', 60);
         response = await fetch(url, { headers: compiladorHeadersApiAtual() });
     }
-    if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+    if (!response.ok) {
+        compiladorLog('Erro HTTP', endpoint, response.status);
+        throw new Error(`Erro na API: ${response.status}`);
+    }
     return await response.json();
 }
-
-// ----- Modelos de relatório no Compilador (GET /obras → modelosDeRelatorios em cada obra) -----
 
 function compilador_prefixoArquivoDeModelo(desc) {
     const base = (desc || 'REL').substring(0, 40)
@@ -153,8 +173,12 @@ function compilador_prefixoArquivoDeModelo(desc) {
 
 function compilador_chaveRotuloModelo(m) {
     if (!m) return '';
-    const a = (m.descricao || '').trim();
-    const b = (m.nome || '').trim();
+    const a = (
+        m.descricao ||
+        (m.modeloDeRelatorioGlobal && m.modeloDeRelatorioGlobal.descricao) ||
+        ''
+    ).trim();
+    const b = (m.nome || (m.modeloDeRelatorioGlobal && m.modeloDeRelatorioGlobal.nome) || '').trim();
     const combined = `${a}\u0000${b}`
         .toLowerCase()
         .normalize('NFD')
@@ -162,17 +186,19 @@ function compilador_chaveRotuloModelo(m) {
         .replace(/\s+/g, ' ')
         .trim();
     if (combined) return combined;
-    return m._id != null ? `__id_${String(m._id)}` : '';
+    const idVal = compilador_idModeloParaValorSelect(m);
+    return idVal ? `__id_${idVal}` : '';
 }
 
-/** União por obra pode trazer o mesmo nome com _id diferentes; no select mostramos uma linha por rótulo (mantém o primeiro). */
 function compilador_dedupeModelosPorRotulo(modelos) {
     const seen = new Set();
     const out = [];
     for (const m of modelos) {
-        if (!m || m._id == null) continue;
+        if (!m) continue;
+        const idVal = compilador_idModeloParaValorSelect(m);
+        if (!idVal) continue;
         const k = compilador_chaveRotuloModelo(m);
-        const key = k || `__id_${String(m._id)}`;
+        const key = k || `__id_${idVal}`;
         if (seen.has(key)) continue;
         seen.add(key);
         out.push(m);
@@ -181,7 +207,12 @@ function compilador_dedupeModelosPorRotulo(modelos) {
 }
 
 function compilador_ordenarModelosPorDescricao(modelos) {
-    return [...modelos].sort((a, b) => (a.descricao || '').localeCompare(b.descricao || '', 'pt-BR'));
+    const rotulo = (m) =>
+        (m.descricao ||
+            (m.modeloDeRelatorioGlobal && m.modeloDeRelatorioGlobal.descricao) ||
+            m.nome ||
+            '') + '';
+    return [...modelos].sort((a, b) => rotulo(a).localeCompare(rotulo(b), 'pt-BR'));
 }
 
 function compilador_normalizarListaModelos(modelosDeRelatorios) {
@@ -194,22 +225,117 @@ function compilador_normalizarListaModelos(modelosDeRelatorios) {
     return compilador_dedupeModelosPorRotulo(sorted);
 }
 
-function compilador_chaveCacheModelos() {
-    // Bump ao mudar estratégia de fetch (ex. v3 = só GET /obras, sem GET por obra).
-    return 'obras-list:v3';
+function compilador_idModeloParaValorSelect(m) {
+    if (!m) return '';
+    const g = m.modeloDeRelatorioGlobal;
+    if (g && g._id != null) return String(g._id).trim();
+    if (m._id != null) return String(m._id).trim();
+    return '';
 }
 
-/** Rede: GET /obras e união de modelosDeRelatorios de todas as obras devolvidas. */
-async function compilador_fetchModelosListaNaRede() {
-    const obras = await fazerRequisicao('obras');
-    if (!Array.isArray(obras)) return [];
-    const merged = new Map();
-    for (const o of obras) {
-        for (const m of o.modelosDeRelatorios || []) {
-            if (m && m._id != null) merged.set(String(m._id), m);
+function compilador_idsModeloNoRelatorio(relatorio) {
+    const ids = new Set();
+    const add = (v) => {
+        if (v == null || v === '') return;
+        const s = String(v).trim();
+        if (s) ids.add(s);
+    };
+    const from = (x) => {
+        if (x == null || x === '') return;
+        if (typeof x === 'string') add(x);
+        else if (typeof x === 'object') {
+            add(x._id);
+            add(x.$oid);
         }
+    };
+    from(relatorio && relatorio.modeloDeRelatorioGlobal);
+    from(relatorio && relatorio.modeloDeRelatorio);
+    return ids;
+}
+
+function compilador_chaveAgrupamentoModelo(r) {
+    const ids = compilador_idsModeloNoRelatorio(r);
+    if (!ids.size) return '_sem_modelo';
+    return [...ids][0];
+}
+
+function compilador_normDesc(s) {
+    return String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+}
+
+function compilador_chaveCacheModelos() {
+    return 'cadastros-modeloDeRelatorioGlobal:v2-dedupe-id-global';
+}
+
+/**
+ * Lista global de modelos: `GET /cadastros` → campo(s) com modelos globais (uma requisição).
+ * Formato da API pode variar; normalizamos abaixo.
+ */
+function compilador_extrairArrayModelosGlobalDoCadastros(resp) {
+    if (resp == null) return [];
+    if (Array.isArray(resp)) return resp;
+    if (typeof resp !== 'object') return [];
+
+    const candidatos = [
+        resp.modeloDeRelatorioGlobal,
+        resp.modelosDeRelatorioGlobal,
+        resp.modeloDeRelatoriosGlobais,
+        resp.modelosDeRelatorio,
+        resp.data && resp.data.modeloDeRelatorioGlobal,
+        resp.cadastros && resp.cadastros.modeloDeRelatorioGlobal
+    ];
+    for (const c of candidatos) {
+        if (Array.isArray(c)) return c;
     }
-    const sorted = compilador_ordenarModelosPorDescricao([...merged.values()]);
+    if (resp.modeloDeRelatorioGlobal && typeof resp.modeloDeRelatorioGlobal === 'object' && resp.modeloDeRelatorioGlobal._id) {
+        return [resp.modeloDeRelatorioGlobal];
+    }
+    return [];
+}
+
+/** Garante objeto compatível com `compilador_idModeloParaValorSelect` e rótulo no select. */
+function compilador_normalizarItemModeloParaSelect(item) {
+    if (!item || typeof item !== 'object') return null;
+    if (item.modeloDeRelatorioGlobal && typeof item.modeloDeRelatorioGlobal === 'object') {
+        return item;
+    }
+    return { modeloDeRelatorioGlobal: item };
+}
+
+async function compilador_fetchModelosListaNaRede() {
+    let cad;
+    try {
+        cad = await fazerRequisicao('cadastros');
+    } catch (e) {
+        compiladorLog('modelos: GET /cadastros falhou', e && e.message);
+        return [];
+    }
+
+    const brutos = compilador_extrairArrayModelosGlobalDoCadastros(cad);
+    const normalizados = brutos.map(compilador_normalizarItemModeloParaSelect).filter(Boolean);
+
+    if (normalizados.length === 0) {
+        compiladorLog(
+            'modelos: /cadastros sem array reconhecido; chaves no topo',
+            cad && typeof cad === 'object' ? Object.keys(cad).slice(0, 25) : typeof cad
+        );
+    } else {
+        compiladorLog('modelos: GET /cadastros →', normalizados.length, 'itens (após normalizar)');
+    }
+
+    const sorted = compilador_ordenarModelosPorDescricao(
+        normalizados.map((m) => ({
+            ...m,
+            descricao:
+                m.descricao ||
+                m.nome ||
+                (m.modeloDeRelatorioGlobal && m.modeloDeRelatorioGlobal.descricao) ||
+                ''
+        }))
+    );
     return compilador_dedupeModelosPorRotulo(sorted);
 }
 
@@ -264,22 +390,30 @@ async function compiladorPopularSelectModelosRelatorio(container) {
     select.appendChild(optTodos);
 
     try {
+        compiladorLog('compiladorPopularSelectModelosRelatorio: buscando lista de modelos (gen ' + myGen + ')');
         const modelos = compilador_dedupeModelosPorRotulo(
             compilador_ordenarModelosPorDescricao(await compilador_obterModelosListaEmCache(false))
         );
+        compiladorLog('select modelos recebidos', modelos.length);
         if (myGen !== compiladorPopulateSelectGen || !select.isConnected) return;
         for (const mod of modelos) {
+            const idVal = compilador_idModeloParaValorSelect(mod);
+            if (!idVal) continue;
             const opt = document.createElement('option');
-            opt.value = String(mod._id);
-            opt.textContent = mod.descricao || mod.nome || `Modelo ${mod._id}`;
+            opt.value = idVal;
+            opt.textContent =
+                mod.descricao ||
+                mod.nome ||
+                (mod.modeloDeRelatorioGlobal && mod.modeloDeRelatorioGlobal.descricao) ||
+                `Modelo ${idVal}`;
             select.appendChild(opt);
         }
-        const validos = new Set(['tudo', ...modelos.map((m) => String(m._id))]);
+        const validos = new Set(['tudo', ...modelos.map((m) => compilador_idModeloParaValorSelect(m)).filter(Boolean)]);
         select.value = validos.has(salvo) ? salvo : 'tudo';
         if (select.value !== salvo) localStorage.setItem('tipoExtrairPDF', select.value);
     } catch (e) {
+        compiladorLog('compiladorPopularSelectModelosRelatorio: ERRO', e);
         if (myGen !== compiladorPopulateSelectGen || !select.isConnected) return;
-        console.warn('Compilador: erro ao listar modelos', e);
         const hint = document.createElement('option');
         hint.value = '';
         hint.disabled = true;
@@ -292,7 +426,6 @@ async function compiladorPopularSelectModelosRelatorio(container) {
 
 window.compiladorPopularSelectModelosRelatorio = compiladorPopularSelectModelosRelatorio;
 
-/** Login no mesmo separador não dispara `storage`; ao voltar o foco ou após token novo, tenta de novo. */
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
     const wrap = document.querySelector('.container_pdf_filtro');
@@ -329,23 +462,19 @@ async function obterNomeObra(obraId) {
         .replace(/_+/g, '_')
         .replace(/^_|_$/g, '');
 }
-// faz a extração em serie dos relatorios
-// async function mergePDFs(pdfUrls, statusCallback) {
-//     const PDFDocument = window.PDFLib.PDFDocument;
-//     const PdfJuntado = await PDFDocument.create();
-//     if (pdfUrls.length === 0) {
-//         throw new Error('Nenhum relatório encontrado no período.');
-//     }
-//     for (let [index, url] of pdfUrls.entries()) {
-//         statusCallback(`Processando PDF ${index + 1} de ${pdfUrls.length}`);
-//         const response = await fetch(url);
-//         const binarioPdf = await response.arrayBuffer();
-//         const pdfDoc = await PDFDocument.load(binarioPdf);
-//         const paginas = await PdfJuntado.copyPages(pdfDoc, pdfDoc.getPageIndices());
-//         paginas.forEach(pagina => PdfJuntado.addPage(pagina));
-//     }
-//     return await PdfJuntado.save();
-// }
+
+function compilador_normalizarListaRelatorios(respostaApi) {
+    if (Array.isArray(respostaApi)) return respostaApi;
+    if (respostaApi && Array.isArray(respostaApi.relatorios)) return respostaApi.relatorios;
+    if (respostaApi && Array.isArray(respostaApi.data)) return respostaApi.data;
+    if (respostaApi != null && typeof respostaApi === 'object') {
+        compiladorLog(
+            'compilador_normalizarListaRelatorios: formato inesperado, chaves',
+            Object.keys(respostaApi).slice(0, 12)
+        );
+    }
+    return [];
+}
 
 async function mergePDFs(pdfItems, statusCallback) {
     const PDFDocument = window.PDFLib.PDFDocument;
@@ -356,14 +485,31 @@ async function mergePDFs(pdfItems, statusCallback) {
         throw new Error('Nenhum relatório encontrado no período.');
     }
 
+    const emitirStatus = (texto, comIndicadorCarregamento = false) => {
+        if (typeof statusCallback === 'function') {
+            statusCallback(texto, comIndicadorCarregamento);
+        }
+    };
+
+    emitirStatus(
+        pdfItems.length === 1
+            ? 'Obtendo binário do PDF no servidor...'
+            : `Obtendo binários dos PDFs (${pdfItems.length} relatórios)...`,
+        true
+    );
+
     const pdfBuffers = [];
     for (let index = 0; index < pdfItems.length; index++) {
         const item = pdfItems[index];
         if (index > 0) await delay(DELAY_ENTRE_REQS_MS);
-        await antesDeRequisicao();
         let buffer = null;
         for (let tentativa = 1; tentativa <= MAX_TENTATIVAS_PDF; tentativa++) {
-            statusCallback(tentativa === 1 ? `Baixando PDF ${index + 1} de ${pdfItems.length}` : `Relatório ${index + 1} erro. Tentativa ${tentativa}/${MAX_TENTATIVAS_PDF}...`);
+            emitirStatus(
+                tentativa === 1
+                    ? `Relatório ${index + 1}/${pdfItems.length} obtendo binário... ${unificador_svgCarregando}`
+                    : `Relatório ${index + 1} nova tentativa ${tentativa}/${MAX_TENTATIVAS_PDF}...`,
+                false
+            );
             try {
                 const response = await fetchComTimeout(item.url, FETCH_TIMEOUT_MS);
                 if (response.status === 429) {
@@ -385,7 +531,10 @@ async function mergePDFs(pdfItems, statusCallback) {
             } catch (e) {
                 const msgErro = e.name === 'AbortError' ? 'timeout' : 'erro na requisição (rede/servidor)';
                 if (tentativa < MAX_TENTATIVAS_PDF) {
-                    statusCallback(`Relatório ${index + 1} ${msgErro}. Tentativa ${tentativa}/${MAX_TENTATIVAS_PDF}...`);
+                    emitirStatus(
+                        `Relatório ${index + 1} ${msgErro}. Tentativa ${tentativa}/${MAX_TENTATIVAS_PDF}...`,
+                        false
+                    );
                 } else {
                     falhas.push(item);
                 }
@@ -394,9 +543,10 @@ async function mergePDFs(pdfItems, statusCallback) {
         if (buffer && ehPdfValido(buffer)) pdfBuffers.push(buffer);
     }
 
+    emitirStatus(`Mesclando binários em um único PDF... ${unificador_svgCarregando}`, true);
     for (let [index, buffer] of pdfBuffers.entries()) {
-        statusCallback(`Processando PDF ${index + 1} de ${pdfBuffers.length}`);
-        const pdfDoc = await PDFDocument.load(buffer);
+        emitirStatus(`Unindo origem ${index + 1}/${pdfBuffers.length}... ${unificador_svgCarregando}`, false);
+        const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
         const paginas = await PdfJuntado.copyPages(pdfDoc, pdfDoc.getPageIndices());
         paginas.forEach(pagina => PdfJuntado.addPage(pagina));
     }
@@ -405,7 +555,7 @@ async function mergePDFs(pdfItems, statusCallback) {
         throw new Error('Nenhum PDF válido obtido. Verifique os links ou tente novamente.');
     }
     if (falhas.length > 0) {
-        statusCallback(`${falhas.length} relatório(s) não baixado(s). Será gerado HTML com os links.`);
+        emitirStatus(`${falhas.length} relatório(s) sem binário válido. Será gerado HTML com os links.`, false);
     }
     return { mergedBytes: await PdfJuntado.save(), falhas };
 }
@@ -441,28 +591,24 @@ async function obterObrasPorPeriodo() {
     if (obrasExcluidasInput && obrasExcluidasInput.value.trim() !== '') {
         siglasExcluidas = obrasExcluidasInput.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     }
-    // selecionando as obras especificas
     let idsObrasEspecificas = [];
     if (obraEspecificaInput && obraEspecificaInput.value.trim() !== '') {
         idsObrasEspecificas = obraEspecificaInput.value.split(',').map(s => s.trim()).filter(Boolean);
     }
     const obras = await fazerRequisicao('obras');
-    console.log('Obras retornadas da API:', obras);
+    if (!Array.isArray(obras)) return [];
     if (idsObrasEspecificas.length > 0) {
-        // retorna os ids
         let obrasSelecionadas = obras.filter(o => idsObrasEspecificas.includes(o._id));
         if (tokensSomenteNome.length > 0) {
             obrasSelecionadas = obrasSelecionadas.filter(o => {
                 const nomeObra = (o.nome || '').toUpperCase();
                 const ok = obraNomePassaFiltroSomente(nomeObra, tokensSomenteNome);
-                if (!ok) console.log('Obra específica ignorada (não bate “somente nome”):', nomeObra);
                 return ok;
             });
         }
         if (obrasSelecionadas.length) {
             return obrasSelecionadas;
         } else {
-            console.log('Nenhuma obra específica encontrada:', idsObrasEspecificas);
             return [];
         }
     }
@@ -471,11 +617,9 @@ async function obterObrasPorPeriodo() {
         const nomeObra = (obra.nome || '').toUpperCase();
         const excluida = siglasExcluidas.some(sigla => nomeObra.includes(sigla));
         if (excluida) {
-            console.log('Obra excluída pelo filtro de siglas:', nomeObra);
             return false;
         }
         if (!obraNomePassaFiltroSomente(nomeObra, tokensSomenteNome)) {
-            console.log('Obra fora do filtro “somente nome contém”:', nomeObra);
             return false;
         }
         return statusOk;
@@ -484,22 +628,20 @@ async function obterObrasPorPeriodo() {
 
 async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
     const params = {
-        limite: 100,
+        limite: 2000,
         ordem: ordem,
         dataInicio: dataInicio,
         dataFim: dataFim
     };
-    const response = await fazerRequisicao(`obras/${obraId}/relatorios`, params);
-    return response;
+    const respostaLista = await fazerRequisicao(`obras/${obraId}/relatorios`, params);
+    const lista = compilador_normalizarListaRelatorios(respostaLista);
+    compiladorLog('obterRelatoriosObra', obraId, '→ itens na lista normalizada', lista.length);
+    return lista;
 }
 
-// processo principal
-
 async function processarRelatorios() {
-    // Verifica se o servidor está disponível para funcionalidades (essencial!!!!!!!!!!!!!!!!!!!!!!!)
     const available = await isServerAvailable();
     if (!available) {
-        console.log('Servidor indisponível - processamento de relatórios não executado');
         return;
     }
     
@@ -518,22 +660,27 @@ async function processarRelatorios() {
         if (!dataInicio) {
             throw new Error('Você precisa selecionar ao menos a data de início');
         }
-        await atualizarStatus("Buscando todas as obras...");
+        await atualizarStatus('Buscando todas as obras...', true);
         const obras = await obterObrasPorPeriodo();
-        console.log('Obras após filtro:', obras);
+        compiladorLog('processarRelatorios: obras após filtros', obras.length);
         if (!obras.length) {
             throw new Error('Nenhuma obra encontrada.');
         }
-        
-        // Lista para coletar relatórios não aprovados e não baixados (erro/timeout)
         let relatoriosNaoAprovados = [];
         let relatoriosNaoBaixados = [];
         
         for (let obra of obras) {
             await atualizarStatus(`Relatórios da obra:<br><b> ${obra.nome.substring(0,33)}</b>`);
-            console.log('Processando obra:', obra.nome, obra._id);
             const relatorios = await obterRelatoriosObra(obra._id, dataInicio, dataFim, ordem);
-            console.log('Relatórios retornados:', relatorios);
+            compiladorLog(
+                'obra',
+                obra.nome,
+                obra._id,
+                'relatórios (API) length',
+                relatorios.length,
+                'amostra primeiro item',
+                relatorios[0] ? { data: relatorios[0].data, id: relatorios[0]._id } : null
+            );
             let relatoriosNoPeriodo = relatorios.filter(relatorio => {
                 if (!relatorio.data) return false;
                 const [dia, mes, ano] = relatorio.data.split('/');
@@ -542,9 +689,7 @@ async function processarRelatorios() {
                 const fim = new Date(dataFim);
                 return dataRelatorio >= inicio && dataRelatorio <= fim;
             });
-            // Filtro de aprovados 100% e coleta de não aprovados
             if (apenasAprovados) {
-                // Coletar relatórios não aprovados para lista
                 const relatoriosNaoAprovadosObra = relatoriosNoPeriodo.filter(r => !(r.status && r.status.descricao && r.status.descricao.toLowerCase() === 'aprovado'));
                 relatoriosNaoAprovadosObra.forEach(relatorio => {
                     relatoriosNaoAprovados.push({
@@ -554,12 +699,9 @@ async function processarRelatorios() {
                         link: `https://web.diariodeobra.app/#/app/obras/${obra._id}/relatorios/${relatorio._id}`
                     });
                 });
-                
-                // Filtrar apenas aprovados para processamento
                 relatoriosNoPeriodo = relatoriosNoPeriodo.filter(r => r.status && r.status.descricao && r.status.descricao.toLowerCase() === 'aprovado');
             }
-            await atualizarStatus(`Achados ${relatoriosNoPeriodo.length} relatórios em:<br><b> ${obra.nome.substring(0,33)}</b>`, 0);
-            console.log('Relatórios no período:', relatoriosNoPeriodo);
+            await atualizarStatus(`Achados ${relatoriosNoPeriodo.length} relatórios em:<br><b> ${obra.nome.substring(0,33)}</b>`);
 
             let tipoExtrair = localStorage.getItem('tipoExtrairPDF') || 'tudo';
             if (tipoExtrair === 'rdo' || tipoExtrair === 'rsp') {
@@ -567,14 +709,13 @@ async function processarRelatorios() {
                 localStorage.setItem('tipoExtrairPDF', 'tudo');
             }
 
-            // Função para processar cada grupo
             async function processarGrupoRelatorios(relatoriosGrupo, prefixoArquivo, listaFalhas) {
                 if (!relatoriosGrupo.length) return;
                 const pdfItems = [];
                 for (let index = 0; index < relatoriosGrupo.length; index++) {
                     const relatorio = relatoriosGrupo[index];
                     if (index > 0) await delay(DELAY_ENTRE_REQS_MS);
-                    await atualizarStatus(`Processando relatório ${index + 1}/${relatoriosGrupo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
+                    await atualizarStatus(`Processando relatório ${index + 1}/${relatoriosGrupo.length} <br><b> (${obra.nome.substring(0,33)}) ${unificador_svgCarregando} </b>`);
                     const detalhes = await obterDetalhesRelatorio(obra._id, relatorio._id);
                     pdfItems.push({
                         url: detalhes.linkPdf,
@@ -586,8 +727,14 @@ async function processarRelatorios() {
                     });
                 }
                 if (pdfItems.length > 0) {
-                    await atualizarStatus(`Preparando mesclagem dos PDFs <br><b> (${obra.nome.substring(0,33)}) </b>`, 1);
-                    const { mergedBytes, falhas } = await mergePDFs(pdfItems, msg => atualizarStatus(msg));
+                    await atualizarStatus(
+                        `Preparando mesclagem de binários <br><b> (${obra.nome.substring(0,33)}) </b>`,
+                        true
+                    );
+                    const { mergedBytes, falhas } = await mergePDFs(pdfItems, (texto, comIndicador) => {
+                        if (comIndicador === true) return atualizarStatus(String(texto), true);
+                        return atualizarStatus(String(texto));
+                    });
                     falhas.forEach(f => listaFalhas.push(f));
                     let nomeObra = obra.nome
                         .toUpperCase()
@@ -596,23 +743,19 @@ async function processarRelatorios() {
                         .replace(/_+/g, '_')
                         .replace(/^_|_$/g, '');
                     nomeObra = prefixoArquivo + nomeObra;
-                    await atualizarStatus(`Finalizando download <br><b> (${obra.nome.substring(0,33)})</b>`, 1);
+                    await atualizarStatus(`Finalizando download <br><b> (${obra.nome.substring(0,33)})</b>`);
                     const blob = new Blob([mergedBytes], { type: 'application/pdf' });
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
                     link.download = `${nomeObra}.pdf`;
                     link.click();
-                    console.log('Download concluído:', nomeObra);
                 }
             }
 
             if (tipoExtrair === 'tudo') {
                 const grupos = new Map();
                 for (const r of relatoriosNoPeriodo) {
-                    const idMod =
-                        r.modeloDeRelatorioGlobal && r.modeloDeRelatorioGlobal._id != null
-                            ? String(r.modeloDeRelatorioGlobal._id)
-                            : '_sem_modelo';
+                    const idMod = compilador_chaveAgrupamentoModelo(r);
                     if (!grupos.has(idMod)) grupos.set(idMod, []);
                     grupos.get(idMod).push(r);
                 }
@@ -624,9 +767,24 @@ async function processarRelatorios() {
                     await processarGrupoRelatorios(lista, prefixo, relatoriosNaoBaixados);
                 }
             } else {
-                const lista = relatoriosNoPeriodo.filter(
-                    (r) => String(r.modeloDeRelatorioGlobal?._id) === tipoExtrair
+                let lista = relatoriosNoPeriodo.filter((r) =>
+                    compilador_idsModeloNoRelatorio(r).has(String(tipoExtrair).trim())
                 );
+                if (lista.length === 0 && relatoriosNoPeriodo.length) {
+                    const sel = document.querySelector('.container_pdf_filtro #pdf-tipo');
+                    const rotulo =
+                        sel && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]
+                            ? sel.options[sel.selectedIndex].textContent.trim()
+                            : '';
+                    if (rotulo && tipoExtrair !== 'tudo') {
+                        const nd = compilador_normDesc(rotulo);
+                        lista = relatoriosNoPeriodo.filter(
+                            (r) =>
+                                compilador_normDesc(r.modeloDeRelatorioGlobal && r.modeloDeRelatorioGlobal.descricao) ===
+                                nd
+                        );
+                    }
+                }
                 const desc = lista[0]?.modeloDeRelatorioGlobal?.descricao || 'REL';
                 const prefixo = compilador_prefixoArquivoDeModelo(desc);
                 await processarGrupoRelatorios(lista, prefixo, relatoriosNaoBaixados);
@@ -634,7 +792,10 @@ async function processarRelatorios() {
         }
         
         if (relatoriosNaoBaixados.length > 0) {
-            await atualizarStatus(`${relatoriosNaoBaixados.length} relatório(s) não baixado(s). Gerando arquivo HTML com os links...`);
+            await atualizarStatus(
+                `${relatoriosNaoBaixados.length} relatório(s) não baixado(s). Gerando arquivo HTML com os links...`,
+                true
+            );
             const htmlBlob = new Blob([gerarHtmlRelatoriosNaoBaixados(relatoriosNaoBaixados)], { type: 'text/html' });
             const linkHtml = document.createElement('a');
             linkHtml.href = URL.createObjectURL(htmlBlob);
@@ -642,12 +803,8 @@ async function processarRelatorios() {
             linkHtml.click();
         }
         await atualizarStatus("Downloads concluídos");
-        
-        // Gerar lista de relatórios não aprovados se houver
         if (apenasAprovados && relatoriosNaoAprovados.length > 0) {
             await atualizarStatus(`${relatoriosNaoAprovados.length} relatórios não aprovados!!!!`);
-            
-            // Criar arquivo HTML com links clicáveis
             const conteudoHTML = `
 <!DOCTYPE html>
 <html>
@@ -676,11 +833,8 @@ async function processarRelatorios() {
             
             await atualizarStatus(`Download concluído! <br> Mas houveram ${relatoriosNaoAprovados.length} relatórios não aprovados!`);
         }
-        
-        console.log('Processo finalizado.');
     } catch (error) {
         atualizarStatus(`Erro: ${error.message}`);
-        console.error('Erro no processamento:', error);
     } finally {
         btnExtrair.disabled = false;
     }
@@ -703,8 +857,6 @@ if (!window.__compiladorHashchangeModelos) {
         }
     });
 }
-
-// observers pra saber quando o conteiner deve ser criado ou removido
 
 const observerRelatorios = new MutationObserver(() => {
     if (!cardFiltroCreated && PDFExtractorAtivo && window.location.href.includes('/app/notificacoes')) {

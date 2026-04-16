@@ -1,4 +1,7 @@
-const unificador_PDFLib = window.PDFLib; // cria o objeto PDFLib
+const unificador_PDFLib = window.PDFLib;
+// No topo de extrairPDFs.js, substitui a linha do svgCarregando
+
+const svgCarregando = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="20" height="20"><path fill="#000000" stroke="#000000" stroke-width="12" transform-origin="center" d="m148 84.7 13.8-8-10-17.3-13.8 8a50 50 0 0 0-27.4-15.9v-16h-20v16A50 50 0 0 0 63 67.4l-13.8-8-10 17.3 13.8 8a50 50 0 0 0 0 31.7l-13.8 8 10 17.3 13.8-8a50 50 0 0 0 27.5 15.9v16h20v-16a50 50 0 0 0 27.4-15.9l13.8 8 10-17.3-13.8-8a50 50 0 0 0 0-31.7Zm-47.5 50.8a35 35 0 1 1 0-70 35 35 0 0 1 0 70Z"><animateTransform type="rotate" attributeName="transform" calcMode="spline" dur="0.5" values="0;120" keyTimes="0;1" keySplines="0 0 1 1" repeatCount="indefinite"></animateTransform></path></svg>';
 
 function unificador_rdoEmpresaDoStorage() {
     try {
@@ -22,45 +25,38 @@ const unificador_headers = {
 let unificador_PDFExtractorAtivo = true;
 let unificador_cardFiltroCreated = false;
 
-// Função para inicializar o extrator apenas se o servidor estiver disponível
 async function initializePDFExtractor() {
     const available = await isServerAvailable();
     if (!available) {
-        console.log('Servidor indisponível - extrator de PDFs não habilitado');
         return;
     }
 
-    // Load initial state
     chrome.storage.sync.get('PDFExtractor', function (data) {
         unificador_PDFExtractorAtivo = data.PDFExtractor ?? true;
         if (!unificador_PDFExtractorAtivo) {
-            const container = document.querySelector('.container_pdf_filtro');
-            if (container) {
-                container.remove();
+            const cardUnificador = document.getElementById('unificador-status-extracao')?.closest('.container_pdf_filtro');
+            if (cardUnificador) {
+                cardUnificador.remove();
                 unificador_cardFiltroCreated = false;
             }
         }
     });
 }
 
-// Inicializa o extrator
 initializePDFExtractor();
 
-// Message listener
 chrome.runtime.onMessage.addListener(async (mensagem, sender, sendResponse) => {
     if ('PDFExtractor' in mensagem) {
-        // Verifica se o servidor está disponível antes de processar
         const available = await isServerAvailable();
         if (!available) {
-            console.log('Servidor indisponível - mensagem PDFExtractor ignorada');
             return;
         }
 
         unificador_PDFExtractorAtivo = mensagem.PDFExtractor;
         if (!unificador_PDFExtractorAtivo) {
-            const container = document.querySelector('.container_pdf_filtro');
-            if (container) {
-                container.remove();
+            const cardUnificador = document.getElementById('unificador-status-extracao')?.closest('.container_pdf_filtro');
+            if (cardUnificador) {
+                cardUnificador.remove();
                 unificador_cardFiltroCreated = false;
             }
         } else if (window.location.href.match(/obras\/(.*?)\/relatorios$/)) {
@@ -73,15 +69,12 @@ chrome.runtime.onMessage.addListener(async (mensagem, sender, sendResponse) => {
 });
 
 async function unificador_criarCardFiltro() {
-    // Verifica se o servidor está disponível para funcionalidades
     const available = await isServerAvailable();
     if (!available) {
-        console.log('Servidor indisponível - card de filtro não criado');
         return null;
     }
 
     if (!unificador_PDFExtractorAtivo) return null;
-    console.log('Criando card filtro');
     const container = document.createElement('div');
     container.classList = "container_pdf_filtro";
 
@@ -158,12 +151,11 @@ async function unificador_criarCardFiltro() {
     const _crvUnif = container.querySelector('.container');
     if (_crvUnif && typeof complementoRdoMountVersionStrip === 'function') complementoRdoMountVersionStrip(_crvUnif);
 
-    void unificador_preencherSelectModelosRelatorio(container).catch((err) => console.warn('Unificador: modelos', err));
+    void unificador_preencherSelectModelosRelatorio(container).catch(() => {});
 
     container.querySelector('.btn-extrair-pdf').addEventListener('click', unificador_processarRelatorios);
     container.querySelector('.wrapper-container').addEventListener('click', unificador_toggleCard);
 
-    // Lógica de wrap: ao minimizar, só mostra aviso e cabeçalho, o resto some
     let unificador_colapsado = localStorage.getItem('unificador_pdf_card_colapsado') === 'true';
     aplicarEstadoColapsoUnificador(unificador_colapsado);
     container.querySelector('.wrapper-container').addEventListener('click', function (e) {
@@ -225,7 +217,6 @@ function unificador_extrairObraIdDaUrl() {
     return m ? m[1] : null;
 }
 
-/** Preenche o select com modelos retornados em GET /obras/{obraId} (campo modelosDeRelatorios). */
 async function unificador_preencherSelectModelosRelatorio(container) {
     const select = container.querySelector('#unificador-pdf-tipo');
     if (!select) return;
@@ -255,13 +246,17 @@ async function unificador_preencherSelectModelosRelatorio(container) {
         montarSoTodos();
         const seen = new Set();
         for (const modelo of modelos) {
-            if (!modelo || modelo._id == null) continue;
-            const id = String(modelo._id);
-            if (seen.has(id)) continue;
+            if (!modelo) continue;
+            const id = unificador_idModeloParaValorSelect(modelo);
+            if (!id || seen.has(id)) continue;
             seen.add(id);
             const opt = document.createElement('option');
             opt.value = id;
-            opt.textContent = modelo.descricao || modelo.nome || `Modelo ${id}`;
+            opt.textContent =
+                modelo.descricao ||
+                modelo.nome ||
+                (modelo.modeloDeRelatorioGlobal && modelo.modeloDeRelatorioGlobal.descricao) ||
+                `Modelo ${id}`;
             select.appendChild(opt);
         }
         if (modelos.length === 0) {
@@ -272,7 +267,6 @@ async function unificador_preencherSelectModelosRelatorio(container) {
             select.appendChild(hint);
         }
     } catch (e) {
-        console.warn('Unificador: erro ao buscar modelos da obra', e);
         montarSoTodos();
         const hint = document.createElement('option');
         hint.value = '';
@@ -282,28 +276,33 @@ async function unificador_preencherSelectModelosRelatorio(container) {
     }
 }
 
-async function unificador_atualizarStatus(mensagem, contador = null) {
-    const statusElement = document.querySelector('.container_pdf_filtro #unificador-status-extracao');
-    if (!statusElement) return;
+function unificador_montarHtmlStatus(mensagemHtml) {
+    return `<div class="complemento-rdo-status-linha" style="font-size:14px;color:#666;line-height:1.45;width:100%;box-sizing:border-box">${mensagemHtml}</div>`;
+}
 
-    if (contador) {
-        let count = contador;
-        statusElement.textContent = `${mensagem} ${count}`;
+async function unificador_atualizarStatus(mensagem, modoOuContagem = null) {
+    const elementoStatus = document.getElementById('unificador-status-extracao');
+    if (!elementoStatus) return;
 
-        return new Promise(resolve => {
-            const interval = setInterval(() => {
-                count--;
-                statusElement.innerHTML = `${mensagem} ${count} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
+    const texto =
+        typeof mensagem === 'string' ? mensagem : mensagem == null ? '' : String(mensagem);
 
-                if (count <= 0) {
-                    clearInterval(interval);
+    if (typeof modoOuContagem === 'number' && modoOuContagem > 0) {
+        let segundosRestantes = modoOuContagem;
+        elementoStatus.innerHTML = unificador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
+        return new Promise((resolve) => {
+            const intervalo = setInterval(() => {
+                segundosRestantes--;
+                elementoStatus.innerHTML = unificador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
+                if (segundosRestantes <= 0) {
+                    clearInterval(intervalo);
                     resolve();
                 }
             }, 1000);
         });
-    } else {
-        statusElement.innerHTML = `${mensagem} <svg style="padding-bottom: 3px" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_d9Sa{transform-origin:center}.spinner_qQQY{animation:spinner_ZpfF 9s linear infinite}.spinner_pote{animation:spinner_ZpfF .75s linear infinite}@keyframes spinner_ZpfF{100%{transform:rotate(360deg)}}</style><path fill="rgb(127, 140, 141)" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_qQQY" x="11" y="6" rx="1" width="2" height="7"/><rect fill="rgb(127, 140, 141)" class="spinner_d9Sa spinner_pote" x="11" y="11" rx="1" width="2" height="9"/></svg>`;
     }
+
+    elementoStatus.innerHTML = unificador_montarHtmlStatus(texto);
 }
 
 async function unificador_fazerRequisicao(endpoint, params = {}) {
@@ -317,27 +316,100 @@ async function unificador_fazerRequisicao(endpoint, params = {}) {
     return await response.json();
 }
 
-async function unificador_obterRelatoriosObra(obraId, dataInicio, dataFim, ordem, tipoRelatorio) {
+function unificador_normalizarListaRelatorios(response) {
+    if (Array.isArray(response)) return response;
+    if (response && Array.isArray(response.relatorios)) return response.relatorios;
+    if (response && Array.isArray(response.data)) return response.data;
+    return [];
+}
+
+function unificador_relatorioDentroDoPeriodo(rel, dataInicioISO, dataFimISO) {
+    if (!rel || !rel.data) return false;
+    const p = String(rel.data).split('/');
+    if (p.length !== 3) return false;
+    const t = new Date(`${p[2]}-${p[1]}-${p[0]}`);
+    if (Number.isNaN(t.getTime())) return false;
+    const ini = new Date(dataInicioISO);
+    const fim = new Date(dataFimISO);
+    fim.setHours(23, 59, 59, 999);
+    return t >= ini && t <= fim;
+}
+
+function unificador_idModeloParaValorSelect(modeloObra) {
+    if (!modeloObra) return '';
+    const g = modeloObra.modeloDeRelatorioGlobal;
+    if (g && g._id != null) return String(g._id).trim();
+    if (modeloObra._id != null) return String(modeloObra._id).trim();
+    return '';
+}
+
+function unificador_idsModeloNoRelatorio(relatorio) {
+    const ids = new Set();
+    const add = (v) => {
+        if (v == null || v === '') return;
+        const s = String(v).trim();
+        if (s) ids.add(s);
+    };
+    const from = (m) => {
+        if (m == null || m === '') return;
+        if (typeof m === 'string') add(m);
+        else if (typeof m === 'object') {
+            add(m._id);
+            add(m.$oid);
+        }
+    };
+    from(relatorio && relatorio.modeloDeRelatorioGlobal);
+    from(relatorio && relatorio.modeloDeRelatorio);
+    return ids;
+}
+
+function unificador_normDesc(s) {
+    return String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
+}
+
+async function unificador_obterRelatoriosObra(obraId, dataInicio, dataFim, ordem, tipoRelatorio, rotuloModeloSelecionado) {
     const params = {
-        limite: 100,
+        limite: 2000,
         ordem: ordem,
         dataInicio: dataInicio,
         dataFim: dataFim
     };
 
-    const response = await unificador_fazerRequisicao(`obras/${obraId}/relatorios`, params);
+    const raw = await unificador_fazerRequisicao(`obras/${obraId}/relatorios`, params);
+    let lista = unificador_normalizarListaRelatorios(raw);
+    lista = lista.filter((r) => unificador_relatorioDentroDoPeriodo(r, dataInicio, dataFim));
 
     if (tipoRelatorio === '') {
-        return response;
+        return lista;
     }
 
-    const idAlvo = String(tipoRelatorio);
-    return response.filter((relatorio) => {
-        const mid = relatorio.modeloDeRelatorioGlobal && relatorio.modeloDeRelatorioGlobal._id != null
-            ? String(relatorio.modeloDeRelatorioGlobal._id)
-            : '';
-        return mid === idAlvo;
-    });
+    const idModeloAlvo = String(tipoRelatorio).trim();
+    let relatoriosFiltrados = lista.filter((relatorio) =>
+        unificador_idsModeloNoRelatorio(relatorio).has(idModeloAlvo)
+    );
+
+    if (
+        relatoriosFiltrados.length === 0 &&
+        lista.length > 0 &&
+        idModeloAlvo &&
+        rotuloModeloSelecionado &&
+        unificador_normDesc(rotuloModeloSelecionado)
+    ) {
+        const descricaoNormalizadaAlvo = unificador_normDesc(rotuloModeloSelecionado);
+        const porDescricao = lista.filter(
+            (relatorio) =>
+                unificador_normDesc(relatorio.modeloDeRelatorioGlobal && relatorio.modeloDeRelatorioGlobal.descricao) ===
+                descricaoNormalizadaAlvo
+        );
+        if (porDescricao.length > 0) {
+            relatoriosFiltrados = porDescricao;
+        }
+    }
+
+    return relatoriosFiltrados;
 }
 
 async function unificador_obterDetalhesRelatorio(obraId, relatorioId) {
@@ -361,24 +433,31 @@ function unificador_ehPdfValido(buffer) {
     return arr[0] === 0x25 && arr[1] === 0x50 && arr[2] === 0x44 && arr[3] === 0x46 && arr[4] === 0x2D;
 }
 
-// Delay entre requisições para respeitar limite da API (150 req/min)
 const UNIFICADOR_DELAY_ENTRE_REQS_MS = 500;
-const UNIFICADOR_FETCH_TIMEOUT_MS = 300000; // 5 min – antes não havia timeout no código; algo no meio (proxy/servidor) fechava em ~45s–1min
+const UNIFICADOR_FETCH_TIMEOUT_MS = 300000;
 
 function unificador_delay(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 
-function unificador_fetchComTimeout(url, msTimeout) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), msTimeout);
-    return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(id));
+function unificador_fetchComTimeout(urlPdf, milissegundosTimeout) {
+    const controladorAborto = new AbortController();
+    const identificadorTimeout = setTimeout(() => controladorAborto.abort(), milissegundosTimeout);
+    return fetch(urlPdf, {
+        signal: controladorAborto.signal,
+        credentials: 'omit',
+        mode: 'cors',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer-when-downgrade',
+        headers: {
+            Accept: 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
+        },
+    }).finally(() => clearTimeout(identificadorTimeout));
 }
 
-const UNIFICADOR_CONCORRENCIA = 5;
-const UNIFICADOR_MAX_TENTATIVAS = 5;
+const UNIFICADOR_CONCORRENCIA = 2;
+const UNIFICADOR_MAX_TENTATIVAS = 6;
 
-// Função pra fazer o merge com fetch paralelo (limite de concorrência) e lista de falhas
 async function unificador_mergePDFs(pdfItems, statusCallback) {
     const PDFDocument = window.PDFLib.PDFDocument;
     const PdfJuntado = await PDFDocument.create();
@@ -389,15 +468,34 @@ async function unificador_mergePDFs(pdfItems, statusCallback) {
         throw new Error('Nenhum relatório encontrado no período.');
     }
 
+    const emitirStatus = (texto, comIndicadorCarregamento = false) => {
+        if (typeof statusCallback === 'function') {
+            statusCallback(texto, comIndicadorCarregamento);
+        }
+    };
+
+    // Fase 1 (binários na rede): relógio só neste bloco; texto de progresso sem ícone
+    emitirStatus(
+        pdfItems.length === 1
+            ? 'Obtendo binário do PDF no servidor...'
+            : `Obtendo binários dos PDFs (${pdfItems.length} relatórios)... ${svgCarregando}`,
+        true
+    );
+
     const baixarUm = async (index) => {
         const item = pdfItems[index];
         const numRelatorio = index + 1;
         for (let tentativa = 1; tentativa <= UNIFICADOR_MAX_TENTATIVAS; tentativa++) {
-            statusCallback(tentativa === 1 ? `Baixando PDF ${numRelatorio} de ${pdfItems.length}` : `Relatório ${numRelatorio} erro. Tentativa ${tentativa}/${UNIFICADOR_MAX_TENTATIVAS}...`);
+            emitirStatus(
+                tentativa === 1
+                    ? `Relatório ${numRelatorio}/${pdfItems.length} obtendo binário... ${svgCarregando}`
+                    : `Relatório ${numRelatorio} nova tentativa ${tentativa}/${UNIFICADOR_MAX_TENTATIVAS}...`,
+                false
+            );
             try {
                 const response = await unificador_fetchComTimeout(item.url, UNIFICADOR_FETCH_TIMEOUT_MS);
                 if (response.status === 429) {
-                    statusCallback('Limite da API (150/min). Aguardando 1 minuto...');
+                    await unificador_atualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
                     await unificador_delay(60000);
                     tentativa--;
                     continue;
@@ -418,7 +516,10 @@ async function unificador_mergePDFs(pdfItems, statusCallback) {
             } catch (e) {
                 const msgErro = e.name === 'AbortError' ? 'timeout' : 'erro na requisição';
                 if (tentativa < UNIFICADOR_MAX_TENTATIVAS) {
-                    statusCallback(`Relatório ${numRelatorio} ${msgErro}. Tentativa ${tentativa}/${UNIFICADOR_MAX_TENTATIVAS}...`);
+                    emitirStatus(
+                        `Relatório ${numRelatorio} ${msgErro}. Tentativa ${tentativa}/${UNIFICADOR_MAX_TENTATIVAS}... ${svgCarregando}`,
+                        false
+                    );
                     await unificador_delay(2000);
                 } else {
                     falhas.push({ obraId: item.obraId, relatorioId: item.relatorioId });
@@ -435,10 +536,15 @@ async function unificador_mergePDFs(pdfItems, statusCallback) {
         await Promise.all(chunk);
     }
 
-    statusCallback('Montando PDF na ordem...');
+    // Fase 2 (mesclagem local): relógio só neste bloco
+    emitirStatus('Mesclando binários em um único PDF...', true);
+    const totalValidos = resultados.filter(Boolean).length;
+    let ordemUniao = 0;
     for (let i = 0; i < resultados.length; i++) {
         if (!resultados[i]) continue;
-        const pdfDoc = await PDFDocument.load(resultados[i]);
+        ordemUniao++;
+        emitirStatus(`Unindo origem ${ordemUniao}/${totalValidos}... ${svgCarregando}`, false);
+        const pdfDoc = await PDFDocument.load(resultados[i], { ignoreEncryption: true });
         const paginas = await PdfJuntado.copyPages(pdfDoc, pdfDoc.getPageIndices());
         paginas.forEach(p => PdfJuntado.addPage(p));
     }
@@ -447,7 +553,7 @@ async function unificador_mergePDFs(pdfItems, statusCallback) {
         throw new Error('Nenhum PDF válido obtido. Os links dos relatórios podem estar indisponíveis, ter expirado (timeout) ou a API pode ter atingido o limite de 150 requisições/minuto.');
     }
     if (falhas.length > 0) {
-        statusCallback(`${falhas.length} relatório(s) não baixado(s). Foi gerado um arquivo HTML com os links.`);
+        emitirStatus(`${falhas.length} relatório(s) sem binário válido. Foi gerado um arquivo HTML com os links. ${svgCarregando}`, false);
     }
     return { mergedBytes: await PdfJuntado.save(), falhas };
 }
@@ -461,8 +567,12 @@ ${falhas.map(f => `<p><a href="${base}/${f.obraId}/relatorios/${f.relatorioId}" 
 </body></html>`;
 }
 
+
+
 async function unificador_processarRelatorios() {
-    const card = document.querySelector('.container_pdf_filtro');
+    const card =
+        document.getElementById('unificador-pdf-tipo')?.closest('.container_pdf_filtro') ||
+        document.getElementById('unificador-status-extracao')?.closest('.container_pdf_filtro');
     const btnExtrair = card && card.querySelector('.btn-extrair-pdf');
     try {
         if (!window.PDFLib) {
@@ -489,15 +599,31 @@ async function unificador_processarRelatorios() {
             throw new Error('Selecione as datas de início e fim');
         }
 
-        await unificador_atualizarStatus("Buscando relatórios");
-        const tipo = card.querySelector('#unificador-pdf-tipo').value;
-        const relatorios = await unificador_obterRelatoriosObra(obraId, dataInicio, dataFim, ordem, tipo);
+        await unificador_atualizarStatus('Buscando todas as obras...', true);
+        const modeloRelatorioSelect = card.querySelector('#unificador-pdf-tipo');
+        const tipoModeloValor = modeloRelatorioSelect ? modeloRelatorioSelect.value : '';
+        const opcaoSelecionada =
+            modeloRelatorioSelect &&
+            modeloRelatorioSelect.selectedIndex >= 0 &&
+            modeloRelatorioSelect.options[modeloRelatorioSelect.selectedIndex]
+                ? modeloRelatorioSelect.options[modeloRelatorioSelect.selectedIndex]
+                : null;
+        const textoModeloSelecionado = opcaoSelecionada ? opcaoSelecionada.textContent.trim() : '';
+        const relatorios = await unificador_obterRelatoriosObra(
+            obraId,
+            dataInicio,
+            dataFim,
+            ordem,
+            tipoModeloValor,
+            textoModeloSelecionado
+        );
 
-        await unificador_atualizarStatus(`Encontrados ${relatorios.length} relatórios`, 2);
+        await unificador_atualizarStatus(`Encontrados ${relatorios.length} relatórios`);
 
         const pdfItems = [];
         for (let index = 0; index < relatorios.length; index++) {
-            await unificador_atualizarStatus(`Buscando link ${index + 1}/${relatorios.length}`);
+        await unificador_atualizarStatus(`Buscando relatório ${index + 1} de ${relatorios.length}... ${svgCarregando}`);
+        
             let detalhes;
             for (let tentativa = 0; ; tentativa++) {
                 try {
@@ -505,21 +631,27 @@ async function unificador_processarRelatorios() {
                     break;
                 } catch (err) {
                     if (err.message && err.message.includes('429') && tentativa < 3) {
-                        await unificador_atualizarStatus('Limite da API (150/min). Aguardando 1 minuto...');
+                        await unificador_atualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
                         await unificador_delay(60000);
                     } else throw err;
                 }
             }
+
             pdfItems.push({ url: detalhes.linkPdf, obraId, relatorioId: relatorios[index]._id });
             if (index < relatorios.length - 1) await unificador_delay(UNIFICADOR_DELAY_ENTRE_REQS_MS);
+        
+     
         }
 
-        await unificador_atualizarStatus("Preparando mesclagem", 2);
-        const { mergedBytes, falhas } = await unificador_mergePDFs(pdfItems, msg => unificador_atualizarStatus(msg));
+        await unificador_atualizarStatus('Preparando mesclagem de binários...', true);
+        const { mergedBytes, falhas } = await unificador_mergePDFs(pdfItems, (texto, comIndicador) => {
+            if (comIndicador === true) return unificador_atualizarStatus(String(texto), true);
+            return unificador_atualizarStatus(String(texto));
+        });
 
         const nomeObra = await unificador_obterNomeObra(obraId);
 
-        await unificador_atualizarStatus("Finalizando download", 2);
+        await unificador_atualizarStatus('Finalizando download');
         const blob = new Blob([mergedBytes], { type: 'application/pdf' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -544,9 +676,9 @@ async function unificador_processarRelatorios() {
 if (!window.__unificadorHashchangeModelos) {
     window.__unificadorHashchangeModelos = true;
     window.addEventListener('hashchange', () => {
-        const c = document.querySelector('.container_pdf_filtro');
-        if (c && unificador_extrairObraIdDaUrl()) {
-            void unificador_preencherSelectModelosRelatorio(c).catch(() => {});
+        const cardUnificador = document.getElementById('unificador-pdf-tipo')?.closest('.container_pdf_filtro');
+        if (cardUnificador && unificador_extrairObraIdDaUrl()) {
+            void unificador_preencherSelectModelosRelatorio(cardUnificador).catch(() => {});
         }
     });
 }
@@ -560,9 +692,9 @@ const unificador_observerRelatorios = new MutationObserver(() => {
 
 const unificador_observerNaoRelatorios = new MutationObserver(() => {
     if (unificador_cardFiltroCreated && !window.location.href.match(/obras\/(.*?)\/relatorios$/)) {
-        const cardFiltro = document.querySelector('.container_pdf_filtro');
-        if (cardFiltro) {
-            cardFiltro.remove();
+        const cardUnificador = document.getElementById('unificador-status-extracao')?.closest('.container_pdf_filtro');
+        if (cardUnificador) {
+            cardUnificador.remove();
             unificador_cardFiltroCreated = false;
         }
     }

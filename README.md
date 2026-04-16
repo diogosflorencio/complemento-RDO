@@ -13,6 +13,16 @@ Diogo, sempre à disposição.
 
 ---
 
+## Versão [2.2], correções e melhorias
+
+- **Correções de bugs** e **melhorias na interface**.
+- **Novo script de carregamento** (`complemento-rdo-spinner.js`) incluído no carregamento da página, com SVG de status reutilizável.
+- **Extração de dados**: ajustes na lógica de requisições e no fluxo do Compilador/Unificador.
+- **Limpeza de código**: remoção de elementos desnecessários e melhor legibilidade onde foi refatorado.
+- **Unificador (por obra)**: indicador de carregamento persistente (`unificador_relogio`), ícone separado do texto de status (sem piscar nem `"undefined"`); mensagem “Buscando relatórios…” corrigida.
+
+---
+
 ## Versão [2.1], correções e ajustes
 
 Versão focada em **correção** de bugs e em pequenos ajustes de fluxo.

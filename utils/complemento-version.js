@@ -3,7 +3,7 @@
  * O background grava em chrome.storage.local a versão informada pelo JSON de status (GitHub raw).
  */
 (function complementoRdoVersionModule() {
-  const COMPLEMENTO_RDO_VERSION = '2.1';
+  const COMPLEMENTO_RDO_VERSION = '2.2';
   const COMPLEMENTO_RDO_STORE_URL =
     'https://chromewebstore.google.com/detail/complemento-rdo/ifcagjkbngilbhannhibomnniipoannd';
 
