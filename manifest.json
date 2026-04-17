@@ -8,7 +8,7 @@
    },
    "content_scripts": [ {
       "css": [  ],
-      "js": [ "utils/server-check.js", "utils/complemento-version.js", "utils/complemento-rdo-spinner.js", "inicio/dashboard-inicio.js", "extrair-pdfs/complemento-card-layout.js", "tema-dark/tema/tema.js", "tema-dark/tema_dark.js", "RDO/card_rdo_hh.js", "RDO/card_rdo_hh_linha_a_linha.js", "RSP/scripts/rsp_script.js", "atalhos/atalhos.js", "atalhos/card_atalhos.js", "extrair-pdfs/lib-extrator.js", "extrair-pdfs/sheetjs.js", "extrair-pdfs/extrairPDFsRelatorios.js", "extrair-pdfs/conteiner.js", "extrair-pdfs/extrairPDFs.js", "extrair-pdfs/extrairDadosRelatorios.js", "relatorios/relatorios.js", "relatorios/scroll.js" ],
+      "js": [ "utils/server-check.js", "utils/complemento-version.js",  "inicio/dashboard-inicio.js", "extrair-pdfs/complemento-card-layout.js", "tema-dark/tema/tema.js", "tema-dark/tema_dark.js", "RDO/card_rdo_hh.js", "RDO/card_rdo_hh_linha_a_linha.js", "RSP/scripts/rsp_script.js", "atalhos/atalhos.js", "atalhos/card_atalhos.js", "extrair-pdfs/lib-extrator.js", "extrair-pdfs/sheetjs.js", "extrair-pdfs/extrairPDFsRelatorios.js", "extrair-pdfs/conteiner.js", "extrair-pdfs/extrairPDFs.js", "extrair-pdfs/extrairDadosRelatorios.js", "relatorios/relatorios.js", "relatorios/scroll.js" ],
       "matches": [ "*://web.diariodeobra.app/*" ],
       "run_at": "document_idle"
    } ],
@@ -23,6 +23,6 @@
    "permissions": [ "activeTab", "storage","sidePanel"],
    "short_name": "Complemento RDO",
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "2.2",
-   "version_name": "2.2 - correções, interface e extração"
+   "version": "2.3",
+   "version_name": "2.3 - correções, interface e extração"
 }

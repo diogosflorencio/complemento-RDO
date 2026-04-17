@@ -13,6 +13,14 @@ Diogo, sempre à disposição.
 
 ---
 
+## Versão [2.3], correções e melhorias
+- **Correções de bugs** e **Spinner no lugar errado**.
+
+-
+
+
+---
+
 ## Versão [2.2], correções e melhorias
 
 - **Correções de bugs** e **melhorias na interface**.
