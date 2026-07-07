@@ -23,6 +23,6 @@
    "permissions": [ "activeTab", "storage","sidePanel"],
    "short_name": "Complemento RDO",
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "2.3",
-   "version_name": "2.3 - correções, interface e extração"
+   "version": "2.4",
+   "version_name": "2.4 - extração de saldos"
 }

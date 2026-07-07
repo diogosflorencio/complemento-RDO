@@ -13,11 +13,14 @@ Diogo, sempre à disposição.
 
 ---
 
+## Versão [2.4] - extração de saldos
+
+Vamos fazer um sistema de extração de saldos da lista de tarefas de todas as obras no contexto da extensão, de modo a possibilitar pelo usuário a extração de todos os saldos (totais, abertos e preenchidos). Também vamos possibilitar a extração em Excel para usar em BI. Irei usar a API do Diário de Obra e técnicas já desenvolvidas de extração e forma de fazer requisição sem ultrapassar os limites da plataforma.
+
+---
+
 ## Versão [2.3], correções e melhorias
 - **Correções de bugs** e **Spinner no lugar errado**.
-
--
-
 
 ---
 
