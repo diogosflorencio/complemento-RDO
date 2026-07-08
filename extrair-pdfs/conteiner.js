@@ -173,13 +173,13 @@ async function criarCardFiltro() {
                                     ${isSaldos ? '<li>Para cada obra, busca a <b>lista de tarefas completa</b> via API do Diário de Obra.</li>' : ''}
                                     ${isSaldos ? '<li>Extrai <b>saldos, escopo total, realizado e porcentagem</b> de cada etapa e tarefa.</li>' : ''}
                                     ${isSaldos ? '<li>Busca o <b>histórico completo de atualizações</b> de cada tarefa (data, incremento, horas, fotos).</li>' : ''}
-                                    ${isSaldos ? '<li>Gera planilha com <b>4 abas</b>: Saldos (para BI), Cronograma, Histórico e progresso da Obra.</li>' : ''}
+                                    ${isSaldos ? '<li>Gera planilha com <b>5 abas</b>: Saldos (para BI), Cronograma, Histórico, Progresso da Obra e Observações.</li>' : ''}
                                 </ul>
                                 <span style="font-size: 0.85rem; color: #888;">Funciona automaticamente com a API de qualquer empresa/contrato, desde que tenha o token de integração gerado.</span>
                             </div>
                         </div>
                         ${isDados ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">Como há diversos usuarios com diferentes casos de uso, essa funcionalidade (extração de dados), extrairá todos os campos existentes no modelo de relatório e período escolhido.</p>' : ''}
-                        ${isSaldos ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">A extração de saldos busca todos os dados de lista de tarefas de todas as obras filtradas. Organiza por obra, etapa e tarefa, extraindo escopo total, realizado, saldo e histórico completo de atualizações. Os dados são exportados em 4 abas para uso em BI: Saldos, Cronograma, Histórico e progresso da Obra.</p>' : ''}
+                        ${isSaldos ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">A extração de saldos busca todos os dados de lista de tarefas de todas as obras filtradas. Organiza por obra, etapa e tarefa, extraindo escopo total, realizado, saldo e histórico completo de atualizações. Os dados são exportados em 5 abas para uso em BI: Saldos, Cronograma, Histórico, Progresso da Obra e Observações.</p>' : ''}
                     </div>
                 </div>
                 <div class="filtro-content" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">

@@ -170,8 +170,6 @@ async function processarExtracaoSaldos() {
             abaProgressoObra.push({
                 'Obra ID': obra._id || '',
                 'Obra': obra.nome || '',
-                'Código OM': obra.codigoOM || '',
-                'Cliente': obra.cliente?.nome || '',
                 'Total Tarefas': listaTarefas.totalTarefas || 0,
                 'Não Iniciadas': listaTarefas.totalTarefasNaoIniciada || 0,
                 'Em Andamento': listaTarefas.totalTarefasEmAndamento || 0,
@@ -224,8 +222,6 @@ async function processarExtracaoSaldos() {
                             abaSaldos.push({
                                 'Obra ID': obra._id || '',
                                 'Obra': obra.nome || '',
-                                'Código OM': obra.codigoOM || '',
-                                'Cliente': obra.cliente?.nome || '',
                                 'Tarefa ID': tarefa._id || '',
                                 'Item Tarefa': tarefa.item || '',
                                 'Nome Tarefa': tarefa.descricao || '',
@@ -259,8 +255,6 @@ async function processarExtracaoSaldos() {
                                             abaHistorico.push({
                                                 'Obra ID': obra._id || '',
                                                 'Obra': obra.nome || '',
-                                                'Código OM': obra.codigoOM || '',
-                                                'Cliente': obra.cliente?.nome || '',
                                                 'Etapa': etapa.descricao || '',
                                                 'Item Etapa': etapa.item || '',
                                                 'Tarefa': tarefa.descricao || '',
@@ -323,6 +317,25 @@ async function processarExtracaoSaldos() {
             const wsProgressoObra = XLSX.utils.json_to_sheet(abaProgressoObra);
             XLSX.utils.book_append_sheet(wb, wsProgressoObra, 'Progresso da Obra');
         }
+        
+        // Aba 5: Observações
+        const textoObs = [
+            ['Observações sobre a estrutura dos dados'],
+            [''],
+            ['Em "Saldos", coloquei o que penso ser a melhor forma de lidar com informação do Excel, repetindo o que se refere ao escopo e colocando em linhas separadas o que é dado para ser trabalhado. Creio que servirá para elaboração de BI.'],
+            [''],
+            ['Em "Cronograma", apenas coloquei os dados na estrutura que a API retorna.'],
+            [''],
+            ['Em "Histórico", não sei se deu muito certo, mas a ideia era criar todo histórico dos dados com base na data de inserção das informações (então repito cada parte de informação quando há uma atualização, de modo que fique o histórico para cada intervalo de tempo).'],
+            [''],
+            ['Em "Progresso", apenas indico a porcentagem para cada obra. Existe uma outra parte da API que retorna isso, então usei.'],
+            [''],
+            ['Basicamente é isso, espero que seja útil.'],
+            [''],
+            ['(Só mais um parêntese: tem informação que não é tão útil, como o ID da obra e da etapa, mas mantive porque pode ser útil. E para finalizar, os dados são extraídos apenas uma vez; essas planilhas são apenas geradas em código com JavaScript usando os dados que armazenamos em arrays vindos de requisições de alguns endpoints da API.)']
+        ];
+        const wsObs = XLSX.utils.aoa_to_sheet(textoObs);
+        XLSX.utils.book_append_sheet(wb, wsObs, 'obs');
         
         XLSX.writeFile(wb, 'saldos_lista_tarefas_complemento_rdo_@diogosflorencio.xlsx');
         await saldosAtualizarStatus('Pronto! Todos os saldos extraídos.');
