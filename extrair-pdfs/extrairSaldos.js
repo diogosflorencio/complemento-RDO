@@ -320,19 +320,17 @@ async function processarExtracaoSaldos() {
         
         // Aba 5: Observações
         const textoObs = [
-            ['Observações sobre a estrutura dos dados'],
+            ['em saldos, coloquei o que penso ser a melhor forma de lidar com informação do excel, repetindo que refere-se ao escopo e colocando em linhas separadas o que é dado pra ser trabalhado, creio que servirá pra elaboração de BI'],
             [''],
-            ['Em "Saldos", coloquei o que penso ser a melhor forma de lidar com informação do Excel, repetindo o que se refere ao escopo e colocando em linhas separadas o que é dado para ser trabalhado. Creio que servirá para elaboração de BI.'],
+            ['em cronograma, apenas coloquei os dados na estruturas que a API retorna.'],
             [''],
-            ['Em "Cronograma", apenas coloquei os dados na estrutura que a API retorna.'],
+            ['Em historico, não sei se deu muito certo, mas a ideia era criar todo historico dos dados com base na data de insersão das infos. (então repido cada parte de info quando há uma atualização de modo que fique o historico pra cada intervalo de tempo)'],
             [''],
-            ['Em "Histórico", não sei se deu muito certo, mas a ideia era criar todo histórico dos dados com base na data de inserção das informações (então repito cada parte de informação quando há uma atualização, de modo que fique o histórico para cada intervalo de tempo).'],
-            [''],
-            ['Em "Progresso", apenas indico a porcentagem para cada obra. Existe uma outra parte da API que retorna isso, então usei.'],
+            ['em progresso, apenas indico a porcentagem pra cada obra. Existe uma outra parte da api que retorna isso, então usei.'],
             [''],
             ['Basicamente é isso, espero que seja útil.'],
             [''],
-            ['(Só mais um parêntese: tem informação que não é tão útil, como o ID da obra e da etapa, mas mantive porque pode ser útil. E para finalizar, os dados são extraídos apenas uma vez; essas planilhas são apenas geradas em código com JavaScript usando os dados que armazenamos em arrays vindos de requisições de alguns endpoints da API.)']
+            ['(só mais um parenteses, tem informação que não é tão util, como o id da obra e da etapa, mas mantive porque pode ser util. E pra finalizar, os dados são extraídos apenas uma vez, essas planilhas é apenas geradas em codigo com javascript usando os dados que amazenos em arrays vindos de reqs de alguns endpoints da api)']
         ];
         const wsObs = XLSX.utils.aoa_to_sheet(textoObs);
         XLSX.utils.book_append_sheet(wb, wsObs, 'obs');
