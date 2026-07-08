@@ -15,7 +15,13 @@ Diogo, sempre à disposição.
 
 ## Versão [2.4] - extração de saldos
 
-Vamos fazer um sistema de extração de saldos da lista de tarefas de todas as obras no contexto da extensão, de modo a possibilitar pelo usuário a extração de todos os saldos (totais, abertos e preenchidos). Também vamos possibilitar a extração em Excel para usar em BI. Irei usar a API do Diário de Obra e técnicas já desenvolvidas de extração e forma de fazer requisição sem ultrapassar os limites da plataforma.
+- **Nova funcionalidade de extração de saldos**: terceira opção no Compilador de Medição (PDFs, Dados, Saldos).
+- **Extração via API**: busca lista completa de tarefas de cada obra, incluindo escopo total, realizado, saldo e porcentagem de conclusão.
+- **Histórico de atualizações**: extrai evolução completa de cada tarefa (data, incremento, horas, fotos, observações).
+- **Exportação em 4 abas**: Saldos (principal para BI), Cronograma Bruto, Histórico e Snapshot da obra.
+- **Novos filtros**: checkbox "Somente obras em andamento" (aplicado aos 3 modos) e "Somente relatórios HH" (modo Dados).
+- **Persistência de filtros**: todos os campos são salvos automaticamente no localStorage e restaurados entre sessões.
+- **Respeita limites da API**: mesmas regras de throttle e pausa (500ms entre requisições, pausa de 1 min a cada 100 requisições).
 
 ---
 

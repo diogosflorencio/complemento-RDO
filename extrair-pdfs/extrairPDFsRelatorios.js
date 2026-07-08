@@ -585,8 +585,10 @@ async function obterObrasPorPeriodo() {
     const dataFimInput = document.getElementById('pdf-data-fim');
     const obrasExcluidasInput = document.getElementById('obras-excluidas');
     const obraEspecificaInput = document.getElementById('obra-especifica');
+    const somenteAndamentoCheckbox = document.getElementById('somente-obras-andamento');
     if (!dataInicioInput || !dataFimInput) return [];
     const tokensSomenteNome = tokensNomeSomenteObras();
+    const somenteAndamento = somenteAndamentoCheckbox ? somenteAndamentoCheckbox.checked : false;
     let siglasExcluidas = [];
     if (obrasExcluidasInput && obrasExcluidasInput.value.trim() !== '') {
         siglasExcluidas = obrasExcluidasInput.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
@@ -613,7 +615,6 @@ async function obterObrasPorPeriodo() {
         }
     }
     return obras.filter(obra => {
-        const statusOk = obra.status && obra.status.descricao && obra.status.descricao.toLowerCase() === 'em andamento';
         const nomeObra = (obra.nome || '').toUpperCase();
         const excluida = siglasExcluidas.some(sigla => nomeObra.includes(sigla));
         if (excluida) {
@@ -622,7 +623,11 @@ async function obterObrasPorPeriodo() {
         if (!obraNomePassaFiltroSomente(nomeObra, tokensSomenteNome)) {
             return false;
         }
-        return statusOk;
+        if (somenteAndamento) {
+            const statusOk = obra.status && obra.status.descricao && obra.status.descricao.toLowerCase() === 'em andamento';
+            return statusOk;
+        }
+        return true;
     });
 }
 

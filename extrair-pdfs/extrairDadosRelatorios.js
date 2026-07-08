@@ -91,6 +91,7 @@ function dadosObraNomePassaFiltroSomente(nomeObraUpper, tokensSomente) {
 async function obterObrasFiltradas() {
     const obrasExcluidasInput = document.getElementById('obras-excluidas');
     const obraEspecificaInput = document.getElementById('obra-especifica');
+    const somenteAndamentoCheckbox = document.getElementById('somente-obras-andamento');
     const tokensSomenteNome = dadosTokensNomeSomenteObras();
     let siglasExcluidas = [];
     if (obrasExcluidasInput && obrasExcluidasInput.value.trim() !== '') {
@@ -100,6 +101,7 @@ async function obterObrasFiltradas() {
     if (obraEspecificaInput && obraEspecificaInput.value.trim() !== '') {
         idsObrasEspecificas = obraEspecificaInput.value.split(',').map(s => s.trim()).filter(Boolean);
     }
+    const somenteAndamento = somenteAndamentoCheckbox ? somenteAndamentoCheckbox.checked : false;
     const obras = await dadosFazerRequisicao('obras');
     if (idsObrasEspecificas.length > 0) {
         let sel = obras.filter(o => idsObrasEspecificas.includes(o._id));
@@ -109,10 +111,15 @@ async function obterObrasFiltradas() {
         return sel;
     }
     return obras.filter(obra => {
-        const statusOk = obra.status && obra.status.descricao && obra.status.descricao.toLowerCase() === 'em andamento';
         const nomeObra = (obra.nome || '').toUpperCase();
         const excluida = siglasExcluidas.some(sigla => nomeObra.includes(sigla));
-        return statusOk && !excluida && dadosObraNomePassaFiltroSomente(nomeObra, tokensSomenteNome);
+        if (excluida) return false;
+        if (!dadosObraNomePassaFiltroSomente(nomeObra, tokensSomenteNome)) return false;
+        if (somenteAndamento) {
+            const statusOk = obra.status && obra.status.descricao && obra.status.descricao.toLowerCase() === 'em andamento';
+            return statusOk;
+        }
+        return true;
     });
 }
 
@@ -187,7 +194,11 @@ async function processarExtracaoDados() {
                     }
                 }
                 // Mão de obra personalizada (aba HH)
-                if ((obra.nome || '').toUpperCase().includes('HH') && detalhes.maoDeObra && Array.isArray(detalhes.maoDeObra.personalizada)) {
+                const somenteHHCheckbox = document.getElementById('somente-relatorios-hh');
+                const somenteHH = somenteHHCheckbox ? somenteHHCheckbox.checked : false;
+                const contemHH = (obra.nome || '').toUpperCase().includes('HH');
+                
+                if (somenteHH && contemHH && detalhes.maoDeObra && Array.isArray(detalhes.maoDeObra.personalizada)) {
                     for (let pessoa of detalhes.maoDeObra.personalizada) {
                         maoDeObraHH.push({
                             'Data': relatorio.data || '', // Coluna A

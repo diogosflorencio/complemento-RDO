@@ -26,8 +26,89 @@ async function criarCardFiltro() {
     const container = document.createElement('div');
     container.classList = "container_pdf_filtro";
 
+    // Funções para salvar/restaurar valores dos campos
+    function salvarValoresFiltros() {
+        const valores = {
+            dataInicio: document.getElementById('pdf-data-inicio')?.value || '',
+            dataFim: document.getElementById('pdf-data-fim')?.value || '',
+            ordem: document.getElementById('pdf-ordem')?.value || 'desc',
+            tipo: document.getElementById('pdf-tipo')?.value || 'tudo',
+            obrasExcluidas: document.getElementById('obras-excluidas')?.value || '',
+            obrasSomenteNome: document.getElementById('obras-somente-nome-contem')?.value || '',
+            obraEspecifica: document.getElementById('obra-especifica')?.value || '',
+            aprovados100: document.getElementById('aprovados-100')?.checked || false,
+            semLimite: document.getElementById('sem-limite')?.checked || false,
+            somenteRelatHH: document.getElementById('somente-relatorios-hh')?.checked || false,
+            somenteObrasAndamento: document.getElementById('somente-obras-andamento')?.checked || false
+        };
+        localStorage.setItem('complementoRDO_filtros', JSON.stringify(valores));
+    }
+
+    function restaurarValoresFiltros() {
+        try {
+            const valoresStr = localStorage.getItem('complementoRDO_filtros');
+            if (!valoresStr) return;
+            const valores = JSON.parse(valoresStr);
+            
+            const dataInicio = document.getElementById('pdf-data-inicio');
+            if (dataInicio && valores.dataInicio) dataInicio.value = valores.dataInicio;
+            
+            const dataFim = document.getElementById('pdf-data-fim');
+            if (dataFim && valores.dataFim) dataFim.value = valores.dataFim;
+            
+            const ordem = document.getElementById('pdf-ordem');
+            if (ordem && valores.ordem) ordem.value = valores.ordem;
+            
+            const tipo = document.getElementById('pdf-tipo');
+            if (tipo && valores.tipo) tipo.value = valores.tipo;
+            
+            const obrasExcluidas = document.getElementById('obras-excluidas');
+            if (obrasExcluidas && valores.obrasExcluidas) obrasExcluidas.value = valores.obrasExcluidas;
+            
+            const obrasSomenteNome = document.getElementById('obras-somente-nome-contem');
+            if (obrasSomenteNome && valores.obrasSomenteNome) obrasSomenteNome.value = valores.obrasSomenteNome;
+            
+            const obraEspecifica = document.getElementById('obra-especifica');
+            if (obraEspecifica && valores.obraEspecifica) obraEspecifica.value = valores.obraEspecifica;
+            
+            const aprovados100 = document.getElementById('aprovados-100');
+            if (aprovados100) aprovados100.checked = valores.aprovados100 || false;
+            
+            const semLimite = document.getElementById('sem-limite');
+            if (semLimite) semLimite.checked = valores.semLimite || false;
+            
+            const somenteRelatHH = document.getElementById('somente-relatorios-hh');
+            if (somenteRelatHH) somenteRelatHH.checked = valores.somenteRelatHH || false;
+            
+            const somenteObrasAndamento = document.getElementById('somente-obras-andamento');
+            if (somenteObrasAndamento) somenteObrasAndamento.checked = valores.somenteObrasAndamento || false;
+        } catch (e) {
+            console.warn('Erro ao restaurar filtros:', e);
+        }
+    }
+
+    function adicionarListenersSalvamento() {
+        const campos = [
+            'pdf-data-inicio', 'pdf-data-fim', 'pdf-ordem', 'pdf-tipo',
+            'obras-excluidas', 'obras-somente-nome-contem', 'obra-especifica',
+            'aprovados-100', 'sem-limite', 'somente-relatorios-hh', 'somente-obras-andamento'
+        ];
+        campos.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.type === 'checkbox') {
+                    el.addEventListener('change', salvarValoresFiltros);
+                } else {
+                    el.addEventListener('input', salvarValoresFiltros);
+                }
+            }
+        });
+    }
+
     function renderizarConteudo(modo) {
         const isDados = modo === 'dados';
+        const isSaldos = modo === 'saldos';
+        const isPdf = modo === 'pdf';
         container.innerHTML = `
             <div class="container compilador-medicacao-card complemento-card-fixo" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; box-sizing: border-box; background: rgb(255, 255, 255); padding: 20px; border-radius: 8px; border: 2px solid black; box-shadow: rgb(0, 0, 0) 4px 4px; font-family: Arial, sans-serif; content-align: center; flex-direction: column; gap: 10px; font-size: 14px;">
                
@@ -58,10 +139,11 @@ async function criarCardFiltro() {
                     " onfocus="this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');" onblur="this.style.setProperty('outline', 'none', 'important'); this.style.setProperty('box-shadow', 'none', 'important');">
                 </div>
                 <div class="modo-switch-wrap">
-                    <div id="modo-switch" class="modo-switch ${isDados ? 'dados' : 'pdf'}" style="width: 120px; height: 30px; position: relative;">
+                    <div id="modo-switch" class="modo-switch ${isPdf ? 'pdf' : isDados ? 'dados' : 'saldos'}" style="width: 180px; height: 30px; position: relative;">
                         <div class="modo-switch-slider"></div>
-                        <span id="modo-switch-pdf" class="modo-switch-label${!isDados ? ' selected' : ''}" style="z-index:1;">PDFs</span>
+                        <span id="modo-switch-pdf" class="modo-switch-label${isPdf ? ' selected' : ''}" style="z-index:1;">PDFs</span>
                         <span id="modo-switch-dados" class="modo-switch-label${isDados ? ' selected' : ''}" style="z-index:1;">Dados</span>
+                        <span id="modo-switch-saldos" class="modo-switch-label${isSaldos ? ' selected' : ''}" style="z-index:1; width: 60px;">Saldos</span>
                     </div>
                 </div>
                 <div class="wrapper-container" style="position: absolute; z-index: 99999; top: 3px; left: 15px; width: 25px; margin: 0px; padding: 0px; color: var(--theme-color); cursor: pointer;">
@@ -83,20 +165,26 @@ async function criarCardFiltro() {
                             </div>
                             <div id="wrap-explicacao-content" style="padding: 0 12px 8px 24px; max-height: 180px; overflow-y: auto;">
                                 <ul style="margin: 8px 0 0 0; padding: 0; font-size: 0.90rem;">
-                                    <li>Busca <b>todas as obras</b> e filtra apenas as que estão com status <b>em andamento</b></li>
-                                    <li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos (excluir por sigla no nome, <b>somente</b> obras cujo nome contenha um trecho, só aprovados, etc).</li>
-                                    <li>Mescla os PDFs por <b>modelo de relatório</b> (lista vinda da API por obra); um arquivo por modelo e obra no período, ou só o modelo escolhido.</li>
-                                    <li>Extrai de todos os relatórios as informações do campo <b>Atividades</b> e salva em formato <b>.XLSX</b>.</li>
-                                    <li>(ainda desenvolvendo) Faz a extração exata (linha a linha) de todas as <b>horas</b> dos relatórios que têm "HH" no nome.</li>
+                                    <li>Busca <b>todas as obras</b> conforme filtros definidos (status, siglas excluídas, nome, ID específico)</li>
+                                    ${isPdf ? '<li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido, filtrando conforme os parâmetros definidos.</li>' : ''}
+                                    ${isPdf ? '<li>Mescla os PDFs por <b>modelo de relatório</b> (lista vinda da API por obra); um arquivo por modelo e obra no período, ou só o modelo escolhido.</li>' : ''}
+                                    ${isDados ? '<li>Para cada obra, extrai <b>todos os relatórios</b> do período escolhido e busca informações do campo <b>Atividades</b>.</li>' : ''}
+                                    ${isDados ? '<li>Extrai de todos os relatórios as informações do campo <b>Atividades</b> e <b>Mão de Obra</b> (se habilitado) em formato <b>.XLSX</b>.</li>' : ''}
+                                    ${isSaldos ? '<li>Para cada obra, busca a <b>lista de tarefas completa</b> via API do Diário de Obra.</li>' : ''}
+                                    ${isSaldos ? '<li>Extrai <b>saldos, escopo total, realizado e porcentagem</b> de cada etapa e tarefa.</li>' : ''}
+                                    ${isSaldos ? '<li>Busca o <b>histórico completo de atualizações</b> de cada tarefa (data, incremento, horas, fotos).</li>' : ''}
+                                    ${isSaldos ? '<li>Gera planilha com <b>4 abas</b>: Saldos (para BI), Cronograma, Histórico e progresso da Obra.</li>' : ''}
                                 </ul>
                                 <span style="font-size: 0.85rem; color: #888;">Funciona automaticamente com a API de qualquer empresa/contrato, desde que tenha o token de integração gerado.</span>
                             </div>
                         </div>
                         ${isDados ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">Como há diversos usuarios com diferentes casos de uso, essa funcionalidade (extração de dados), extrairá todos os campos existentes no modelo de relatório e período escolhido.</p>' : ''}
+                        ${isSaldos ? '<p style="margin-top: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f7f7f7; border-radius: 6px; font-size: 0.70rem; color: #444; font-weight: 400;">A extração de saldos busca todos os dados de lista de tarefas de todas as obras filtradas. Organiza por obra, etapa e tarefa, extraindo escopo total, realizado, saldo e histórico completo de atualizações. Os dados são exportados em 4 abas para uso em BI: Saldos, Cronograma, Histórico e progresso da Obra.</p>' : ''}
                     </div>
                 </div>
                 <div class="filtro-content" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
                     <div class="input-group" style="display: flex; flex-direction: column; gap: 8px;">
+                        ${!isSaldos ? `
                         <div style="display: flex; gap: 10px;">
                             <div style="flex: 1;">
                                 <label for="pdf-data-inicio" style="display: block; margin-bottom: 4px; color: #444;">Data Inicial:</label>
@@ -121,7 +209,7 @@ async function criarCardFiltro() {
                                     <option value="tudo">Todos os modelos</option>
                                 </select>
                             </div>
-                        </div>
+                        </div>` : ''}
                         <div>
                             <label for="obras-excluidas" style="display: block; margin-bottom: 4px; color: #444;">Obras excluídas:</label>
                             <input type="text" id="obras-excluidas" class="form-control" placeholder="Ex: M3, TAC, REC" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
@@ -135,19 +223,31 @@ async function criarCardFiltro() {
                             <input type="text" id="obra-especifica" class="form-control" placeholder="Ex: 664b1c7f7b8129706b075bba, 65f481f910388195c3094254" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                         </div>
 
+                        ${!isSaldos ? `
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                             <input type="checkbox" id="aprovados-100" style="margin: 0;">
                             <label for="aprovados-100" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair aprovados</label>
                             <input type="checkbox" id="sem-limite" style="margin: 0;">
                             <label for="sem-limite" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extração ilimitada</label>
+                        </div>` : ''}
+                        
+                        ${isDados ? `
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <input type="checkbox" id="somente-relatorios-hh" style="margin: 0;">
+                            <label for="somente-relatorios-hh" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair M.O apenas de obras com "HH" no nome</label>
+                        </div>` : ''}
+                        
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <input type="checkbox" id="somente-obras-andamento" style="margin: 0;">
+                            <label for="somente-obras-andamento" style="color: #444; margin: 0; font-size: 0.97em; cursor: pointer;">Extrair apenas obras com status "em andamento"</label>
                         </div>
                         
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                         
 
 
-                        <button class="${isDados ? 'btn-extrair-dados' : 'btn-extrair-pdf'}" style="width: 100%; padding: 8px; background: var(--theme-color); color: white; border: 2px solid black; border-radius: 8px; box-shadow: 2px 2px rgb(0, 0, 0); cursor: pointer; margin-top: 5px;">
-                            ${isDados ? 'EXTRAIR DADOS' : 'EXTRAIR PDFs'}
+                        <button class="${isSaldos ? 'btn-extrair-saldos' : isDados ? 'btn-extrair-dados' : 'btn-extrair-pdf'}" style="width: 100%; padding: 8px; background: var(--theme-color); color: white; border: 2px solid black; border-radius: 8px; box-shadow: 2px 2px rgb(0, 0, 0); cursor: pointer; margin-top: 5px;">
+                            ${isSaldos ? 'EXTRAIR SALDOS' : isDados ? 'EXTRAIR DADOS' : 'EXTRAIR PDFs'}
                         </button>
                     </div>
                     <div id="status-extracao" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
@@ -156,8 +256,9 @@ async function criarCardFiltro() {
         `;
         container.querySelector('#modo-switch-pdf').onclick = () => renderizarConteudo('pdf');
         container.querySelector('#modo-switch-dados').onclick = () => renderizarConteudo('dados');
+        container.querySelector('#modo-switch-saldos').onclick = () => renderizarConteudo('saldos');
         const selectTipo = container.querySelector('#pdf-tipo');
-        if (selectTipo) {
+        if (selectTipo && !isSaldos) {
             selectTipo.addEventListener('change', (evento) => {
                 localStorage.setItem('tipoExtrairPDF', evento.target.value);
             });
@@ -166,7 +267,18 @@ async function criarCardFiltro() {
         
 
         
-        if (isDados) {
+        if (isSaldos) {
+            const btnSaldos = container.querySelector('.btn-extrair-saldos');
+            if (btnSaldos) {
+                btnSaldos.addEventListener('click', function () {
+                    if (typeof window.processarExtracaoSaldos === 'function') {
+                        window.processarExtracaoSaldos();
+                    } else {
+                        alert('Função de extração de saldos não carregada!');
+                    }
+                });
+            }
+        } else if (isDados) {
             const btnDados = container.querySelector('.btn-extrair-dados');
             if (btnDados) {
                 btnDados.addEventListener('click', function () {
@@ -204,6 +316,13 @@ async function criarCardFiltro() {
         }
         let colapsado = localStorage.getItem('pdf_card_colapsado') === 'true';
         aplicarEstadoColapso(colapsado);
+        
+        // Restaura valores salvos e adiciona listeners
+        setTimeout(() => {
+            restaurarValoresFiltros();
+            adicionarListenersSalvamento();
+        }, 100);
+        
         container.querySelector('.wrapper-container').addEventListener('click', function (e) {
             e.stopPropagation();
             colapsado = !colapsado;
@@ -295,7 +414,7 @@ async function criarCardFiltro() {
       top: 2px;
       left: 2px;
         margin-right: 2px;
-      width: 50%;
+      width: 33.333%;
       height: 22px;
       background: var(--theme-color);
       border-radius: 16px;
@@ -306,7 +425,10 @@ async function criarCardFiltro() {
       left: 2px;
     }
     .modo-switch.dados .modo-switch-slider {
-      left: 48%;
+      left: 33.333%;
+    }
+    .modo-switch.saldos .modo-switch-slider {
+      left: 65.666%;
     }
 
     `;
