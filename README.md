@@ -13,6 +13,16 @@ Diogo, sempre à disposição.
 
 ---
 
+## Versão [2.5] - Saldos - melhorias
+
+- **Período na extração de saldos**: data inicial e final no modo Saldos do Compilador de Medição.
+- **Modelo de relatório dinâmico**: select igual ao modo PDFs (lista da API). Opção padrão **Todos orçamentos** busca modelos com `orçamento`, `orcamento`, `orçamentos` ou `orcamentos` no nome; também é possível escolher um modelo específico.
+- **Nova aba Orçamento**: atividades com todos os subcampos da API, número, status, primeiro comentário; links da obra e do relatório.
+- **Links nas abas**: cada obra traz `Link Obra`; em Histórico/Orçamento, cada relatório traz `Link Relatório` quando houver ID.
+- Removida a aba `obs`.
+
+---
+
 ## Versão [2.4] - extração de saldos
 
 - **Nova funcionalidade de extração de saldos**: terceira opção no Compilador de Medição (PDFs, Dados, Saldos).

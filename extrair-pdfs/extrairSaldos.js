@@ -25,10 +25,34 @@ const SALDOS_LIMITE_REQS_ANTES_PAUSA = 100;
 let contadorRequisicoesSaldos = 0;
 
 function delaySaldos(ms) {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise((resolve, reject) => {
+        const id = setTimeout(() => {
+            try {
+                if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        }, ms);
+        const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+        if (signal) {
+            const onAbort = () => {
+                clearTimeout(id);
+                const erro = new Error('Extração cancelada pelo usuário.');
+                erro.name = 'ComplementoRdoCancelado';
+                reject(erro);
+            };
+            if (signal.aborted) {
+                onAbort();
+                return;
+            }
+            signal.addEventListener('abort', onAbort, { once: true });
+        }
+    });
 }
 
 async function saldosAntesDeRequisicao() {
+    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
     if (contadorRequisicoesSaldos > 0 && contadorRequisicoesSaldos % SALDOS_LIMITE_REQS_ANTES_PAUSA === 0) {
         await saldosAtualizarStatus('Mais de 100 requisições: aguardando 1 minuto (limite API 150/min)...', 60);
     }
@@ -42,15 +66,26 @@ async function saldosAtualizarStatus(mensagem, contador = null) {
     if (comContagem) {
         let count = contador;
         statusElement.innerHTML = `${mensagem} ${count}`;
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
+            if (typeof complementoRdoLimparCountdown === 'function') complementoRdoLimparCountdown();
             const interval = setInterval(() => {
+                try {
+                    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                } catch (e) {
+                    clearInterval(interval);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
+                    reject(e);
+                    return;
+                }
                 count--;
                 statusElement.innerHTML = `${mensagem} ${count}`;
                 if (count <= 0) {
                     clearInterval(interval);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
                     resolve();
                 }
             }, 1000);
+            if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = interval;
         });
     } else {
         statusElement.innerHTML = `${mensagem}`;
@@ -61,10 +96,13 @@ async function saldosFazerRequisicao(endpoint, params = {}) {
     await saldosAntesDeRequisicao();
     const url = new URL(`${window.API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    let response = await fetch(url, { headers: window.headers });
+    const opts = { headers: window.headers };
+    const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+    if (signal) opts.signal = signal;
+    let response = await fetch(url, opts);
     if (response.status === 429) {
         await saldosAtualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
-        response = await fetch(url, { headers: window.headers });
+        response = await fetch(url, opts);
     }
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
     return await response.json();
@@ -127,6 +165,201 @@ async function obterDetalhesTarefa(obraId, tarefaId) {
     return await saldosFazerRequisicao(`obras/${obraId}/lista-de-tarefas/${tarefaId}`);
 }
 
+function saldosNormTexto(texto) {
+    return String(texto || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+}
+
+function saldosLerFiltroModeloRelatorio() {
+    const el = document.getElementById('pdf-tipo');
+    const valor = el && el.value ? el.value.trim() : '';
+    if (!valor) return localStorage.getItem('tipoExtrairSaldos') || 'todos-orcamentos';
+    return valor;
+}
+
+function saldosModeloContemOrcamento(relatorio) {
+    const descGlobal = saldosNormTexto(relatorio?.modeloDeRelatorioGlobal?.descricao);
+    const descLocal = saldosNormTexto(relatorio?.modeloDeRelatorio?.descricao);
+    const termos = ['orcamento', 'orcamentos'];
+    return termos.some((t) => descGlobal.includes(t) || descLocal.includes(t));
+}
+
+function saldosRelatorioBateModelo(relatorio, tipoSelecionado) {
+    const tipo = String(tipoSelecionado || 'todos-orcamentos').trim();
+    if (!tipo || tipo === 'todos-orcamentos' || tipo === 'tudo') {
+        return saldosModeloContemOrcamento(relatorio);
+    }
+    if (typeof compilador_idsModeloNoRelatorio === 'function') {
+        const ids = compilador_idsModeloNoRelatorio(relatorio);
+        if (ids.has(tipo)) return true;
+    }
+    if (typeof compilador_normDesc === 'function') {
+        const nd = compilador_normDesc(tipo);
+        const g = compilador_normDesc(relatorio?.modeloDeRelatorioGlobal?.descricao);
+        const l = compilador_normDesc(relatorio?.modeloDeRelatorio?.descricao);
+        if (nd && (g === nd || l === nd)) return true;
+    }
+    const descGlobal = saldosNormTexto(relatorio?.modeloDeRelatorioGlobal?.descricao);
+    const descLocal = saldosNormTexto(relatorio?.modeloDeRelatorio?.descricao);
+    const filtro = saldosNormTexto(tipo);
+    return !!(filtro && (descGlobal.includes(filtro) || descLocal.includes(filtro)));
+}
+
+function saldosRelatorioNoPeriodo(relatorio, dataInicio, dataFim) {
+    if (!dataInicio || !dataFim) return true;
+    if (!relatorio?.data) return false;
+    const partes = String(relatorio.data).split('/');
+    if (partes.length !== 3) return false;
+    const [dia, mes, ano] = partes;
+    const dataRelatorio = new Date(`${ano}-${mes}-${dia}`);
+    const inicio = new Date(dataInicio);
+    const fim = new Date(dataFim);
+    fim.setHours(23, 59, 59, 999);
+    return dataRelatorio >= inicio && dataRelatorio <= fim;
+}
+
+function saldosLinkObra(obraId) {
+    if (!obraId) return '';
+    return `https://web.diariodeobra.app/#/app/obras/${obraId}`;
+}
+
+function saldosLinkRelatorio(obraId, relatorioId) {
+    if (!obraId || !relatorioId) return '';
+    return `https://web.diariodeobra.app/#/app/obras/${obraId}/relatorios/${relatorioId}`;
+}
+
+function saldosAchatarAtividade(atividade, prefixo = 'atividade') {
+    const destino = {};
+    function walk(valor, caminho) {
+        if (valor == null) {
+            destino[caminho] = '';
+            return;
+        }
+        if (typeof valor === 'boolean' || typeof valor === 'number' || typeof valor === 'string') {
+            destino[caminho] = valor;
+            return;
+        }
+        if (Array.isArray(valor)) {
+            if (!valor.length) {
+                destino[caminho] = '';
+                return;
+            }
+            if (valor.every((v) => v == null || typeof v !== 'object')) {
+                destino[caminho] = valor.join('; ');
+                return;
+            }
+            destino[caminho] = JSON.stringify(valor);
+            destino[`${caminho}.total`] = valor.length;
+            return;
+        }
+        if (typeof valor === 'object') {
+            const chaves = Object.keys(valor);
+            if (!chaves.length) {
+                destino[caminho] = '';
+                return;
+            }
+            for (const chave of chaves) {
+                walk(valor[chave], `${caminho}.${chave}`);
+            }
+            return;
+        }
+        destino[caminho] = String(valor);
+    }
+    if (atividade == null || typeof atividade !== 'object') {
+        destino[prefixo] = atividade == null ? '' : String(atividade);
+        return destino;
+    }
+    for (const chave of Object.keys(atividade)) {
+        walk(atividade[chave], `${prefixo}.${chave}`);
+    }
+    return destino;
+}
+
+function saldosNormalizarLinhasPlanilha(linhas) {
+    if (!Array.isArray(linhas) || !linhas.length) return linhas;
+    const chaves = [];
+    const visto = new Set();
+    for (const linha of linhas) {
+        for (const k of Object.keys(linha || {})) {
+            if (!visto.has(k)) {
+                visto.add(k);
+                chaves.push(k);
+            }
+        }
+    }
+    return linhas.map((linha) => {
+        const out = {};
+        for (const k of chaves) out[k] = linha && linha[k] != null ? linha[k] : '';
+        return out;
+    });
+}
+
+function saldosPrimeiroComentario(detalhes) {
+    const comentarios = Array.isArray(detalhes?.comentarios) ? detalhes.comentarios : [];
+    for (const comentario of comentarios) {
+        const texto = (comentario?.descricao || '').trim();
+        if (texto) return texto;
+    }
+    return '';
+}
+
+function saldosNormalizarListaRelatorios(resposta) {
+    if (Array.isArray(resposta)) return resposta;
+    if (Array.isArray(resposta?.data)) return resposta.data;
+    if (Array.isArray(resposta?.relatorios)) return resposta.relatorios;
+    return [];
+}
+
+async function obterRelatoriosObraSaldos(obraId, dataInicio, dataFim) {
+    const params = {
+        limite: 2000,
+        ordem: 'desc'
+    };
+    if (dataInicio && dataFim) {
+        params.dataInicio = dataInicio;
+        params.dataFim = dataFim;
+    }
+    const resposta = await saldosFazerRequisicao(`obras/${obraId}/relatorios`, params);
+    return saldosNormalizarListaRelatorios(resposta);
+}
+
+async function obterDetalhesRelatorioSaldos(obraId, relatorioId) {
+    return await saldosFazerRequisicao(`obras/${obraId}/relatorios/${relatorioId}`);
+}
+
+function saldosAdicionarLinhasOrcamento(abaOrcamento, obra, relatorio, detalhes) {
+    const obraId = obra._id || '';
+    const relatorioId = relatorio._id || detalhes?._id || '';
+    const base = {
+        'Obra ID': obraId,
+        'Obra': obra.nome || '',
+        'Link Obra': saldosLinkObra(obraId),
+        'Número': relatorio.numero ?? detalhes?.numero ?? '',
+        'Status (Aprovações intermediárias não são consideradas nem retornadas pelo Diário de Obra)': detalhes?.status?.descricao || relatorio.status?.descricao || '',
+        'Data': relatorio.data || detalhes?.data || '',
+        'Modelo': relatorio.modeloDeRelatorioGlobal?.descricao
+            || detalhes?.modeloDeRelatorio?.descricao
+            || detalhes?.modeloDeRelatorioGlobal?.descricao
+            || '',
+        'Primeiro Comentário (Normalmente o primeiro comentário é o nome do orçamento, não existe outra forma de associar o orçamento à seu escopo na lista de tarefas. Seria interessante se o nome da Etapa da lista de tarefas tivesse o número do relatório de orçamento)': saldosPrimeiroComentario(detalhes),
+        'Link Relatório': saldosLinkRelatorio(obraId, relatorioId)
+    };
+    const atividades = Array.isArray(detalhes?.atividades) ? detalhes.atividades : [];
+    if (!atividades.length) {
+        abaOrcamento.push({ ...base });
+        return;
+    }
+    for (const atividade of atividades) {
+        abaOrcamento.push({
+            ...base,
+            ...saldosAchatarAtividade(atividade, 'atividade')
+        });
+    }
+}
+
 // Função auxiliar para calcular saldo
 function calcularSaldo(quantidadeTotal, realizado) {
     const total = parseFloat(quantidadeTotal) || 0;
@@ -147,7 +380,17 @@ async function processarExtracaoSaldos() {
     try {
         if (btnExtrair) btnExtrair.disabled = true;
         contadorRequisicoesSaldos = 0;
+        if (typeof complementoRdoIniciarControleCancelamento === 'function') {
+            complementoRdoIniciarControleCancelamento();
+        }
         
+        const dataInicio = document.getElementById('pdf-data-inicio')?.value || '';
+        const dataFim = document.getElementById('pdf-data-fim')?.value || '';
+        const tipoModeloSelecionado = saldosLerFiltroModeloRelatorio();
+        if ((dataInicio && !dataFim) || (!dataInicio && dataFim)) {
+            throw new Error('Informe data inicial e final, ou deixe ambas vazias para extrair todos os relatórios.');
+        }
+
         await saldosAtualizarStatus('Iniciando extração de saldos...');
         
         const obras = await obterObrasFiltradas();
@@ -158,10 +401,12 @@ async function processarExtracaoSaldos() {
         let abaCronograma = [];  // Aba 2: Cronograma
         let abaHistorico = [];        // Aba 3: Histórico dos relatórios
         let abaProgressoObra = [];         // Aba 4: Progresso da Obra
+        let abaOrcamento = [];             // Aba 5: Orçamento
         
         const dataExtracao = new Date().toISOString().split('T')[0];
         
         for (let obra of obras) {
+            if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
             await saldosAtualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`);
             
             const listaTarefas = await obterListaDeTarefas(obra._id);
@@ -170,6 +415,7 @@ async function processarExtracaoSaldos() {
             abaProgressoObra.push({
                 'Obra ID': obra._id || '',
                 'Obra': obra.nome || '',
+                'Link Obra': saldosLinkObra(obra._id),
                 'Total Tarefas': listaTarefas.totalTarefas || 0,
                 'Não Iniciadas': listaTarefas.totalTarefasNaoIniciada || 0,
                 'Em Andamento': listaTarefas.totalTarefasEmAndamento || 0,
@@ -185,6 +431,7 @@ async function processarExtracaoSaldos() {
                     abaCronograma.push({
                         'Obra ID': obra._id || '',
                         'Obra': obra.nome || '',
+                        'Link Obra': saldosLinkObra(obra._id),
                         'Etapa ID': etapa._id || '',
                         'Posição': etapa.posicao || '',
                         'Item': etapa.item || '',
@@ -200,6 +447,7 @@ async function processarExtracaoSaldos() {
                             abaCronograma.push({
                                 'Obra ID': obra._id || '',
                                 'Obra': obra.nome || '',
+                                'Link Obra': saldosLinkObra(obra._id),
                                 'Tarefa ID': tarefa._id || '',
                                 'Etapa ID': etapa._id || '',
                                 'Posição': tarefa.posicao || '',
@@ -222,6 +470,7 @@ async function processarExtracaoSaldos() {
                             abaSaldos.push({
                                 'Obra ID': obra._id || '',
                                 'Obra': obra.nome || '',
+                                'Link Obra': saldosLinkObra(obra._id),
                                 'Tarefa ID': tarefa._id || '',
                                 'Item Tarefa': tarefa.item || '',
                                 'Nome Tarefa': tarefa.descricao || '',
@@ -240,6 +489,7 @@ async function processarExtracaoSaldos() {
                             
                             // Aba 3: Histórico dos relatórios - busca detalhes da tarefa
                             if (tarefa._id) {
+                                if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
                                 await delaySaldos(SALDOS_DELAY_ENTRE_REQS_MS);
                                 await saldosAtualizarStatus(`Extraindo histórico da tarefa:<br><b>${tarefa.item} - ${tarefa.descricao.substring(0,30)}...</b>`);
                                 
@@ -251,10 +501,12 @@ async function processarExtracaoSaldos() {
                                             const porcentagemAnterior = relatorio.porcentagemAnterior || 0;
                                             const porcentagemAtual = relatorio.porcentagem || 0;
                                             const incremento = porcentagemAtual - porcentagemAnterior;
+                                            const relatorioId = relatorio._id || relatorio.relatorioId || relatorio.relatorio?._id || '';
                                             
                                             abaHistorico.push({
                                                 'Obra ID': obra._id || '',
                                                 'Obra': obra.nome || '',
+                                                'Link Obra': saldosLinkObra(obra._id),
                                                 'Etapa': etapa.descricao || '',
                                                 'Item Etapa': etapa.item || '',
                                                 'Tarefa': tarefa.descricao || '',
@@ -270,7 +522,8 @@ async function processarExtracaoSaldos() {
                                                 'Unidade': tarefa.controleDeProducao?.unidade || '',
                                                 'Realizado': relatorio.controleDeProducao?.realizado || '',
                                                 'Realizado Anterior': relatorio.controleDeProducao?.realizadoAnterior || '',
-                                                'Acumulado': relatorio.controleDeProducao?.acumulado || ''
+                                                'Acumulado': relatorio.controleDeProducao?.acumulado || '',
+                                                'Link Relatório': saldosLinkRelatorio(obra._id, relatorioId)
                                             });
                                         }
                                     }
@@ -282,9 +535,40 @@ async function processarExtracaoSaldos() {
                     }
                 }
             }
+
+            // Aba Orçamento: relatórios do período cujo modelo contém o filtro informado
+            try {
+                await saldosAtualizarStatus(`Buscando orçamentos:<br><b>${obra.nome.substring(0, 33)}</b>`);
+                const relatorios = await obterRelatoriosObraSaldos(obra._id, dataInicio, dataFim);
+                const relatoriosOrcamento = relatorios.filter(
+                    (r) => saldosRelatorioNoPeriodo(r, dataInicio, dataFim) && saldosRelatorioBateModelo(r, tipoModeloSelecionado)
+                );
+                for (let i = 0; i < relatoriosOrcamento.length; i++) {
+                    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                    const relatorio = relatoriosOrcamento[i];
+                    if (i > 0) await delaySaldos(SALDOS_DELAY_ENTRE_REQS_MS);
+                    await saldosAtualizarStatus(
+                        `Extraindo orçamento ${i + 1}/${relatoriosOrcamento.length}<br><b>${obra.nome.substring(0, 33)}</b>`
+                    );
+                    try {
+                        const detalhes = await obterDetalhesRelatorioSaldos(obra._id, relatorio._id);
+                        saldosAdicionarLinhasOrcamento(abaOrcamento, obra, relatorio, detalhes);
+                    } catch (error) {
+                        console.warn(`Erro ao buscar relatório ${relatorio._id}:`, error);
+                    }
+                }
+            } catch (error) {
+                console.warn(`Erro ao buscar orçamentos da obra ${obra._id}:`, error);
+            }
         }
         
-        if (abaSaldos.length === 0 && abaCronograma.length === 0 && abaHistorico.length === 0 && abaProgressoObra.length === 0) {
+        if (
+            abaSaldos.length === 0 &&
+            abaCronograma.length === 0 &&
+            abaHistorico.length === 0 &&
+            abaProgressoObra.length === 0 &&
+            abaOrcamento.length === 0
+        ) {
             await saldosAtualizarStatus('Nenhum dado encontrado para exportar.');
             return;
         }
@@ -296,52 +580,48 @@ async function processarExtracaoSaldos() {
         
         // Aba 1: Saldos (principal para BI)
         if (abaSaldos.length > 0) {
-            const wsSaldos = XLSX.utils.json_to_sheet(abaSaldos);
+            const wsSaldos = XLSX.utils.json_to_sheet(saldosNormalizarLinhasPlanilha(abaSaldos));
             XLSX.utils.book_append_sheet(wb, wsSaldos, 'Saldos');
         }
         
         // Aba 2: Cronograma
         if (abaCronograma.length > 0) {
-            const wsCronograma = XLSX.utils.json_to_sheet(abaCronograma);
+            const wsCronograma = XLSX.utils.json_to_sheet(saldosNormalizarLinhasPlanilha(abaCronograma));
             XLSX.utils.book_append_sheet(wb, wsCronograma, 'Cronograma');
         }
         
         // Aba 3: Histórico dos relatórios
         if (abaHistorico.length > 0) {
-            const wsHistorico = XLSX.utils.json_to_sheet(abaHistorico);
+            const wsHistorico = XLSX.utils.json_to_sheet(saldosNormalizarLinhasPlanilha(abaHistorico));
             XLSX.utils.book_append_sheet(wb, wsHistorico, 'Histórico');
         }
         
         // Aba 4: Progresso da Obra
         if (abaProgressoObra.length > 0) {
-            const wsProgressoObra = XLSX.utils.json_to_sheet(abaProgressoObra);
+            const wsProgressoObra = XLSX.utils.json_to_sheet(saldosNormalizarLinhasPlanilha(abaProgressoObra));
             XLSX.utils.book_append_sheet(wb, wsProgressoObra, 'Progresso da Obra');
         }
-        
-        // Aba 5: Observações
-        const textoObs = [
-            ['Bruno, como pediu, em saldos, coloquei o que penso ser a melhor forma de lidar com informação do excel, repetindo a informação referente ao contexto (obras e etapas) e colocando em linhas separadas o que são dados a serem trabalhados (tarefas e suas informações), creio que servirá pra elaboração de BI'],
-            [''],
-            ['Em cronograma, apenas coloquei os dados na estrutura que a API retorna.'],
-            [''],
-            ['Em historico, não sei se deu muito certo, mas a ideia era criar todo historico dos dados com base na data de inserção das infos. (então repito cada parte de informação quando há uma atualização de modo que fique o historico pra cada intervalo de tempo)'],
-            [''],
-            ['Em progresso, apenas indico a porcentagem pra cada obra. Existe uma outra parte da api que retorna isso, então usei.'],
-            [''],
-            ['Basicamente é isso, espero que seja útil.'],
-            [''],
-            ['(só mais um parêntese, tem informação que não é tão util, como o id da obra e da etapa, mas mantive porque pode ser util. E pra finalizar, os dados são extraídos apenas uma vez, essas planilhas são apenas geradas em codigo com javascript usando os dados que armazeno em arrays vindos de reqs de alguns endpoints da api. Caso queira, posso apresetar de outras formas. Dados de testes de qualidade também são extraídos. Após sinal positivo quanto à serventia/utilidade, nas proximas atualizações removo essa aba. Até mais!)']
-        ];
-        const wsObs = XLSX.utils.aoa_to_sheet(textoObs);
-        XLSX.utils.book_append_sheet(wb, wsObs, 'obs');
+
+        // Aba 5: Orçamento
+        if (abaOrcamento.length > 0) {
+            const wsOrcamento = XLSX.utils.json_to_sheet(saldosNormalizarLinhasPlanilha(abaOrcamento));
+            XLSX.utils.book_append_sheet(wb, wsOrcamento, 'Orçamento');
+        }
         
         XLSX.writeFile(wb, 'saldos_lista_tarefas_complemento_rdo_@diogosflorencio.xlsx');
         await saldosAtualizarStatus('Pronto! Todos os saldos extraídos.');
         
     } catch (error) {
-        await saldosAtualizarStatus(`Erro: ${error.message}`);
-        console.error('Erro no processamento:', error);
+        if (typeof complementoRdoFoiCancelamento === 'function' && complementoRdoFoiCancelamento(error)) {
+            await saldosAtualizarStatus('Extração cancelada.');
+        } else {
+            await saldosAtualizarStatus(`Erro: ${error.message}`);
+            console.error('Erro no processamento:', error);
+        }
     } finally {
+        if (typeof complementoRdoFinalizarControleCancelamento === 'function') {
+            complementoRdoFinalizarControleCancelamento();
+        }
         if (btnExtrair) btnExtrair.disabled = false;
     }
 }

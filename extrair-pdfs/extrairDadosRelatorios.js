@@ -25,11 +25,35 @@ const DADOS_LIMITE_REQS_ANTES_PAUSA = 100;
 let contadorRequisicoesAPI = 0;
 
 function delay(ms) {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise((resolve, reject) => {
+        const id = setTimeout(() => {
+            try {
+                if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        }, ms);
+        const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+        if (signal) {
+            const onAbort = () => {
+                clearTimeout(id);
+                const erro = new Error('Extração cancelada pelo usuário.');
+                erro.name = 'ComplementoRdoCancelado';
+                reject(erro);
+            };
+            if (signal.aborted) {
+                onAbort();
+                return;
+            }
+            signal.addEventListener('abort', onAbort, { once: true });
+        }
+    });
 }
 
 /** Não usar nome global `antesDeRequisicao`  o Compilador (extrairPDFsRelatorios) declara o seu. */
 async function dadosAntesDeRequisicao() {
+    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
     if (contadorRequisicoesAPI > 0 && contadorRequisicoesAPI % DADOS_LIMITE_REQS_ANTES_PAUSA === 0) {
         await dadosAtualizarStatus('Mais de 100 requisições: aguardando 1 minuto (limite API 150/min)...', 60);
     }
@@ -44,15 +68,26 @@ async function dadosAtualizarStatus(mensagem, contador = null) {
     if (comContagem) {
         let count = contador;
         statusElement.innerHTML = `${mensagem} ${count}`;
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
+            if (typeof complementoRdoLimparCountdown === 'function') complementoRdoLimparCountdown();
             const interval = setInterval(() => {
+                try {
+                    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                } catch (e) {
+                    clearInterval(interval);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
+                    reject(e);
+                    return;
+                }
                 count--;
                 statusElement.innerHTML = `${mensagem} ${count}`;
                 if (count <= 0) {
                     clearInterval(interval);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
                     resolve();
                 }
             }, 1000);
+            if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = interval;
         });
     } else {
         statusElement.innerHTML = `${mensagem}`;
@@ -63,10 +98,13 @@ async function dadosFazerRequisicao(endpoint, params = {}) {
     await dadosAntesDeRequisicao();
     const url = new URL(`${window.API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    let response = await fetch(url, { headers: window.headers });
+    const opts = { headers: window.headers };
+    const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+    if (signal) opts.signal = signal;
+    let response = await fetch(url, opts);
     if (response.status === 429) {
         await dadosAtualizarStatus('Limite da API (150/min). Aguardando 1 minuto...', 60);
-        response = await fetch(url, { headers: window.headers });
+        response = await fetch(url, opts);
     }
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
     return await response.json();
@@ -149,6 +187,9 @@ async function processarExtracaoDados() {
     try {
         if (btnExtrair) btnExtrair.disabled = true;
         contadorRequisicoesAPI = 0;
+        if (typeof complementoRdoIniciarControleCancelamento === 'function') {
+            complementoRdoIniciarControleCancelamento();
+        }
         await dadosAtualizarStatus('Iniciando extração de dados...');
         const dataInicio = document.getElementById('pdf-data-inicio').value;
         const dataFim = document.getElementById('pdf-data-fim').value;
@@ -160,6 +201,7 @@ async function processarExtracaoDados() {
         let atividadesExtraidas = [];
         let maoDeObraHH = [];
         for (let obra of obras) {
+            if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
             await dadosAtualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`);
             const relatorios = await obterRelatoriosObra(obra._id, dataInicio, dataFim, ordem);
             let relatoriosNoPeriodo = relatorios.filter(relatorio => {
@@ -174,6 +216,7 @@ async function processarExtracaoDados() {
                 relatoriosNoPeriodo = relatoriosNoPeriodo.filter(r => r.status && r.status.descricao && r.status.descricao.toLowerCase() === 'aprovado');
             }
             for (let i = 0; i < relatoriosNoPeriodo.length; i++) {
+                if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
                 const relatorio = relatoriosNoPeriodo[i];
                 if (i > 0) await delay(DADOS_DELAY_ENTRE_REQS_MS);
                 await dadosAtualizarStatus(`Extraindo relatório ${i + 1}/${relatoriosNoPeriodo.length} <br><b> (${obra.nome.substring(0,33)}) </b>`);
@@ -255,9 +298,16 @@ async function processarExtracaoDados() {
         XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_@diogosflorencio.xlsx');
         await dadosAtualizarStatus('Pronto! Tudo extraído.');
     } catch (error) {
-        await dadosAtualizarStatus(`Erro: ${error.message}`);
-        console.error('Erro no processamento:', error);
+        if (typeof complementoRdoFoiCancelamento === 'function' && complementoRdoFoiCancelamento(error)) {
+            await dadosAtualizarStatus('Extração cancelada.');
+        } else {
+            await dadosAtualizarStatus(`Erro: ${error.message}`);
+            console.error('Erro no processamento:', error);
+        }
     } finally {
+        if (typeof complementoRdoFinalizarControleCancelamento === 'function') {
+            complementoRdoFinalizarControleCancelamento();
+        }
         if (btnExtrair) btnExtrair.disabled = false;
     }
 }

@@ -67,7 +67,30 @@ function compiladorLog(...args) {
 }
 
 function delay(ms) {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise((resolve, reject) => {
+        const id = setTimeout(() => {
+            try {
+                if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        }, ms);
+        const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+        if (signal) {
+            const onAbort = () => {
+                clearTimeout(id);
+                const erro = new Error('Extração cancelada pelo usuário.');
+                erro.name = 'ComplementoRdoCancelado';
+                reject(erro);
+            };
+            if (signal.aborted) {
+                onAbort();
+                return;
+            }
+            signal.addEventListener('abort', onAbort, { once: true });
+        }
+    });
 }
 
 function ehPdfValido(buffer) {
@@ -79,6 +102,14 @@ function ehPdfValido(buffer) {
 function fetchComTimeout(urlPdf, milissegundosTimeout) {
     const controladorAborto = new AbortController();
     const identificadorTimeout = setTimeout(() => controladorAborto.abort(), milissegundosTimeout);
+    const signalExterno = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+    const onExtAbort = () => {
+        try { controladorAborto.abort(); } catch (_) {}
+    };
+    if (signalExterno) {
+        if (signalExterno.aborted) onExtAbort();
+        else signalExterno.addEventListener('abort', onExtAbort, { once: true });
+    }
     return fetch(urlPdf, {
         signal: controladorAborto.signal,
         credentials: 'omit',
@@ -88,10 +119,14 @@ function fetchComTimeout(urlPdf, milissegundosTimeout) {
         headers: {
             Accept: 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
         },
-    }).finally(() => clearTimeout(identificadorTimeout));
+    }).finally(() => {
+        clearTimeout(identificadorTimeout);
+        if (signalExterno) signalExterno.removeEventListener('abort', onExtAbort);
+    });
 }
 
 async function antesDeRequisicao() {
+    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
     if (contadorRequisicoes > 0 && contadorRequisicoes % LIMITE_REQS_ANTES_PAUSA === 0) {
         await atualizarStatus('Limite de requisição! \nAguardando 1 minuto \n(API 150req/min)...', 60);
     }
@@ -127,15 +162,26 @@ async function atualizarStatus(mensagem, modoOuContagem = null) {
     if (typeof modoOuContagem === 'number' && modoOuContagem > 0) {
         let segundosRestantes = modoOuContagem;
         elementoStatus.innerHTML = compilador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            if (typeof complementoRdoLimparCountdown === 'function') complementoRdoLimparCountdown();
             const intervalo = setInterval(() => {
+                try {
+                    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
+                } catch (e) {
+                    clearInterval(intervalo);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
+                    reject(e);
+                    return;
+                }
                 segundosRestantes--;
                 elementoStatus.innerHTML = compilador_montarHtmlStatus(`${texto} ${segundosRestantes}`);
                 if (segundosRestantes <= 0) {
                     clearInterval(intervalo);
+                    if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = null;
                     resolve();
                 }
             }, 1000);
+            if (window.__complementoRdoExtracao) window.__complementoRdoExtracao.countdownId = intervalo;
         });
     }
 
@@ -147,11 +193,14 @@ async function fazerRequisicao(endpoint, params = {}) {
     const url = new URL(`${API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
     const headers = compiladorHeadersApiAtual();
-    let response = await fetch(url, { headers });
+    const opts = { headers };
+    const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
+    if (signal) opts.signal = signal;
+    let response = await fetch(url, opts);
     if (response.status === 429) {
         compiladorLog('429 no endpoint', endpoint, ', aguardando 1 min');
         await atualizarStatus('Limite da API (150req/min)! \nAguardando 1 minuto...', 60);
-        response = await fetch(url, { headers: compiladorHeadersApiAtual() });
+        response = await fetch(url, { ...opts, headers: compiladorHeadersApiAtual() });
     }
     if (!response.ok) {
         compiladorLog('Erro HTTP', endpoint, response.status);
@@ -377,16 +426,28 @@ async function compiladorPopularSelectModelosRelatorio(container) {
     const select = container.querySelector('#pdf-tipo');
     if (!select) return;
 
-    let salvo = localStorage.getItem('tipoExtrairPDF') || 'tudo';
-    if (salvo === 'rdo' || salvo === 'rsp') {
+    const isSaldos = !!(
+        container.querySelector('.modo-switch.saldos') ||
+        container.querySelector('#modo-switch.saldos')
+    );
+    const storageKey = isSaldos ? 'tipoExtrairSaldos' : 'tipoExtrairPDF';
+    const defaultValue = isSaldos ? 'todos-orcamentos' : 'tudo';
+    const defaultLabel = isSaldos ? 'Todos orçamentos' : 'Todos os modelos';
+
+    let salvo = localStorage.getItem(storageKey) || defaultValue;
+    if (!isSaldos && (salvo === 'rdo' || salvo === 'rsp' || salvo === 'todos-orcamentos')) {
         salvo = 'tudo';
-        localStorage.setItem('tipoExtrairPDF', 'tudo');
+        localStorage.setItem(storageKey, 'tudo');
+    }
+    if (isSaldos && (salvo === 'tudo' || salvo === 'rdo' || salvo === 'rsp')) {
+        salvo = 'todos-orcamentos';
+        localStorage.setItem(storageKey, 'todos-orcamentos');
     }
 
     select.innerHTML = '';
     const optTodos = document.createElement('option');
-    optTodos.value = 'tudo';
-    optTodos.textContent = 'Todos os modelos';
+    optTodos.value = defaultValue;
+    optTodos.textContent = defaultLabel;
     select.appendChild(optTodos);
 
     try {
@@ -408,19 +469,21 @@ async function compiladorPopularSelectModelosRelatorio(container) {
                 `Modelo ${idVal}`;
             select.appendChild(opt);
         }
-        const validos = new Set(['tudo', ...modelos.map((m) => compilador_idModeloParaValorSelect(m)).filter(Boolean)]);
-        select.value = validos.has(salvo) ? salvo : 'tudo';
-        if (select.value !== salvo) localStorage.setItem('tipoExtrairPDF', select.value);
+        const validos = new Set([defaultValue, ...modelos.map((m) => compilador_idModeloParaValorSelect(m)).filter(Boolean)]);
+        select.value = validos.has(salvo) ? salvo : defaultValue;
+        if (select.value !== salvo) localStorage.setItem(storageKey, select.value);
     } catch (e) {
         compiladorLog('compiladorPopularSelectModelosRelatorio: ERRO', e);
         if (myGen !== compiladorPopulateSelectGen || !select.isConnected) return;
         const hint = document.createElement('option');
         hint.value = '';
         hint.disabled = true;
-        hint.textContent = 'Não foi possível carregar os modelos; use “Todos os modelos”.';
+        hint.textContent = isSaldos
+            ? 'Não foi possível carregar os modelos; use “Todos orçamentos”.'
+            : 'Não foi possível carregar os modelos; use “Todos os modelos”.';
         select.appendChild(hint);
-        select.value = 'tudo';
-        localStorage.setItem('tipoExtrairPDF', 'tudo');
+        select.value = defaultValue;
+        localStorage.setItem(storageKey, defaultValue);
     }
 }
 
@@ -657,6 +720,9 @@ async function processarRelatorios() {
         }
         btnExtrair.disabled = true;
         contadorRequisicoes = 0;
+        if (typeof complementoRdoIniciarControleCancelamento === 'function') {
+            complementoRdoIniciarControleCancelamento();
+        }
         await atualizarStatus("Iniciando conexão com API", 3);
         const dataInicio = document.getElementById('pdf-data-inicio').value;
         const dataFim = document.getElementById('pdf-data-fim').value;
@@ -675,6 +741,7 @@ async function processarRelatorios() {
         let relatoriosNaoBaixados = [];
         
         for (let obra of obras) {
+            if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
             await atualizarStatus(`Relatórios da obra:<br><b> ${obra.nome.substring(0,33)}</b>`);
             const relatorios = await obterRelatoriosObra(obra._id, dataInicio, dataFim, ordem);
             compiladorLog(
@@ -718,6 +785,7 @@ async function processarRelatorios() {
                 if (!relatoriosGrupo.length) return;
                 const pdfItems = [];
                 for (let index = 0; index < relatoriosGrupo.length; index++) {
+                    if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
                     const relatorio = relatoriosGrupo[index];
                     if (index > 0) await delay(DELAY_ENTRE_REQS_MS);
                     await atualizarStatus(`Processando relatório ${index + 1}/${relatoriosGrupo.length} <br><b> (${obra.nome.substring(0,33)}) ${unificador_svgCarregando} </b>`);
@@ -839,8 +907,15 @@ async function processarRelatorios() {
             await atualizarStatus(`Download concluído! <br> Mas houveram ${relatoriosNaoAprovados.length} relatórios não aprovados!`);
         }
     } catch (error) {
-        atualizarStatus(`Erro: ${error.message}`);
+        if (typeof complementoRdoFoiCancelamento === 'function' && complementoRdoFoiCancelamento(error)) {
+            atualizarStatus('Extração cancelada.');
+        } else {
+            atualizarStatus(`Erro: ${error.message}`);
+        }
     } finally {
+        if (typeof complementoRdoFinalizarControleCancelamento === 'function') {
+            complementoRdoFinalizarControleCancelamento();
+        }
         btnExtrair.disabled = false;
     }
 }
@@ -864,9 +939,13 @@ if (!window.__compiladorHashchangeModelos) {
 }
 
 const observerRelatorios = new MutationObserver(() => {
-    if (!cardFiltroCreated && PDFExtractorAtivo && window.location.href.includes('/app/notificacoes')) {
+    if (!PDFExtractorAtivo || !window.location.href.includes('/app/notificacoes')) return;
+    if (!cardFiltroCreated) {
         criarCardFiltro();
         cardFiltroCreated = true;
+    }
+    if (typeof montarPrototipoIncorporacaoComplementoRDO === 'function') {
+        montarPrototipoIncorporacaoComplementoRDO();
     }
 });
 
@@ -876,6 +955,9 @@ const observerNaoRelatorios = new MutationObserver(() => {
         if (cardFiltro) {
             cardFiltro.remove();
             cardFiltroCreated = false;
+        }
+        if (typeof removerPrototipoIncorporacaoComplementoRDO === 'function') {
+            removerPrototipoIncorporacaoComplementoRDO();
         }
     }
 });
@@ -893,4 +975,7 @@ observerNaoRelatorios.observe(document.body, {
 if (window.location.href.includes('/app/notificacoes') && PDFExtractorAtivo) {
     criarCardFiltro();
     cardFiltroCreated = true;
+    if (typeof agendarPrototipoIncorporacaoComplementoRDO === 'function') {
+        agendarPrototipoIncorporacaoComplementoRDO();
+    }
 }
