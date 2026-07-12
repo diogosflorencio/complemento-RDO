@@ -344,7 +344,7 @@ function saldosAdicionarLinhasOrcamento(abaOrcamento, obra, relatorio, detalhes)
             || detalhes?.modeloDeRelatorio?.descricao
             || detalhes?.modeloDeRelatorioGlobal?.descricao
             || '',
-        'Primeiro Comentário (Normalmente o primeiro comentário é o nome do orçamento, não existe outra forma de associar o orçamento à seu escopo na lista de tarefas. Seria interessante se o nome da Etapa da lista de tarefas tivesse o número do relatório de orçamento)': saldosPrimeiroComentario(detalhes),
+        'Primeiro Comentário (Normalmente o primeiro comentário é o nome do orçamento, não existe outra forma de associar o orçamento ao seu escopo na lista de tarefas. Seria interessante se o nome da Etapa da lista de tarefas tivesse o número do relatório de orçamento)': saldosPrimeiroComentario(detalhes),
         'Link Relatório': saldosLinkRelatorio(obraId, relatorioId)
     };
     const atividades = Array.isArray(detalhes?.atividades) ? detalhes.atividades : [];
