@@ -313,7 +313,7 @@ async function criarCardFiltro() {
                         ${isDados ? `
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
                             <input type="checkbox" id="somente-relatorios-hh" style="margin: 0;">
-                            <label for="somente-relatorios-hh" style="color: #444; margin: 0; font-size: 12px; cursor: pointer;">Extrair M.O apenas de obras com "HH" no nome</label>
+                            <label for="somente-relatorios-hh" style="color: #444; margin: 0; font-size: 12px; cursor: pointer;">Extrair M.O somente de obras com "HH" no nome (desmarcado = todas as obras)</label>
                         </div>` : ''}
                         
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">

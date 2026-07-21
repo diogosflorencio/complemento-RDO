@@ -94,11 +94,97 @@ async function dadosAtualizarStatus(mensagem, contador = null) {
     }
 }
 
+function dadosHeadersApiAtual() {
+    const r = lerRdoEmpresaDoStorage() || window.rdoEmpresa || {};
+    return {
+        token: r.tokenApiExterna || window.tokenApiExterna || '',
+        'Content-Type': 'application/json'
+    };
+}
+
+function dadosNormalizarListaRelatorios(resposta) {
+    if (Array.isArray(resposta)) return resposta;
+    if (Array.isArray(resposta?.relatorios)) return resposta.relatorios;
+    if (Array.isArray(resposta?.data)) return resposta.data;
+    return [];
+}
+
+function dadosPrimeiroComentario(detalhes) {
+    const comentarios = Array.isArray(detalhes?.comentarios) ? detalhes.comentarios : [];
+    for (const comentario of comentarios) {
+        const texto = (comentario?.descricao || '').trim();
+        if (texto) return texto;
+    }
+    return '';
+}
+
+function dadosLinkRelatorio(obraId, relatorioId) {
+    return `https://web.diariodeobra.app/#/app/obras/${obraId}/relatorios/${relatorioId}`;
+}
+
+function dadosExtrairComentarios(detalhes) {
+    const comentarios = Array.isArray(detalhes?.comentarios) ? detalhes.comentarios : [];
+    return comentarios
+        .map(c => (c?.descricao || '').trim())
+        .filter(Boolean);
+}
+
+function dadosExtrairOcorrencias(detalhes) {
+    const ocorrencias = Array.isArray(detalhes?.ocorrencias) ? detalhes.ocorrencias : [];
+    return ocorrencias
+        .map(oc => {
+            const desc = (oc?.descricao || '').trim();
+            if (!desc) return '';
+            const tags = (oc.tags || [])
+                .filter(t => t.checked)
+                .map(t => t.descricao)
+                .filter(Boolean);
+            return tags.length ? `${desc} [${tags.join(', ')}]` : desc;
+        })
+        .filter(Boolean);
+}
+
+function dadosMontarLinhasTextos(relatorio, obra, detalhes) {
+    const comentarios = dadosExtrairComentarios(detalhes);
+    const ocorrencias = dadosExtrairOcorrencias(detalhes);
+    if (!comentarios.length && !ocorrencias.length) return [];
+
+    const relatorioId = relatorio._id || detalhes?._id || '';
+    const tipo = relatorio.modeloDeRelatorioGlobal?.descricao || detalhes?.modeloDeRelatorioGlobal?.descricao || '';
+    const nomeObra = obra.nome || '';
+    const base = {
+        'Obra': [tipo, nomeObra].filter(Boolean).join(', '),
+        'Data': relatorio.data || detalhes?.data || '',
+        'Link': relatorioId ? dadosLinkRelatorio(obra._id, relatorioId) : ''
+    };
+
+    const linhas = [];
+    for (const texto of comentarios) {
+        linhas.push({
+            'Obra': base.Obra,
+            'Data': base.Data,
+            'Comentários': texto,
+            'Ocorrências': '',
+            'Link': base.Link
+        });
+    }
+    for (const texto of ocorrencias) {
+        linhas.push({
+            'Obra': base.Obra,
+            'Data': base.Data,
+            'Comentários': '',
+            'Ocorrências': texto,
+            'Link': base.Link
+        });
+    }
+    return linhas;
+}
+
 async function dadosFazerRequisicao(endpoint, params = {}) {
     await dadosAntesDeRequisicao();
     const url = new URL(`${window.API_BASE_URL}/${endpoint}`);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    const opts = { headers: window.headers };
+    const opts = { headers: dadosHeadersApiAtual() };
     const signal = typeof complementoRdoSignal === 'function' ? complementoRdoSignal() : null;
     if (signal) opts.signal = signal;
     let response = await fetch(url, opts);
@@ -171,7 +257,8 @@ async function obterRelatoriosObra(obraId, dataInicio, dataFim, ordem) {
         dataInicio: dataInicio,
         dataFim: dataFim
     };
-    return await dadosFazerRequisicao(`obras/${obraId}/relatorios`, params);
+    const resposta = await dadosFazerRequisicao(`obras/${obraId}/relatorios`, params);
+    return dadosNormalizarListaRelatorios(resposta);
 }
 
 // Função principal: extrai dados dos relatórios e exporta XLSX
@@ -200,6 +287,7 @@ async function processarExtracaoDados() {
         if (!obras.length) throw new Error('Nenhuma obra encontrada.');
         let atividadesExtraidas = [];
         let maoDeObraHH = [];
+        let textosExtraidos = [];
         for (let obra of obras) {
             if (typeof complementoRdoLancarSeCancelado === 'function') complementoRdoLancarSeCancelado();
             await dadosAtualizarStatus(`Processando obra:<br><b> ${obra.nome.substring(0,33)} </b>`);
@@ -236,46 +324,54 @@ async function processarExtracaoDados() {
                         });
                     }
                 }
-                // Mão de obra personalizada (aba HH)
+                // Mão de obra personalizada (aba HH / linha a linha)
                 const somenteHHCheckbox = document.getElementById('somente-relatorios-hh');
-                const somenteHH = somenteHHCheckbox ? somenteHHCheckbox.checked : false;
+                const filtrarSomenteObrasHH = somenteHHCheckbox ? somenteHHCheckbox.checked : false;
                 const contemHH = (obra.nome || '').toUpperCase().includes('HH');
-                
-                if (somenteHH && contemHH && detalhes.maoDeObra && Array.isArray(detalhes.maoDeObra.personalizada)) {
+                const extrairMaoDeObra = !filtrarSomenteObrasHH || contemHH;
+
+                if (extrairMaoDeObra && detalhes.maoDeObra && Array.isArray(detalhes.maoDeObra.personalizada)) {
+                    const primeiroComentario = dadosPrimeiroComentario(detalhes);
                     for (let pessoa of detalhes.maoDeObra.personalizada) {
                         maoDeObraHH.push({
-                            'Data': relatorio.data || '', // Coluna A
-                            'Nome': pessoa.nome || '',     // Coluna D
-                            'Funcao': pessoa.funcao || '', // Coluna E
-                            'HoraInicio': pessoa.horaInicio || '', // Coluna F
-                            'HoraFim': pessoa.horaFim || '',       // Coluna G
-                            'Intervalo': pessoa.horasIntervalo || '', // Coluna H
-                            'Obra': obra.nome || ''        // Coluna P
+                            'Data': relatorio.data || '',
+                            'Nome': pessoa.nome || '',
+                            'Funcao': pessoa.funcao || '',
+                            'HoraInicio': pessoa.horaInicio || '',
+                            'HoraFim': pessoa.horaFim || '',
+                            'Intervalo': pessoa.horasIntervalo || '',
+                            'Primeiro Comentário': primeiroComentario,
+                            'Obra': obra.nome || ''
                         });
                     }
                 }
+
+                textosExtraidos.push(...dadosMontarLinhasTextos(relatorio, obra, detalhes));
             }
         }
-        if (atividadesExtraidas.length === 0 && maoDeObraHH.length === 0) {
-            await dadosAtualizarStatus('Nenhuma atividade ou mão de obra encontrada para exportar.');
+        if (atividadesExtraidas.length === 0 && maoDeObraHH.length === 0 && textosExtraidos.length === 0) {
+            await dadosAtualizarStatus('Nenhuma atividade, mão de obra ou texto encontrado para exportar.');
             return;
         }
         await dadosAtualizarStatus('Compilando dados e gerando o arquivo .xlsx');
-        const ws = XLSX.utils.json_to_sheet(atividadesExtraidas);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
+        if (atividadesExtraidas.length > 0) {
+            const ws = XLSX.utils.json_to_sheet(atividadesExtraidas);
+            XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
+        }
         // Se houver dados de HH, cria a aba HH com colunas específicas
         if (maoDeObraHH.length > 0) {
             const dadosHHParaPlanilha = [
                 // Cabeçalho - Linha 1
                 [
-                    'Data', // A
-                    'Nome', // B
-                    'Função', // C
-                    'Hora de Entrada', // D
-                    'Hora de Saída', // E
-                    'Intervalo', // F
-                    'Obra', // G
+                    'Data',
+                    'Nome',
+                    'Função',
+                    'Hora de Entrada',
+                    'Hora de Saída',
+                    'Intervalo',
+                    'Primeiro Comentário',
+                    'Obra',
                 ]
             ];
 
@@ -288,12 +384,17 @@ async function processarExtracaoDados() {
                     item.HoraInicio,
                     item.HoraFim,
                     item.Intervalo,
+                    item['Primeiro Comentário'],
                     item.Obra
                 ]);
             });
 
             const wsHH = XLSX.utils.aoa_to_sheet(dadosHHParaPlanilha);
             XLSX.utils.book_append_sheet(wb, wsHH, 'HH');
+        }
+        if (textosExtraidos.length > 0) {
+            const wsTextos = XLSX.utils.json_to_sheet(textosExtraidos);
+            XLSX.utils.book_append_sheet(wb, wsTextos, 'Textos');
         }
         XLSX.writeFile(wb, 'relatorio_geral_atividades_complemento_rdo_@diogosflorencio.xlsx');
         await dadosAtualizarStatus('Pronto! Tudo extraído.');

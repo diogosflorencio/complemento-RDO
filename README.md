@@ -13,6 +13,14 @@ Diogo, sempre à disposição.
 
 ---
 
+## Versão [2.6] - extração de dados
+
+- Correção da mão de obra linha a linha no modo Dados.
+- Aba HH com primeiro comentário do relatório.
+- Nova aba Textos com comentários e ocorrências.
+
+---
+
 ## Versão [2.5] - Saldos - melhorias
 
 - **Período na extração de saldos**: data inicial e final no modo Saldos do Compilador de Medição.
